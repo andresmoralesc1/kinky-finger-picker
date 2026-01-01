@@ -1,6 +1,23 @@
 # Kinky Finger Picker 🌶️
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![React Native](https://img.shields.io/badge/React_Native-20232A?logo=react&logoColor=61DAFB)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo-000020?logo=expo&logoColor=white)](https://expo.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
 A multiplayer party game that combines random finger selection with truth-or-dare style challenges, now with ADVANCED features! Perfect for breaking the ice and heating things up at parties!
+
+> ⚠️ **18+ ADULT CONTENT** - This app contains explicit content. Intended for consenting adults only.
+
+## 📸 Screenshots
+
+<!-- TODO: Add actual screenshots once app is deployed -->
+```
+[Main Menu]  [Gameplay]  [Achievements]  [Question Screen]
+```
+
+*Screenshots coming soon! To add your own, see [CONTRIBUTING.md](CONTRIBUTING.md)*
 
 ## 🎉 What's New - Phase 1 UX/UI Overhaul Complete!
 
@@ -384,11 +401,49 @@ Created with ❤️ for unforgettable parties
 - React Native & Expo
 - Claude Sonnet 4.5 (AI Assistant)
 
-## Support
+## 🤝 Contributing
+
+We welcome contributions! Whether it's:
+- 🐛 Bug reports
+- 💡 Feature requests
+- 🌶️ New questions/dares
+- 📝 Documentation improvements
+- 🎨 UI/UX enhancements
+
+Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting a PR.
+
+### Quick Start for Contributors
+
+```bash
+# Fork and clone the repo
+git clone https://github.com/YOUR_USERNAME/kinky-finger-picker.git
+cd kinky-finger-picker
+
+# Install dependencies
+npm install
+
+# Start development
+npm start
+
+# Run TypeScript checks
+npx tsc --noEmit
+```
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 💬 Support
 
 Found a bug? Want a feature?
-- Open an issue on GitHub
-- DM @neuralflow on social media
+- 🐛 [Report a Bug](https://github.com/andresmoralesc1/kinky-finger-picker/issues/new?template=bug_report.md)
+- 💡 [Request a Feature](https://github.com/andresmoralesc1/kinky-finger-picker/issues/new?template=feature_request.md)
+- 🌶️ [Submit a Question](https://github.com/andresmoralesc1/kinky-finger-picker/issues/new?template=question_submission.md)
+- 💬 [Start a Discussion](https://github.com/andresmoralesc1/kinky-finger-picker/discussions)
+
+## ⭐ Show Your Support
+
+If you like this project, give it a ⭐ on GitHub!
 
 ---
 
