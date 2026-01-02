@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, Alert } from 'react-native';
 import { Settings, QuestionCategory } from '../types';
 
 interface Props {
@@ -7,14 +7,30 @@ interface Props {
   onUpdateSettings: (settings: Settings) => void;
   onBack: () => void;
   onResetStats: () => void;
+  onOpenCustomQuestions?: () => void;
 }
 
-export default function SettingsScreen({ settings, onUpdateSettings, onBack, onResetStats }: Props) {
+export default function SettingsScreen({ settings, onUpdateSettings, onBack, onResetStats, onOpenCustomQuestions }: Props) {
   const toggleSetting = (key: keyof Settings) => {
     onUpdateSettings({
       ...settings,
       [key]: !settings[key],
     });
+  };
+
+  const handleResetStats = () => {
+    Alert.alert(
+      'Reset Statistics',
+      'Are you sure you want to reset all statistics? This will delete all your session data, but will keep your achievements and XP. This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: onResetStats
+        }
+      ]
+    );
   };
 
   const toggleCategory = (category: QuestionCategory) => {
@@ -157,24 +173,39 @@ export default function SettingsScreen({ settings, onUpdateSettings, onBack, onR
           <Text style={styles.sectionTitle}>Question Categories</Text>
           <Text style={styles.sectionSubtext}>Select which categories to include</Text>
 
-          {(['classic', 'romantic', 'party', 'nsfw'] as QuestionCategory[]).map(category => (
+          {([
+            { id: 'classic' as QuestionCategory, name: 'Classic', desc: 'Traditional truths and dares' },
+            { id: 'romantic' as QuestionCategory, name: 'Romantic', desc: 'Sweet and intimate moments' },
+            { id: 'party' as QuestionCategory, name: 'Party', desc: 'Fun group activities' },
+            { id: 'nsfw' as QuestionCategory, name: 'NSFW', desc: 'Adults only (18+)' },
+          ]).map(category => (
             <TouchableOpacity
-              key={category}
+              key={category.id}
               style={[
                 styles.categoryButton,
-                settings.categories.includes(category) && styles.categoryButtonActive,
+                settings.categories.includes(category.id) && styles.categoryButtonActive,
               ]}
-              onPress={() => toggleCategory(category)}
+              onPress={() => toggleCategory(category.id)}
             >
-              <Text
-                style={[
-                  styles.categoryButtonText,
-                  settings.categories.includes(category) && styles.categoryButtonTextActive,
-                ]}
-              >
-                {category.charAt(0).toUpperCase() + category.slice(1)}
-              </Text>
-              {settings.categories.includes(category) && (
+              <View style={styles.categoryContent}>
+                <Text
+                  style={[
+                    styles.categoryButtonText,
+                    settings.categories.includes(category.id) && styles.categoryButtonTextActive,
+                  ]}
+                >
+                  {category.name}
+                </Text>
+                <Text
+                  style={[
+                    styles.categoryDescription,
+                    settings.categories.includes(category.id) && styles.categoryDescriptionActive,
+                  ]}
+                >
+                  {category.desc}
+                </Text>
+              </View>
+              {settings.categories.includes(category.id) && (
                 <Text style={styles.checkmark}>✓</Text>
               )}
             </TouchableOpacity>
@@ -192,16 +223,24 @@ export default function SettingsScreen({ settings, onUpdateSettings, onBack, onR
             <Text style={styles.actionButtonText}>Show Tutorial Again</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => {/* Navigate to custom questions - will be handled by parent */}}
-          >
-            <Text style={styles.actionButtonText}>Manage Custom Questions</Text>
-          </TouchableOpacity>
+          {onOpenCustomQuestions && (
+            <TouchableOpacity
+              style={[styles.actionButton, styles.customQuestionsButton]}
+              onPress={onOpenCustomQuestions}
+            >
+              <View style={styles.actionButtonContent}>
+                <Text style={styles.actionButtonEmoji}>✏️</Text>
+                <View>
+                  <Text style={styles.actionButtonText}>Manage Custom Questions</Text>
+                  <Text style={styles.actionButtonSubtext}>Add your own dares</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
             style={[styles.actionButton, styles.dangerButton]}
-            onPress={onResetStats}
+            onPress={handleResetStats}
           >
             <Text style={[styles.actionButtonText, styles.dangerButtonText]}>
               Reset Statistics
@@ -253,7 +292,7 @@ const styles = StyleSheet.create({
   },
   sectionSubtext: {
     fontSize: 14,
-    color: '#999',
+    color: '#BBB',
     marginBottom: 15,
   },
   settingRow: {
@@ -271,7 +310,7 @@ const styles = StyleSheet.create({
   },
   settingSubtext: {
     fontSize: 12,
-    color: '#999',
+    color: '#BBB',
     marginTop: 2,
   },
   counter: {
@@ -314,13 +353,24 @@ const styles = StyleSheet.create({
     borderColor: '#FF006E',
     backgroundColor: 'rgba(255,0,110,0.1)',
   },
+  categoryContent: {
+    flex: 1,
+  },
   categoryButtonText: {
     fontSize: 16,
-    color: '#999',
+    color: '#BBB',
   },
   categoryButtonTextActive: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  categoryDescription: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 4,
+  },
+  categoryDescriptionActive: {
+    color: '#BBB',
   },
   checkmark: {
     color: '#FF006E',
@@ -338,6 +388,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  customQuestionsButton: {
+    backgroundColor: 'rgba(255,190,11,0.1)',
+    borderWidth: 2,
+    borderColor: '#FFBE0B',
+  },
+  actionButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+  },
+  actionButtonEmoji: {
+    fontSize: 32,
+  },
+  actionButtonSubtext: {
+    fontSize: 12,
+    color: '#BBB',
+    marginTop: 3,
   },
   dangerButton: {
     backgroundColor: 'rgba(255,0,0,0.1)',

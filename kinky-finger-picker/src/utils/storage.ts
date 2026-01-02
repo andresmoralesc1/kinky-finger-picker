@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GameStats, Settings, Question, UserProgress, Achievement, IntensityLevel, QuestionCategory } from '../types';
+import { GameStats, Settings, Question, UserProgress, Achievement, IntensityLevel, QuestionCategory, DailyChallengeProgress } from '../types';
 import { initializeAchievements } from './achievements';
+import { initializeDailyChallengeProgress } from './dailyChallenges';
 
 const KEYS = {
   STATS: '@kinky_picker_stats',
@@ -8,6 +9,7 @@ const KEYS = {
   CUSTOM_QUESTIONS: '@kinky_picker_custom_questions',
   TUTORIAL_SEEN: '@kinky_picker_tutorial_seen',
   USER_PROGRESS: '@kinky_picker_user_progress',
+  DAILY_CHALLENGES: '@kinky_picker_daily_challenges',
 };
 
 export const defaultSettings: Settings = {
@@ -240,6 +242,36 @@ export const StorageService = {
       await AsyncStorage.setItem(KEYS.USER_PROGRESS, JSON.stringify(defaultUserProgress));
     } catch (error) {
       console.error('Error resetting user progress:', error);
+    }
+  },
+
+  // Daily Challenges
+  async getDailyChallenges(): Promise<DailyChallengeProgress> {
+    try {
+      const data = await AsyncStorage.getItem(KEYS.DAILY_CHALLENGES);
+      if (!data) return initializeDailyChallengeProgress();
+
+      const parsed = JSON.parse(data);
+      return parsed;
+    } catch {
+      return initializeDailyChallengeProgress();
+    }
+  },
+
+  async saveDailyChallenges(progress: DailyChallengeProgress): Promise<void> {
+    try {
+      await AsyncStorage.setItem(KEYS.DAILY_CHALLENGES, JSON.stringify(progress));
+    } catch (error) {
+      console.error('Error saving daily challenges:', error);
+    }
+  },
+
+  async resetDailyChallenges(): Promise<void> {
+    try {
+      const initialized = initializeDailyChallengeProgress();
+      await AsyncStorage.setItem(KEYS.DAILY_CHALLENGES, JSON.stringify(initialized));
+    } catch (error) {
+      console.error('Error resetting daily challenges:', error);
     }
   },
 

@@ -11,13 +11,19 @@ interface Props {
   onOpenSettings?: () => void;
   onOpenStats?: () => void;
   onOpenAchievements?: () => void;
+  onOpenDailyChallenges?: () => void;
 }
 
-export default function ModeSelectionScreen({ onSelectMode, onQuickPlay, onOpenSettings, onOpenStats, onOpenAchievements }: Props) {
+export default function ModeSelectionScreen({ onSelectMode, onQuickPlay, onOpenSettings, onOpenStats, onOpenAchievements, onOpenDailyChallenges }: Props) {
   return (
     <View style={styles.container}>
       {/* Header buttons */}
       <View style={styles.headerButtons}>
+        {onOpenDailyChallenges && (
+          <TouchableOpacity style={styles.iconButton} onPress={onOpenDailyChallenges}>
+            <Text style={styles.iconButtonText}>🎯</Text>
+          </TouchableOpacity>
+        )}
         {onOpenAchievements && (
           <TouchableOpacity style={styles.iconButton} onPress={onOpenAchievements}>
             <Text style={styles.iconButtonText}>🏆</Text>
@@ -43,6 +49,9 @@ export default function ModeSelectionScreen({ onSelectMode, onQuickPlay, onOpenS
           style={styles.quickPlayButton}
           onPress={onQuickPlay}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Quick Play"
+          accessibilityHint="Start a game immediately with Hetero mode and Mild level"
         >
           <LinearGradient
             colors={['#FF006E', '#8338EC']}
@@ -64,6 +73,9 @@ export default function ModeSelectionScreen({ onSelectMode, onQuickPlay, onOpenS
           style={styles.button}
           onPress={() => onSelectMode('hetero')}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Hetero mode"
+          accessibilityHint="Choose Hetero mode with split screen for female and male players"
         >
           <LinearGradient
             colors={['#FF006E', '#FF1744']}
@@ -81,6 +93,9 @@ export default function ModeSelectionScreen({ onSelectMode, onQuickPlay, onOpenS
           style={styles.button}
           onPress={() => onSelectMode('gay')}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Gay mode"
+          accessibilityHint="Choose Gay mode with full screen for male players"
         >
           <LinearGradient
             colors={['#3A86FF', '#8338EC']}
@@ -98,6 +113,9 @@ export default function ModeSelectionScreen({ onSelectMode, onQuickPlay, onOpenS
           style={styles.button}
           onPress={() => onSelectMode('lesbian')}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Lesbian mode"
+          accessibilityHint="Choose Lesbian mode with full screen for female players"
         >
           <LinearGradient
             colors={['#FF6D00', '#FFBE0B']}

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { GameMode, IntensityLevel, Player, Settings, GameStats, Question, PlayerStats, UserProgress, Achievement } from './src/types';
+import { GameMode, IntensityLevel, Player, Settings, GameStats, Question, PlayerStats, UserProgress, Achievement, DailyChallengeProgress } from './src/types';
 import ModeSelectionScreen from './src/screens/ModeSelectionScreen';
 import LevelSelectionScreen from './src/screens/LevelSelectionScreen';
 import GameScreen from './src/screens/GameScreen';
@@ -12,10 +13,12 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import StatsScreen from './src/screens/StatsScreen';
 import CustomQuestionsScreen from './src/screens/CustomQuestionsScreen';
 import AchievementsScreen from './src/screens/AchievementsScreen';
+import DailyChallengesScreen from './src/screens/DailyChallengesScreen';
 import AchievementUnlockedModal from './src/components/AchievementUnlockedModal';
 import { StorageService, defaultSettings, defaultStats, defaultUserProgress } from './src/utils/storage';
 import { soundManager } from './src/utils/sounds';
 import { checkAchievements } from './src/utils/achievements';
+import { isNewDay, resetDailyStats, updateChallengeProgress, getTotalXPReward } from './src/utils/dailyChallenges';
 
 type Screen =
   | 'tutorial'
@@ -26,7 +29,87 @@ type Screen =
   | 'settings'
   | 'stats'
   | 'customQuestions'
-  | 'achievements';
+  | 'achievements'
+  | 'dailyChallenges';
+
+function LoadingScreen() {
+  const spinValue = useRef(new Animated.Value(0)).current;
+  const pulseValue = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    // Rotation animation
+    Animated.loop(
+      Animated.timing(spinValue, {
+        toValue: 1,
+        duration: 2000,
+        useNativeDriver: true,
+      })
+    ).start();
+
+    // Pulse animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseValue, {
+          toValue: 1.2,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseValue, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  return (
+    <View style={loadingStyles.container}>
+      <Animated.View
+        style={[
+          loadingStyles.iconContainer,
+          {
+            transform: [{ rotate: spin }, { scale: pulseValue }],
+          },
+        ]}
+      >
+        <Text style={loadingStyles.icon}>🎲</Text>
+      </Animated.View>
+      <Text style={loadingStyles.title}>Kinky Finger Picker</Text>
+      <Text style={loadingStyles.subtitle}>Loading your game...</Text>
+    </View>
+  );
+}
+
+const loadingStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    marginBottom: 30,
+  },
+  icon: {
+    fontSize: 80,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#FF006E',
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#BBB',
+  },
+});
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('tutorial');
@@ -41,6 +124,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [userProgress, setUserProgress] = useState<UserProgress>(defaultUserProgress);
   const [newlyUnlockedAchievements, setNewlyUnlockedAchievements] = useState<Achievement[]>([]);
+  const [dailyChallenges, setDailyChallenges] = useState<DailyChallengeProgress | null>(null);
 
   // Load data on mount
   useEffect(() => {
@@ -50,18 +134,28 @@ export default function App() {
 
   const loadData = async () => {
     try {
-      const [loadedSettings, loadedStats, loadedCustomQuestions, tutorialSeen, loadedUserProgress] = await Promise.all([
+      const [loadedSettings, loadedStats, loadedCustomQuestions, tutorialSeen, loadedUserProgress, loadedChallenges] = await Promise.all([
         StorageService.getSettings(),
         StorageService.getStats(),
         StorageService.getCustomQuestions(),
         StorageService.getTutorialSeen(),
         StorageService.getUserProgress(),
+        StorageService.getDailyChallenges(),
       ]);
 
       setSettings(loadedSettings);
       setStats(loadedStats);
       setCustomQuestions(loadedCustomQuestions);
       setUserProgress(loadedUserProgress);
+
+      // Check if it's a new day and reset daily challenges if needed
+      if (isNewDay(loadedChallenges.date)) {
+        const resetChallenges = resetDailyStats(loadedChallenges);
+        setDailyChallenges(resetChallenges);
+        await StorageService.saveDailyChallenges(resetChallenges);
+      } else {
+        setDailyChallenges(loadedChallenges);
+      }
 
       // Apply sound settings
       soundManager.setSoundEnabled(loadedSettings.soundEnabled);
@@ -120,6 +214,34 @@ export default function App() {
     await StorageService.saveUserProgress(updatedProgress);
   };
 
+  const updateDailyChallenges = async (statsUpdate: Partial<DailyChallengeProgress['dailyStats']>) => {
+    if (!dailyChallenges) return;
+
+    // Update daily stats
+    const updatedDailyStats = {
+      ...dailyChallenges.dailyStats,
+      ...statsUpdate,
+    };
+
+    // Update challenge progress based on new stats
+    const updatedProgress = updateChallengeProgress(dailyChallenges, updatedDailyStats);
+
+    // Check for newly completed challenges and award XP
+    const newlyCompleted = updatedProgress.challenges.filter(
+      (c, i) => c.completed && !dailyChallenges.challenges[i].completed
+    );
+
+    if (newlyCompleted.length > 0) {
+      const totalXpEarned = newlyCompleted.reduce((sum, c) => sum + c.xpReward, 0);
+      await StorageService.addXP(totalXpEarned);
+      const updatedUserProgress = await StorageService.getUserProgress();
+      setUserProgress(updatedUserProgress);
+    }
+
+    setDailyChallenges(updatedProgress);
+    await StorageService.saveDailyChallenges(updatedProgress);
+  };
+
   const handleTutorialComplete = async () => {
     await StorageService.setTutorialSeen();
     setCurrentScreen('mode');
@@ -163,6 +285,17 @@ export default function App() {
       timesSelected: userProgress.stats.timesSelected + 1,
     });
 
+    // Update daily challenges - round played
+    if (dailyChallenges) {
+      updateDailyChallenges({
+        roundsPlayed: dailyChallenges.dailyStats.roundsPlayed + 1,
+        modeStats: {
+          ...dailyChallenges.dailyStats.modeStats,
+          [gameMode]: dailyChallenges.dailyStats.modeStats[gameMode] + 1,
+        },
+      });
+    }
+
     setCurrentScreen('question');
   };
 
@@ -200,6 +333,28 @@ export default function App() {
       categoriesPlayed: updatedCategories,
     });
 
+    // Update daily challenges - dare completed
+    if (dailyChallenges) {
+      const updatedLevelStats = {
+        ...dailyChallenges.dailyStats.levelStats,
+        [intensityLevel]: dailyChallenges.dailyStats.levelStats[intensityLevel] + 1,
+      };
+
+      const updatedCategoryStats = category
+        ? {
+            ...dailyChallenges.dailyStats.categoryStats,
+            [category]: dailyChallenges.dailyStats.categoryStats[category as keyof typeof dailyChallenges.dailyStats.categoryStats] + 1,
+          }
+        : dailyChallenges.dailyStats.categoryStats;
+
+      updateDailyChallenges({
+        daresCompleted: dailyChallenges.dailyStats.daresCompleted + 1,
+        consecutiveCompletions: dailyChallenges.dailyStats.consecutiveCompletions + 1,
+        levelStats: updatedLevelStats,
+        categoryStats: updatedCategoryStats,
+      });
+    }
+
     // Move to next round
     setSelectedPlayer(null);
     setCurrentScreen('game');
@@ -229,6 +384,13 @@ export default function App() {
       totalDaresSkipped: userProgress.stats.totalDaresSkipped + 1,
       consecutiveCompletions: 0,
     });
+
+    // Update daily challenges - reset consecutive completions
+    if (dailyChallenges) {
+      updateDailyChallenges({
+        consecutiveCompletions: 0,
+      });
+    }
 
     // Move to next round
     setSelectedPlayer(null);
@@ -285,6 +447,10 @@ export default function App() {
     setCurrentScreen('customQuestions');
   };
 
+  const handleOpenDailyChallenges = () => {
+    setCurrentScreen('dailyChallenges');
+  };
+
   const handleCloseAchievementModal = () => {
     // Remove the first achievement from the queue
     setNewlyUnlockedAchievements(prev => prev.slice(1));
@@ -317,7 +483,7 @@ export default function App() {
   };
 
   if (isLoading) {
-    return null; // Or a loading screen
+    return <LoadingScreen />;
   }
 
   return (
@@ -335,6 +501,7 @@ export default function App() {
           onOpenSettings={handleOpenSettings}
           onOpenStats={handleOpenStats}
           onOpenAchievements={handleOpenAchievements}
+          onOpenDailyChallenges={handleOpenDailyChallenges}
         />
       )}
 
@@ -377,6 +544,7 @@ export default function App() {
           onUpdateSettings={saveSettings}
           onBack={() => setCurrentScreen('mode')}
           onResetStats={handleResetStats}
+          onOpenCustomQuestions={handleOpenCustomQuestions}
         />
       )}
 
@@ -399,6 +567,13 @@ export default function App() {
       {currentScreen === 'achievements' && (
         <AchievementsScreen
           userProgress={userProgress}
+          onBack={() => setCurrentScreen('mode')}
+        />
+      )}
+
+      {currentScreen === 'dailyChallenges' && dailyChallenges && (
+        <DailyChallengesScreen
+          challengeProgress={dailyChallenges}
           onBack={() => setCurrentScreen('mode')}
         />
       )}

@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 14,
-    color: '#999',
+    color: '#BBB',
   },
   barContainer: {
     gap: 15,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   },
   categoryLabel: {
     fontSize: 12,
-    color: '#999',
+    color: '#BBB',
   },
   mvpCard: {
     backgroundColor: 'rgba(255,0,110,0.1)',
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   },
   mvpTitle: {
     fontSize: 16,
-    color: '#999',
+    color: '#BBB',
     marginBottom: 10,
   },
   mvpColor: {

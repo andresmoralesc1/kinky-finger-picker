@@ -101,3 +101,65 @@ export interface UserProgress {
     longestSession: number; // rounds in single session
   };
 }
+
+// Daily Challenges System
+export type DailyChallengeType =
+  | 'rounds'
+  | 'level_specific'
+  | 'consecutive'
+  | 'mode_specific'
+  | 'category_specific'
+  | 'social'
+  | 'speed';
+
+export type ChallengeDifficulty = 'normal' | 'hard' | 'epic';
+
+export interface DailyChallenge {
+  id: string;
+  type: DailyChallengeType;
+  title: string;
+  description: string;
+  difficulty: ChallengeDifficulty;
+  requirement: number;
+  progress: number;
+  completed: boolean;
+  xpReward: number;
+  icon: string; // emoji
+  // Type-specific requirements
+  specificLevel?: IntensityLevel;
+  specificMode?: GameMode;
+  specificCategory?: QuestionCategory;
+}
+
+export interface DailyChallengeProgress {
+  date: string; // ISO date string
+  challenges: DailyChallenge[];
+  streak: number; // consecutive days completed
+  lastCompletedDate?: string; // ISO date string
+  totalChallengesCompleted: number;
+  // Daily progress tracking
+  dailyStats: {
+    roundsPlayed: number;
+    daresCompleted: number;
+    consecutiveCompletions: number;
+    sharesCount: number;
+    levelStats: {
+      mild: number;
+      spicy: number;
+      extreme: number;
+    };
+    modeStats: {
+      hetero: number;
+      gay: number;
+      lesbian: number;
+    };
+    categoryStats: {
+      classic: number;
+      romantic: number;
+      party: number;
+      nsfw: number;
+      custom: number;
+    };
+    fastestCompletion: number;
+  };
+}

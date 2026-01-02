@@ -249,13 +249,23 @@ export default function ImprovedQuestionScreen({
             style={[styles.skipButton, !canSkip && styles.skipButtonDisabled]}
             onPress={handleSkip}
             disabled={!canSkip}
+            accessibilityRole="button"
+            accessibilityLabel={`Skip dare, ${settings.skipLimit - skipCount} skips remaining`}
+            accessibilityHint="Skip this dare without earning XP"
+            accessibilityState={{ disabled: !canSkip }}
           >
             <Text style={[styles.skipButtonText, !canSkip && styles.skipButtonTextDisabled]}>
               Skip ({settings.skipLimit - skipCount} left)
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.completeButton} onPress={handleComplete}>
+          <TouchableOpacity
+            style={styles.completeButton}
+            onPress={handleComplete}
+            accessibilityRole="button"
+            accessibilityLabel="Complete dare"
+            accessibilityHint="Mark this dare as completed and earn XP"
+          >
             <Text style={styles.completeButtonText}>
               {timeLeft === 0 ? "Time's Up! →" : 'Completed! →'}
             </Text>

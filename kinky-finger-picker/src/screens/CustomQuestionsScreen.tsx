@@ -35,6 +35,21 @@ export default function CustomQuestionsScreen({ customQuestions, onAddQuestion, 
     setShowForm(false);
   };
 
+  const handleDelete = (id: string, text: string, type: 'question' | 'dare') => {
+    Alert.alert(
+      'Delete Question',
+      `Are you sure you want to delete this ${type}?\n\n"${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => onDeleteQuestion(id)
+        }
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -109,7 +124,7 @@ export default function CustomQuestionsScreen({ customQuestions, onAddQuestion, 
               <View style={styles.questionCardHeader}>
                 <Text style={styles.questionCardType}>{question.type === 'dare' ? '💋' : '❓'}</Text>
                 <Text style={styles.questionCardLevel}>{question.level}</Text>
-                <TouchableOpacity onPress={() => onDeleteQuestion(question.id)}>
+                <TouchableOpacity onPress={() => handleDelete(question.id, question.text, question.type)}>
                   <Text style={styles.deleteButton}>🗑️</Text>
                 </TouchableOpacity>
               </View>
@@ -191,7 +206,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF006E',
   },
   typeButtonText: {
-    color: '#999',
+    color: '#BBB',
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -214,7 +229,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FB5607',
   },
   levelButtonText: {
-    color: '#999',
+    color: '#BBB',
     fontSize: 14,
     fontWeight: 'bold',
   },
