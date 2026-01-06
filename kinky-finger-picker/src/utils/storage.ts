@@ -21,6 +21,7 @@ export const defaultSettings: Settings = {
   timerDuration: 60,
   showTutorial: true,
   categories: ['classic', 'romantic', 'party', 'nsfw'],
+  selectedTheme: 'default',
 };
 
 export const defaultStats: GameStats = {

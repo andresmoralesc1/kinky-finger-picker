@@ -54,6 +54,8 @@ export interface GameStats {
   };
 }
 
+export type ThemeName = 'default' | 'neon' | 'pastel' | 'dark' | 'ocean' | 'sunset';
+
 export interface Settings {
   soundEnabled: boolean;
   musicEnabled: boolean;
@@ -63,6 +65,7 @@ export interface Settings {
   timerDuration: number; // in seconds
   showTutorial: boolean;
   categories: QuestionCategory[];
+  selectedTheme: ThemeName;
 }
 
 // Achievements System

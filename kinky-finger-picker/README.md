@@ -6,6 +6,11 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
+[![CI](https://github.com/andresmoralesc1/kinky-finger-picker/actions/workflows/ci.yml/badge.svg)](https://github.com/andresmoralesc1/kinky-finger-picker/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/andresmoralesc1/kinky-finger-picker/actions/workflows/codeql.yml/badge.svg)](https://github.com/andresmoralesc1/kinky-finger-picker/actions/workflows/codeql.yml)
+[![Tests](https://img.shields.io/badge/tests-65%2F67%20passing-brightgreen)](https://github.com/andresmoralesc1/kinky-finger-picker/actions)
+[![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)](https://github.com/andresmoralesc1/kinky-finger-picker)
+
 A multiplayer party game that combines random finger selection with truth-or-dare style challenges, now with ADVANCED features! Perfect for breaking the ice and heating things up at parties!
 
 > ⚠️ **18+ ADULT CONTENT** - This app contains explicit content. Intended for consenting adults only.
@@ -308,25 +313,64 @@ Screenshots are generated locally on your device and shared through your phone's
 - **Completed vs Skipped** - Performance metrics
 - **Color-coded** - Easy player identification
 
-## Publishing
+## 🎨 Visual Themes
 
-### To Expo
+The app now includes 6 stunning visual themes that you can unlock:
+
+| Theme | Description | Unlock Requirement |
+|-------|-------------|-------------------|
+| **Classic** 🎨 | Original vibrant colors | Default (Level 1) |
+| **Neon Nights** ✨ | Electric neon aesthetic | Reach Level 5 |
+| **Soft Pastel** 🌸 | Gentle pastel palette | Reach Level 10 |
+| **Midnight** 🌙 | Dark mode variant | Play 50 rounds |
+| **Ocean Breeze** 🌊 | Cool blue tones | Unlock "Party Animal" achievement |
+| **Sunset Vibes** 🌅 | Warm orange gradients | Unlock "Dare Devil" achievement |
+
+**To change themes:**
+1. Open ⚙️ Settings
+2. Tap "🎨 Visual Themes"
+3. Select any unlocked theme
+4. Theme applies immediately and saves automatically
+
+## 🚀 Publishing & Deployment
+
+### Quick Publish to Expo
 ```bash
 npx expo login
 npx expo publish
 ```
 
-### To App Stores
+### Production Builds for App Stores
+
+**Complete deployment guide:** See [DEPLOYMENT.md](./DEPLOYMENT.md)
+
 ```bash
 # Install EAS CLI
 npm install -g eas-cli
 
-# Build for iOS
-eas build --platform ios
+# Login to Expo
+eas login
 
-# Build for Android
-eas build --platform android
+# Configure project
+eas init
+
+# Build for iOS (requires Apple Developer account)
+eas build --platform ios --profile production
+
+# Build for Android (requires Google Play account)
+eas build --platform android --profile production
+
+# Auto-submit to stores
+eas submit --platform ios --latest
+eas submit --platform android --latest
 ```
+
+**What you need:**
+- 📱 **iOS**: Apple Developer Program ($99/year) + App Store Connect setup
+- 🤖 **Android**: Google Play Console ($25 one-time) + Service Account key
+- 📄 **Both**: Age rating 17+ (Mature content), Privacy Policy, Store assets
+
+For detailed step-by-step instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ## FAQ
 
@@ -354,17 +398,25 @@ A: Not yet, but it's on the roadmap!
 - [x] **Micro-Interactions** - Ripple, bounce, glow effects
 - [x] **Roulette Animation** - Suspenseful player selection
 
-### 📋 Phase 2: Engagement & Gamification (Planned)
-- [ ] **Achievements System** - Unlock badges for milestones
-  - "First Blood", "Party Animal", "Dare Devil", etc.
-  - Visual achievement cards
-  - Progress tracking
-- [ ] **Daily Challenges** - Special limited-time dares
-  - Rotating daily content
-  - Bonus points for completion
-- [ ] **Visual Themes** - Customizable color schemes
-  - Neon, Pastel, Dark Mode variants
-  - Theme unlocks via achievements
+### ✅ Phase 2: Engagement & Gamification (COMPLETED!)
+- [x] **Achievements System** - Unlock badges for milestones ✅
+  - "First Blood", "Party Animal", "Dare Devil", and more
+  - Visual achievement cards with rarity tiers
+  - Progress tracking and XP rewards
+  - Level system (1-10+)
+- [x] **Daily Challenges** - Special limited-time dares ✅
+  - Rotating daily content with 3 unique challenges
+  - Bonus XP for completion
+  - Streak tracking system
+  - Challenge difficulty tiers (Normal, Hard, Epic)
+- [x] **Visual Themes** - 6 customizable color schemes ✅
+  - **Classic** - Original vibrant colors (Default)
+  - **Neon Nights** - Electric neon aesthetic (Level 5+)
+  - **Soft Pastel** - Gentle pastel palette (Level 10+)
+  - **Midnight** - Dark mode variant (50+ rounds)
+  - **Ocean Breeze** - Cool blue tones (Unlock via achievement)
+  - **Sunset Vibes** - Warm orange gradients (Unlock via achievement)
+  - Theme unlocks via level progression and achievements
 
 ### 🚀 Phase 3: Polish & Accessibility (Future)
 - [ ] **Player Profiles** - Save player names & stats

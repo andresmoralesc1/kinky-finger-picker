@@ -1,0 +1,77 @@
+name: Label PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  label:
+    name: Auto Label PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Label based on changed files
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+
+      - name: Label PR size
+        uses: codelytv/pr-size-labeler@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          xs_label: 'size/XS'
+          xs_max_size: 10
+          s_label: 'size/S'
+          s_max_size: 100
+          m_label: 'size/M'
+          m_max_size: 500
+          l_label: 'size/L'
+          l_max_size: 1000
+          xl_label: 'size/XL'
+          fail_if_xl: false
+
+      - name: Check PR title format
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = context.payload.pull_request.title;
+            const validPrefixes = ['feat:', 'fix:', 'docs:', 'style:', 'refactor:', 'test:', 'chore:', 'perf:'];
+
+            const hasValidPrefix = validPrefixes.some(prefix =>
+              title.toLowerCase().startsWith(prefix)
+            );
+
+            if (!hasValidPrefix) {
+              const message = `
+              ## ⚠️  PR Title Format
+
+              Your PR title doesn't follow the conventional commit format.
+
+              **Expected format**: \`type: description\`
+
+              **Valid types**:
+              - \`feat:\` - New feature
+              - \`fix:\` - Bug fix
+              - \`docs:\` - Documentation changes
+              - \`style:\` - Code style changes
+              - \`refactor:\` - Code refactoring
+              - \`test:\` - Test changes
+              - \`chore:\` - Maintenance tasks
+              - \`perf:\` - Performance improvements
+
+              **Example**: \`feat: add daily challenges system\`
+              `;
+
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: message
+              });
+            }
