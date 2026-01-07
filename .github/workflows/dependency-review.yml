@@ -1,0 +1,66 @@
+name: Dependency Review
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  dependency-review:
+    name: Review Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: always
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check for known vulnerabilities
+        run: |
+          npm audit --json > audit-report.json || true
+
+          # Parse and display results
+          if [ -f audit-report.json ]; then
+            HIGH=$(jq '.metadata.vulnerabilities.high // 0' audit-report.json)
+            CRITICAL=$(jq '.metadata.vulnerabilities.critical // 0' audit-report.json)
+
+            echo "High severity vulnerabilities: $HIGH"
+            echo "Critical severity vulnerabilities: $CRITICAL"
+
+            if [ "$CRITICAL" -gt 0 ]; then
+              echo "❌ Critical vulnerabilities found!"
+              npm audit
+              exit 1
+            elif [ "$HIGH" -gt 0 ]; then
+              echo "⚠️  High severity vulnerabilities found"
+              npm audit
+            else
+              echo "✅ No high or critical vulnerabilities"
+            fi
+          fi
+
+      - name: Check package sizes
+        run: |
+          npm ci --legacy-peer-deps
+          npx package-size-analyzer --max-size=500kb || true
+
+      - name: Outdated packages check
+        run: |
+          echo "Checking for outdated packages..."
+          npm outdated || true

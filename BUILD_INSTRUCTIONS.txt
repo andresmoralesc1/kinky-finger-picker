@@ -1,0 +1,51 @@
+
+KinkyFingerPicker.apk - Build Instructions
+
+STATUS: Ready to build, needs Java installed
+
+===============================================
+STEP 1: Install Java (REQUIRED)
+===============================================
+Run these commands in your terminal:
+
+sudo apt update
+sudo apt install -y openjdk-11-jdk
+
+Verify installation:
+java -version
+javac -version
+
+===============================================
+STEP 2: Build the APK
+===============================================
+cd /home/telchar/kinky-finger-picker
+./simple_build.sh
+
+OR manually:
+cd android
+chmod +x gradlew
+./gradlew assembleDebug
+cp app/build/outputs/apk/debug/app-debug.apk ../KinkyFingerPicker.apk
+
+===============================================
+RESULT
+===============================================
+Your APK will be at: /home/telchar/kinky-finger-picker/KinkyFingerPicker.apk
+
+===============================================
+TROUBLESHOOTING
+===============================================
+If build fails, check:
+1. Java is installed: java -version
+2. You're in the right directory: pwd
+3. Android SDK is configured (should be automatic)
+
+===============================================
+PROJECT INFO
+===============================================
+- App Name: KinkyFingerPicker
+- Package: com.kinky.fingerpicker
+- Min SDK: 21 (Android 5.0+)
+- Target SDK: 33 (Android 13)
+- Icon: /www/img/icon.png
+- Size: ~8-12 MB

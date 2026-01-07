@@ -1,0 +1,82 @@
+{
+  "expo": {
+    "name": "Kinky Finger Picker",
+    "slug": "kinky-finger-picker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "scheme": "kinkyfingerpicker",
+    "owner": "telchar01",
+    "description": "A multiplayer party game that combines random finger selection with truth-or-dare challenges. Perfect for breaking the ice at parties!",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/[your-project-id]"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.neuralflow.kinkyfingerpicker",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "This app does not use your microphone.",
+        "NSCameraUsageDescription": "This app does not use your camera.",
+        "UIRequiresFullScreen": true
+      },
+      "privacyManifests": {
+        "NSPrivacyAccessedAPITypes": []
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.neuralflow.kinkyfingerpicker",
+      "versionCode": 1,
+      "permissions": [
+        "VIBRATE",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ],
+      "blockedPermissions": [
+        "RECORD_AUDIO",
+        "CAMERA",
+        "READ_CONTACTS",
+        "WRITE_CONTACTS",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "androidStatusBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#000000"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-av",
+        {
+          "microphonePermission": false
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "fe654397-70ea-4b04-abc8-d767a12fc62e"
+      }
+    }
+  }
+}
