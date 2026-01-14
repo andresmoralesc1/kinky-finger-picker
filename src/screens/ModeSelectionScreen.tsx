@@ -12,9 +12,11 @@ interface Props {
   onOpenStats?: () => void;
   onOpenAchievements?: () => void;
   onOpenDailyChallenges?: () => void;
+  onOpenAIChat?: () => void;
+  onOpenAIGenerator?: () => void;
 }
 
-export default function ModeSelectionScreen({ onSelectMode, onQuickPlay, onOpenSettings, onOpenStats, onOpenAchievements, onOpenDailyChallenges }: Props) {
+export default function ModeSelectionScreen({ onSelectMode, onQuickPlay, onOpenSettings, onOpenStats, onOpenAchievements, onOpenDailyChallenges, onOpenAIChat, onOpenAIGenerator }: Props) {
   return (
     <View style={styles.container}>
       {/* Header buttons */}
@@ -136,6 +138,55 @@ export default function ModeSelectionScreen({ onSelectMode, onQuickPlay, onOpenS
           </LinearGradient>
         </TouchableOpacity>
       </View>
+
+      {/* AI Features Section */}
+      <Text style={styles.subtitle}>🤖 AI-Powered Features</Text>
+
+      <View style={styles.aiButtonsContainer}>
+        {onOpenAIChat && (
+          <TouchableOpacity
+            style={styles.aiButton}
+            onPress={onOpenAIChat}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel="AI Chat Assistant"
+            accessibilityHint="Chat with AI assistant for suggestions and advice"
+          >
+            <LinearGradient
+              colors={['#8338EC', '#3A86FF']}
+              style={styles.aiGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <Text style={styles.aiEmoji}>💬</Text>
+              <Text style={styles.aiText}>AI Chat</Text>
+              <Text style={styles.aiSubtext}>Get suggestions & advice</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
+
+        {onOpenAIGenerator && (
+          <TouchableOpacity
+            style={styles.aiButton}
+            onPress={onOpenAIGenerator}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel="AI Question Generator"
+            accessibilityHint="Generate custom questions with AI"
+          >
+            <LinearGradient
+              colors={['#FF006E', '#8338EC', '#3A86FF']}
+              style={styles.aiGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <Text style={styles.aiEmoji}>✨</Text>
+              <Text style={styles.aiText}>AI Generator</Text>
+              <Text style={styles.aiSubtext}>Create custom questions</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 }
@@ -222,6 +273,38 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     width: '100%',
     gap: 20,
+  },
+  aiButtonsContainer: {
+    width: '100%',
+    gap: 15,
+    marginTop: 10,
+  },
+  aiButton: {
+    width: '100%',
+    height: 100,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  aiGradient: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 15,
+  },
+  aiEmoji: {
+    fontSize: 30,
+    marginBottom: 5,
+  },
+  aiText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 3,
+  },
+  aiSubtext: {
+    fontSize: 13,
+    color: '#fff',
+    opacity: 0.9,
   },
   button: {
     width: '100%',

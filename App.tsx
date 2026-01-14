@@ -14,6 +14,8 @@ import StatsScreen from './src/screens/StatsScreen';
 import CustomQuestionsScreen from './src/screens/CustomQuestionsScreen';
 import AchievementsScreen from './src/screens/AchievementsScreen';
 import DailyChallengesScreen from './src/screens/DailyChallengesScreen';
+import AIChatScreen from './src/screens/AIChatScreen';
+import AIQuestionGeneratorScreen from './src/screens/AIQuestionGeneratorScreen';
 import AchievementUnlockedModal from './src/components/AchievementUnlockedModal';
 import { StorageService, defaultSettings, defaultStats, defaultUserProgress } from './src/utils/storage';
 import { soundManager } from './src/utils/sounds';
@@ -30,7 +32,9 @@ type Screen =
   | 'stats'
   | 'customQuestions'
   | 'achievements'
-  | 'dailyChallenges';
+  | 'dailyChallenges'
+  | 'aiChat'
+  | 'aiGenerator';
 
 function LoadingScreen() {
   const spinValue = useRef(new Animated.Value(0)).current;
@@ -501,6 +505,8 @@ export default function App() {
           onOpenStats={handleOpenStats}
           onOpenAchievements={handleOpenAchievements}
           onOpenDailyChallenges={handleOpenDailyChallenges}
+          onOpenAIChat={() => setCurrentScreen('aiChat')}
+          onOpenAIGenerator={() => setCurrentScreen('aiGenerator')}
         />
       )}
 
@@ -574,6 +580,27 @@ export default function App() {
         <DailyChallengesScreen
           challengeProgress={dailyChallenges}
           onBack={() => setCurrentScreen('mode')}
+        />
+      )}
+
+      {currentScreen === 'aiChat' && (
+        <AIChatScreen
+          level={intensityLevel}
+          mode={gameMode}
+          playerCount={stats.totalPlayers}
+          onBack={() => setCurrentScreen('mode')}
+        />
+      )}
+
+      {currentScreen === 'aiGenerator' && (
+        <AIQuestionGeneratorScreen
+          onBack={() => setCurrentScreen('mode')}
+          onAddQuestions={(questions) => {
+            // Add generated questions to custom questions
+            StorageService.saveCustomQuestions([...customQuestions, ...questions]);
+            setCustomQuestions(prev => [...prev, ...questions]);
+            setCurrentScreen('mode');
+          }}
         />
       )}
 
