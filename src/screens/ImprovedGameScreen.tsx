@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,8 @@ import {
   Dimensions,
   Animated,
   TouchableOpacity,
-  GestureResponderHandlers,
+  GestureResponderEvent,
+  NativeSyntheticEvent,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { GameMode, IntensityLevel, Player } from '../types';
@@ -19,6 +20,13 @@ import BounceAnimation from '../components/BounceAnimation';
 import GlowEffect from '../components/GlowEffect';
 
 const { width, height } = Dimensions.get('window');
+
+// Proper types for touch events
+interface Touch {
+  identifier: number;
+  pageX: number;
+  pageY: number;
+}
 
 interface Props {
   mode: GameMode;
@@ -47,8 +55,22 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   // Track active touches by their identifier
   const activeTouches = useRef<Map<number, Player>>(new Map());
   const countdownTimeout = useRef<NodeJS.Timeout | null>(null);
+  const rippleTimeouts = useRef<Set<NodeJS.Timeout>>(new Set());
 
   const countdownAnim = useRef(new Animated.Value(1)).current;
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // Clear countdown timeout
+      if (countdownTimeout.current) {
+        clearTimeout(countdownTimeout.current);
+      }
+      // Clear all ripple timeouts
+      rippleTimeouts.current.forEach(timeout => clearTimeout(timeout));
+      rippleTimeouts.current.clear();
+    };
+  }, []);
 
   const addRipple = (x: number, y: number, color: string) => {
     const ripple: RippleData = {
@@ -59,19 +81,21 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
     };
     setRipples(prev => [...prev, ripple]);
 
-    // Remove ripple after animation
-    setTimeout(() => {
+    // Remove ripple after animation - track timeout for cleanup
+    const timeout = setTimeout(() => {
       setRipples(prev => prev.filter(r => r.id !== ripple.id));
+      rippleTimeouts.current.delete(timeout);
     }, 600);
+    rippleTimeouts.current.add(timeout);
   };
 
-  const handleTouchStart = (evt: any) => {
+  const handleTouchStart = (evt: GestureResponderEvent) => {
     if (isSelecting) return;
 
-    const touches = evt.nativeEvent.touches;
+    const touches = evt.nativeEvent.touches as unknown as Touch[];
 
     // Process all current touches
-    touches.forEach((touch: any) => {
+    touches.forEach((touch: Touch) => {
       const touchId = touch.identifier;
 
       // Only add if we haven't already tracked this touch
@@ -111,13 +135,13 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
     }
   };
 
-  const handleTouchMove = (evt: any) => {
+  const handleTouchMove = (evt: GestureResponderEvent) => {
     if (isSelecting) return;
 
-    const touches = evt.nativeEvent.touches;
+    const touches = evt.nativeEvent.touches as unknown as Touch[];
 
     // Update positions of existing touches
-    touches.forEach((touch: any) => {
+    touches.forEach((touch: Touch) => {
       const touchId = touch.identifier;
       const existingPlayer = activeTouches.current.get(touchId);
 
@@ -134,12 +158,12 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
     setPlayers(allPlayers);
   };
 
-  const handleTouchEnd = (evt: any) => {
+  const handleTouchEnd = (evt: GestureResponderEvent) => {
     if (isSelecting) return;
 
     // Remove touches that ended
-    const changedTouches = evt.nativeEvent.changedTouches;
-    changedTouches.forEach((touch: any) => {
+    const changedTouches = evt.nativeEvent.changedTouches as unknown as Touch[];
+    changedTouches.forEach((touch: Touch) => {
       activeTouches.current.delete(touch.identifier);
     });
 
