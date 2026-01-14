@@ -6,7 +6,7 @@ import {
   Dimensions,
   Animated,
   TouchableOpacity,
-  PanResponder,
+  GestureResponderHandlers,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { GameMode, IntensityLevel, Player } from '../types';
@@ -44,6 +44,10 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   const usedColors = useRef<string[]>([]);
   const rippleIdCounter = useRef(0);
 
+  // Track active touches by their identifier
+  const activeTouches = useRef<Map<number, Player>>(new Map());
+  const countdownTimeout = useRef<NodeJS.Timeout | null>(null);
+
   const countdownAnim = useRef(new Animated.Value(1)).current;
 
   const addRipple = (x: number, y: number, color: string) => {
@@ -61,54 +65,100 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
     }, 600);
   };
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
+  const handleTouchStart = (evt: any) => {
+    if (isSelecting) return;
 
-      onPanResponderGrant: (evt) => {
-        if (isSelecting) return;
+    const touches = evt.nativeEvent.touches;
 
-        const touches = evt.nativeEvent.touches;
-        const newPlayers: Player[] = [];
+    // Process all current touches
+    touches.forEach((touch: any) => {
+      const touchId = touch.identifier;
 
-        touches.forEach((touch, index) => {
-          const x = touch.pageX;
-          const y = touch.pageY;
+      // Only add if we haven't already tracked this touch
+      if (!activeTouches.current.has(touchId)) {
+        const x = touch.pageX;
+        const y = touch.pageY;
+        const color = getRandomColor(usedColors.current);
+        usedColors.current.push(color);
 
-          const color = getRandomColor(usedColors.current);
-          usedColors.current.push(color);
+        const player: Player = {
+          id: touchId,
+          x,
+          y,
+          color,
+          gender: mode === 'hetero' ? (x < width / 2 ? 'female' : 'male') : undefined,
+        };
 
-          // Add ripple effect at touch point
-          addRipple(x, y, color);
+        activeTouches.current.set(touchId, player);
+        addRipple(x, y, color);
+      }
+    });
 
-          newPlayers.push({
-            id: index,
-            x,
-            y,
-            color,
-            gender: mode === 'hetero' ? (x < width / 2 ? 'female' : 'male') : undefined,
-          });
+    // Update players state with all active touches
+    const allPlayers = Array.from(activeTouches.current.values());
+    setPlayers(allPlayers);
+
+    // Check if we have enough players to start countdown
+    if (allPlayers.length >= 2 && !countdown && countdownTimeout.current === null) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      soundManager.playSound('tap');
+
+      // Small delay to ensure all touches are registered
+      countdownTimeout.current = setTimeout(() => {
+        startCountdown();
+        countdownTimeout.current = null;
+      }, 300);
+    }
+  };
+
+  const handleTouchMove = (evt: any) => {
+    if (isSelecting) return;
+
+    const touches = evt.nativeEvent.touches;
+
+    // Update positions of existing touches
+    touches.forEach((touch: any) => {
+      const touchId = touch.identifier;
+      const existingPlayer = activeTouches.current.get(touchId);
+
+      if (existingPlayer) {
+        activeTouches.current.set(touchId, {
+          ...existingPlayer,
+          x: touch.pageX,
+          y: touch.pageY,
         });
+      }
+    });
 
-        setPlayers(newPlayers);
+    const allPlayers = Array.from(activeTouches.current.values());
+    setPlayers(allPlayers);
+  };
 
-        if (newPlayers.length >= 2) {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          soundManager.playSound('tap');
-          startCountdown();
-        }
-      },
+  const handleTouchEnd = (evt: any) => {
+    if (isSelecting) return;
 
-      onPanResponderRelease: () => {
-        if (!isSelecting) {
-          setPlayers([]);
-          setCountdown(null);
-          usedColors.current = [];
-        }
-      },
-    })
-  ).current;
+    // Remove touches that ended
+    const changedTouches = evt.nativeEvent.changedTouches;
+    changedTouches.forEach((touch: any) => {
+      activeTouches.current.delete(touch.identifier);
+    });
+
+    // If we lost players, reset
+    const remainingPlayers = Array.from(activeTouches.current.values());
+
+    if (remainingPlayers.length < 2) {
+      setPlayers(remainingPlayers);
+      setCountdown(null);
+      usedColors.current = [];
+
+      if (countdownTimeout.current) {
+        clearTimeout(countdownTimeout.current);
+        countdownTimeout.current = null;
+      }
+    } else {
+      setPlayers(remainingPlayers);
+    }
+  };
 
   const startCountdown = () => {
     setIsSelecting(true);
@@ -169,7 +219,15 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   };
 
   return (
-    <View style={styles.container} {...panResponder.panHandlers}>
+    <View
+      style={styles.container}
+      onStartShouldSetResponder={() => true}
+      onMoveShouldSetResponder={() => true}
+      onResponderGrant={handleTouchStart}
+      onResponderMove={handleTouchMove}
+      onResponderRelease={handleTouchEnd}
+      onResponderTerminationRequest={() => false}
+    >
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
@@ -269,7 +327,9 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
       {players.length > 0 && countdown === null && !showRoulette && (
         <View style={styles.playerCountContainer}>
           <Text style={styles.playerCountText}>
-            {players.length} player{players.length > 1 ? 's' : ''} detected
+            {players.length === 0 ? 'Waiting for players...' : 
+               players.length === 1 ? '1 player detected - need 1 more!' : 
+               `${players.length} players detected - Get ready!`}
           </Text>
           <Text style={styles.playerCountSubtext}>
             Hold still...

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { GameMode, IntensityLevel, Player, Settings, GameStats, Question, PlayerStats, UserProgress, Achievement, DailyChallengeProgress } from './src/types';
 import ModeSelectionScreen from './src/screens/ModeSelectionScreen';
@@ -70,16 +70,16 @@ function LoadingScreen() {
 
   return (
     <View style={loadingStyles.container}>
-      <Animated.View
+      <Animated.Image
+        source={require('./assets/logo.png')}
         style={[
-          loadingStyles.iconContainer,
+          loadingStyles.logo,
           {
-            transform: [{ rotate: spin }, { scale: pulseValue }],
+            transform: [{ scale: pulseValue }],
           },
         ]}
-      >
-        <Text style={loadingStyles.icon}>🎲</Text>
-      </Animated.View>
+        resizeMode="contain"
+      />
       <Text style={loadingStyles.title}>Kinky Finger Picker</Text>
       <Text style={loadingStyles.subtitle}>Loading your game...</Text>
     </View>
@@ -93,11 +93,10 @@ const loadingStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  iconContainer: {
+  logo: {
+    width: 250,
+    height: 250,
     marginBottom: 30,
-  },
-  icon: {
-    fontSize: 80,
   },
   title: {
     fontSize: 32,

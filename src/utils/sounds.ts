@@ -22,7 +22,6 @@ class SoundManager {
         staysActiveInBackground: false,
       });
     } catch (error) {
-      console.log('Audio init error:', error);
     }
   }
 

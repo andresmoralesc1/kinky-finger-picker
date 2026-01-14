@@ -11,6 +11,10 @@
 [![Tests](https://img.shields.io/badge/tests-65%2F67%20passing-brightgreen)](https://github.com/andresmoralesc1/kinky-finger-picker/actions)
 [![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)](https://github.com/andresmoralesc1/kinky-finger-picker)
 
+<p align="center">
+  <img src="assets/logo.png" alt="Kinky Finger Picker Logo" width="300" height="300">
+</p>
+
 A multiplayer party game that combines random finger selection with truth-or-dare style challenges, now with ADVANCED features! Perfect for breaking the ice and heating things up at parties!
 
 > ⚠️ **18+ ADULT CONTENT** - This app contains explicit content. Intended for consenting adults only.
