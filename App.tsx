@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { GameMode, IntensityLevel, Player, Settings, GameStats, Question, PlayerStats, UserProgress, Achievement, DailyChallengeProgress, Screen } from './src/types';
 import ModeSelectionScreen from './src/screens/ModeSelectionScreen';
 import LevelSelectionScreen from './src/screens/LevelSelectionScreen';
@@ -561,7 +562,7 @@ export default function App() {
   }
 
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style="light" />
 
       {/* Tutorial Screen */}
@@ -758,6 +759,6 @@ export default function App() {
           onClose={handleCloseAchievementModal}
         />
       )}
-    </>
+    </GestureHandlerRootView>
   );
 }

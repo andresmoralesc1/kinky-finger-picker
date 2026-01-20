@@ -6,6 +6,8 @@ import { Player, IntensityLevel, Question, QuestionCategory, Settings } from '..
 import { getRandomQuestion } from '../data/questions';
 import ConfettiEffect from '../components/ConfettiEffect';
 import { soundManager } from '../utils/sounds';
+import AccessibleTouchable from '../components/AccessibleTouchable';
+import { SwipeGesture } from '../components/SwipeGesture';
 
 interface Props {
   player: Player;
@@ -155,24 +157,35 @@ export default function ImprovedQuestionScreen({
 
   const canSkip = skipCount < settings.skipLimit;
 
-  return (
-    <LinearGradient
-      colors={getLevelColor()}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
-      {showConfetti && <ConfettiEffect colors={[player.color, '#fff', '#FFD700']} />}
+  const handleSwipeComplete = () => onComplete(question.id);
+  const handleSwipeSkip = () => {
+    if (canSkip) handleSkip();
+  };
 
-      <Animated.View
-        style={[
-          styles.content,
-          {
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }],
-          },
-        ]}
+  return (
+    <SwipeGesture
+      onSwipeRight={handleSwipeComplete}
+      onSwipeLeft={handleSwipeSkip}
+      enableRightSwipe={true}
+      enableLeftSwipe={canSkip}
+    >
+      <LinearGradient
+        colors={getLevelColor()}
+        style={styles.container}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
+        {showConfetti && <ConfettiEffect colors={[player.color, '#fff', '#FFD700']} />}
+
+        <Animated.View
+          style={[
+            styles.content,
+            {
+              opacity: fadeAnim,
+              transform: [{ scale: scaleAnim }],
+            },
+          ]}
+        >
         {/* Winner indicator */}
         <View style={styles.winnerSection}>
           <Text style={styles.winnerLabel}>Selected Player</Text>
@@ -219,60 +232,76 @@ export default function ImprovedQuestionScreen({
 
         {/* Start Timer Button */}
         {!isTimerActive && timeLeft === settings.timerDuration && (
-          <TouchableOpacity style={styles.timerButton} onPress={handleStartTimer}>
+          <AccessibleTouchable
+            style={styles.timerButton}
+            onPress={handleStartTimer}
+            accessibilityLabel="Start timer"
+            accessibilityHint={`Start ${settings.timerDuration} second countdown for the dare`}
+            accessibilityRole="button"
+          >
             <Text style={styles.timerButtonText}>⏱️ Start Timer</Text>
-          </TouchableOpacity>
+          </AccessibleTouchable>
         )}
 
         {/* Level controls */}
         <View style={styles.levelControls}>
-          <TouchableOpacity
+          <AccessibleTouchable
             style={[styles.levelButton, !canLevelDown && styles.levelButtonDisabled]}
             onPress={canLevelDown ? onChangeLevelDown : undefined}
-            disabled={!canLevelDown}
+            accessibilityLabel="Make question milder"
+            accessibilityHint={canLevelDown ? "Decrease intensity level" : "Already at mildest level"}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !canLevelDown }}
           >
-            <Text style={styles.levelButtonText}>⬇️ Milder</Text>
-          </TouchableOpacity>
+            <Text style={[styles.levelButtonText, !canLevelDown && styles.levelButtonTextDisabled]}>
+              ⬇️ Milder
+            </Text>
+          </AccessibleTouchable>
 
-          <TouchableOpacity
+          <AccessibleTouchable
             style={[styles.levelButton, !canLevelUp && styles.levelButtonDisabled]}
             onPress={canLevelUp ? onChangeLevelUp : undefined}
-            disabled={!canLevelUp}
+            accessibilityLabel="Make question hotter"
+            accessibilityHint={canLevelUp ? "Increase intensity level" : "Already at hottest level"}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !canLevelUp }}
           >
-            <Text style={styles.levelButtonText}>Hotter ⬆️</Text>
-          </TouchableOpacity>
+            <Text style={[styles.levelButtonText, !canLevelUp && styles.levelButtonTextDisabled]}>
+              Hotter ⬆️
+            </Text>
+          </AccessibleTouchable>
         </View>
 
         {/* Action buttons */}
         <View style={styles.actionButtons}>
-          <TouchableOpacity
+          <AccessibleTouchable
             style={[styles.skipButton, !canSkip && styles.skipButtonDisabled]}
             onPress={handleSkip}
-            disabled={!canSkip}
-            accessibilityRole="button"
-            accessibilityLabel={`Skip dare, ${settings.skipLimit - skipCount} skips remaining`}
+            accessibilityLabel={`Skip dare. ${settings.skipLimit - skipCount} skips remaining`}
             accessibilityHint="Skip this dare without earning XP"
+            accessibilityRole="button"
             accessibilityState={{ disabled: !canSkip }}
           >
             <Text style={[styles.skipButtonText, !canSkip && styles.skipButtonTextDisabled]}>
               Skip ({settings.skipLimit - skipCount} left)
             </Text>
-          </TouchableOpacity>
+          </AccessibleTouchable>
 
-          <TouchableOpacity
+          <AccessibleTouchable
             style={styles.completeButton}
             onPress={handleComplete}
-            accessibilityRole="button"
             accessibilityLabel="Complete dare"
             accessibilityHint="Mark this dare as completed and earn XP"
+            accessibilityRole="button"
           >
             <Text style={styles.completeButtonText}>
               {timeLeft === 0 ? "Time's Up! →" : 'Completed! →'}
             </Text>
-          </TouchableOpacity>
+          </AccessibleTouchable>
         </View>
       </Animated.View>
     </LinearGradient>
+    </SwipeGesture>
   );
 }
 
@@ -410,6 +439,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  levelButtonTextDisabled: {
+    opacity: 0.5,
   },
   actionButtons: {
     flexDirection: 'row',

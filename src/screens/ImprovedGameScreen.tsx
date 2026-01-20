@@ -10,6 +10,7 @@ import {
   NativeSyntheticEvent,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 import { GameMode, IntensityLevel, Player } from '../types';
 import { getRandomColor } from '../utils/colors';
 import { soundManager } from '../utils/sounds';
@@ -18,8 +19,10 @@ import RippleEffect from '../components/RippleEffect';
 import PulsingCircle from '../components/PulsingCircle';
 import BounceAnimation from '../components/BounceAnimation';
 import GlowEffect from '../components/GlowEffect';
+import AccessibleTouchable from '../components/AccessibleTouchable';
 
-const { width, height } = Dimensions.get('window');
+// Get dimensions dynamically (will update on orientation change)
+const getWindowDimensions = () => Dimensions.get('window');
 
 // Proper types for touch events
 interface Touch {
@@ -49,6 +52,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   const [isSelecting, setIsSelecting] = useState(false);
   const [showRoulette, setShowRoulette] = useState(false);
   const [ripples, setRipples] = useState<RippleData[]>([]);
+  const [screenWidth, setScreenWidth] = useState(getWindowDimensions().width);
   const usedColors = useRef<string[]>([]);
   const rippleIdCounter = useRef(0);
 
@@ -58,6 +62,37 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   const rippleTimeouts = useRef<Set<NodeJS.Timeout>>(new Set());
 
   const countdownAnim = useRef(new Animated.Value(1)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const headerAnim = useRef(new Animated.Value(-50)).current;
+  const playerCountAnim = useRef(new Animated.Value(100)).current;
+
+  // Fade-in animation on mount
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.spring(headerAnim, {
+        toValue: 0,
+        tension: 50,
+        friction: 7,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  // Update screen width on orientation change
+  useEffect(() => {
+    const updateDimensions = () => {
+      const newWidth = getWindowDimensions().width;
+      setScreenWidth(newWidth);
+    };
+
+    const subscription = Dimensions.addEventListener('change', updateDimensions);
+    return () => subscription?.remove();
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -110,7 +145,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
           x,
           y,
           color,
-          gender: mode === 'hetero' ? (x < width / 2 ? 'female' : 'male') : undefined,
+          gender: mode === 'hetero' ? (x < screenWidth / 2 ? 'female' : 'male') : undefined,
         };
 
         activeTouches.current.set(touchId, player);
@@ -243,8 +278,8 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   };
 
   return (
-    <View
-      style={styles.container}
+    <Animated.View
+      style={[styles.container, { opacity: fadeAnim }]}
       onStartShouldSetResponder={() => true}
       onMoveShouldSetResponder={() => true}
       onResponderGrant={handleTouchStart}
@@ -252,24 +287,36 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
       onResponderRelease={handleTouchEnd}
       onResponderTerminationRequest={() => false}
     >
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+      {/* Animated Header */}
+      <Animated.View style={[styles.header, { transform: [{ translateY: headerAnim }] }]}>
+        <AccessibleTouchable
+          style={styles.backButton}
+          onPress={onBack}
+          accessibilityLabel="Go back"
+          accessibilityHint="Return to level selection"
+          accessibilityRole="button"
+        >
           <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
+        </AccessibleTouchable>
 
-        <TouchableOpacity style={styles.levelButton} onPress={onChangeLevel}>
+        <AccessibleTouchable
+          style={styles.levelButton}
+          onPress={onChangeLevel}
+          accessibilityLabel={`Change intensity level. Current is ${level}`}
+          accessibilityHint="Tap to change the intensity level"
+          accessibilityRole="button"
+        >
           <GlowEffect color={getLevelColor()} intensity={15}>
             <Text style={[styles.levelText, { color: getLevelColor() }]}>
               {getLevelEmoji()} {level.toUpperCase()}
             </Text>
           </GlowEffect>
-        </TouchableOpacity>
-      </View>
+        </AccessibleTouchable>
+      </Animated.View>
 
       {/* Split screen divider for hetero mode */}
       {mode === 'hetero' && (
-        <View style={styles.divider}>
+        <View style={[styles.divider, { left: screenWidth / 2 }]}>
           <View style={styles.dividerLine} />
           <Text style={styles.dividerTextLeft}>♀️</Text>
           <Text style={styles.dividerTextRight}>♂️</Text>
@@ -349,18 +396,23 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
 
       {/* Player count */}
       {players.length > 0 && countdown === null && !showRoulette && (
-        <View style={styles.playerCountContainer}>
+        <Animated.View
+          style={[
+            styles.playerCountContainer,
+            { transform: [{ translateY: playerCountAnim }] },
+          ]}
+        >
           <Text style={styles.playerCountText}>
-            {players.length === 0 ? 'Waiting for players...' : 
-               players.length === 1 ? '1 player detected - need 1 more!' : 
+            {players.length === 0 ? 'Waiting for players...' :
+               players.length === 1 ? '1 player detected - need 1 more!' :
                `${players.length} players detected - Get ready!`}
           </Text>
           <Text style={styles.playerCountSubtext}>
             Hold still...
           </Text>
-        </View>
+        </Animated.View>
       )}
-    </View>
+    </Animated.View>
   );
 }
 
@@ -395,7 +447,6 @@ const styles = StyleSheet.create({
   },
   divider: {
     position: 'absolute',
-    left: width / 2,
     top: 0,
     bottom: 0,
     zIndex: 5,
