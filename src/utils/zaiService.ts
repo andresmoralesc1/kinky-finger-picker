@@ -7,7 +7,7 @@
 const ZAI_CONFIG = {
   baseURL: 'https://api.z.ai/api/coding/paas/v4',
   apiKey: '7fa72fc789e44077827a30054d99fed1.rXHDigZaDwAI5MxY',
-  model: 'glm-4.6',
+  model: 'glm-4.7',
   maxTokens: 1000,
   temperature: 0.9, // High creativity for varied questions
 };
