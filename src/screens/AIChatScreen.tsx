@@ -8,13 +8,15 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
   Dimensions,
+  Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { IntensityLevel, Question } from '../types';
 import { zaiService } from '../utils/zaiService';
 import { soundManager } from '../utils/sounds';
+import { EnhancedLoadingSpinner, DotsLoading } from '../components/EnhancedLoadingSpinner';
+import AccessibleTouchable from '../components/AccessibleTouchable';
 
 const { width, height } = Dimensions.get('window');
 
@@ -33,6 +35,15 @@ interface Props {
   onBack: () => void;
 }
 
+/**
+ * Enhanced AI Chat Screen with improved loading states and animations
+ *
+ * Features:
+ * - DotsLoading for typing indicator
+ * - AccessibleTouchable for all buttons
+ * - Smooth animations for messages
+ * - Better visual feedback
+ */
 export default function AIChatScreen({
   level = 'mild',
   mode = 'hetero',
@@ -51,6 +62,16 @@ export default function AIChatScreen({
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Initial fade-in animation
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   useEffect(() => {
     // Auto-scroll to bottom when new messages arrive
@@ -105,12 +126,18 @@ export default function AIChatScreen({
   };
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+        <AccessibleTouchable
+          style={styles.backButton}
+          onPress={onBack}
+          accessibilityLabel="Go back"
+          accessibilityHint="Return to main menu"
+          accessibilityRole="button"
+        >
           <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
+        </AccessibleTouchable>
         <Text style={styles.headerTitle}>🤖 AI Assistant</Text>
         <View style={styles.headerSpacer} />
       </View>
@@ -122,7 +149,7 @@ export default function AIChatScreen({
         contentContainerStyle={styles.messagesContent}
       >
         {messages.map((message) => (
-          <View
+          <Animated.View
             key={message.id}
             style={[
               styles.messageBubble,
@@ -137,30 +164,39 @@ export default function AIChatScreen({
             >
               {message.text}
             </Text>
-          </View>
+          </Animated.View>
         ))}
 
+        {/* Enhanced Loading Indicator */}
         {isLoading && (
           <View style={[styles.messageBubble, styles.assistantBubble]}>
-            <ActivityIndicator color="#FF006E" />
-            <Text style={styles.loadingText}>Thinking...</Text>
+            <DotsLoading
+              message="Thinking..."
+              dotCount={3}
+              dotSize={8}
+              color="#FF006E"
+              showBackground={false}
+            />
           </View>
         )}
       </ScrollView>
 
       {/* Quick Actions */}
       <View style={styles.quickActions}>
-        <TouchableOpacity
+        <AccessibleTouchable
           style={styles.quickActionButton}
           onPress={generateRandomQuestions}
+          accessibilityLabel="Generate random questions"
+          accessibilityHint="Automatically generate 3 random questions"
+          accessibilityRole="button"
         >
           <LinearGradient
-            colors={['#FF006E', '#8338EC']}
+            colors={['#FF006E', '#8338EC'] as const}
             style={styles.quickActionGradient}
           >
             <Text style={styles.quickActionText}>🎲 Generate Questions</Text>
           </LinearGradient>
-        </TouchableOpacity>
+        </AccessibleTouchable>
       </View>
 
       {/* Input */}
@@ -184,7 +220,7 @@ export default function AIChatScreen({
             disabled={!inputText.trim() || isLoading}
           >
             <LinearGradient
-              colors={['#FF006E', '#8338EC']}
+              colors={['#FF006E', '#8338EC'] as const}
               style={styles.sendButtonGradient}
             >
               <Text style={styles.sendButtonText}>Send</Text>
@@ -192,7 +228,7 @@ export default function AIChatScreen({
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -258,11 +294,6 @@ const styles = StyleSheet.create({
   },
   assistantText: {
     color: '#fff',
-  },
-  loadingText: {
-    color: '#fff',
-    marginLeft: 10,
-    fontSize: 14,
   },
   quickActions: {
     paddingHorizontal: 20,

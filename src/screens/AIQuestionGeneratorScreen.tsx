@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
   Alert,
+  Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { IntensityLevel, QuestionCategory, Question } from '../types';
 import { zaiService } from '../utils/zaiService';
 import { soundManager } from '../utils/sounds';
+import { EnhancedLoadingSpinner, ProgressLoading } from '../components/EnhancedLoadingSpinner';
+import AccessibleTouchable from '../components/AccessibleTouchable';
 
 const CATEGORIES: { value: QuestionCategory; label: string; emoji: string }[] = [
   { value: 'classic', label: 'Classic', emoji: '🎲' },
@@ -32,6 +34,15 @@ interface Props {
   onAddQuestions: (questions: Question[]) => void;
 }
 
+/**
+ * Enhanced AI Question Generator Screen with improved UI and loading states
+ *
+ * Features:
+ * - ProgressLoading for generation progress
+ * - AccessibleTouchable for all buttons
+ * - Smooth animations
+ * - Better visual feedback
+ */
 export default function AIQuestionGeneratorScreen({ onBack, onAddQuestions }: Props) {
   const [selectedLevel, setSelectedLevel] = useState<IntensityLevel>('mild');
   const [selectedCategory, setSelectedCategory] = useState<QuestionCategory>('classic');
@@ -39,10 +50,26 @@ export default function AIQuestionGeneratorScreen({ onBack, onAddQuestions }: Pr
   const [customPrompt, setCustomPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedQuestions, setGeneratedQuestions] = useState<Question[]>([]);
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  React.useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   const generateQuestions = async () => {
     setIsGenerating(true);
+    setGenerationProgress(0);
     soundManager.playSound('tap');
+
+    // Simulate progress
+    const progressInterval = setInterval(() => {
+      setGenerationProgress(prev => Math.min(prev + 0.1, 0.9));
+    }, 200);
 
     try {
       const questions = await zaiService.generateQuestions({
@@ -51,6 +78,9 @@ export default function AIQuestionGeneratorScreen({ onBack, onAddQuestions }: Pr
         category: selectedCategory,
         customPrompt: customPrompt || undefined,
       });
+
+      clearInterval(progressInterval);
+      setGenerationProgress(1);
 
       const formattedQuestions: Question[] = questions.map((q, index) => ({
         id: `ai_${Date.now()}_${index}`,
@@ -64,9 +94,12 @@ export default function AIQuestionGeneratorScreen({ onBack, onAddQuestions }: Pr
       setGeneratedQuestions(formattedQuestions);
       soundManager.playSound('countdown');
     } catch (error) {
+      clearInterval(progressInterval);
+      setGenerationProgress(0);
       Alert.alert('Error', 'Failed to generate questions. Please try again.');
     } finally {
       setIsGenerating(false);
+      setTimeout(() => setGenerationProgress(0), 500);
     }
   };
 
@@ -86,12 +119,18 @@ export default function AIQuestionGeneratorScreen({ onBack, onAddQuestions }: Pr
   };
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+        <AccessibleTouchable
+          style={styles.backButton}
+          onPress={onBack}
+          accessibilityLabel="Go back"
+          accessibilityHint="Return to main menu"
+          accessibilityRole="button"
+        >
           <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
+        </AccessibleTouchable>
         <Text style={styles.headerTitle}>🤖 AI Generator</Text>
         <View style={styles.headerSpacer} />
       </View>
@@ -181,22 +220,34 @@ export default function AIQuestionGeneratorScreen({ onBack, onAddQuestions }: Pr
         </View>
 
         {/* Generate Button */}
-        <TouchableOpacity
-          style={styles.generateButton}
-          onPress={generateQuestions}
-          disabled={isGenerating}
-        >
-          <LinearGradient
-            colors={['#FF006E', '#8338EC']}
-            style={styles.generateButtonGradient}
+        <View style={styles.generateContainer}>
+          <TouchableOpacity
+            style={styles.generateButton}
+            onPress={generateQuestions}
+            disabled={isGenerating}
           >
-            {isGenerating ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.generateButtonText}>🎲 Generate Questions</Text>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
+            <LinearGradient
+              colors={['#FF006E', '#8338EC'] as const}
+              style={styles.generateButtonGradient}
+            >
+              {isGenerating ? (
+                <Text style={styles.generateButtonText}>Generating...</Text>
+              ) : (
+                <Text style={styles.generateButtonText}>🎲 Generate Questions</Text>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Progress Loading Overlay */}
+          {isGenerating && generationProgress > 0 && (
+            <ProgressLoading
+              progress={generationProgress}
+              message={`Creating ${count} ${selectedLevel} questions...`}
+              color="#FF006E"
+              showPercentage={true}
+            />
+          )}
+        </View>
 
         {/* Generated Questions */}
         {generatedQuestions.length > 0 && (
@@ -229,7 +280,7 @@ export default function AIQuestionGeneratorScreen({ onBack, onAddQuestions }: Pr
           </>
         )}
       </ScrollView>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -345,6 +396,9 @@ const styles = StyleSheet.create({
   input: {
     color: '#fff',
     fontSize: 15,
+  },
+  generateContainer: {
+    position: 'relative',
   },
   generateButton: {
     borderRadius: 20,
