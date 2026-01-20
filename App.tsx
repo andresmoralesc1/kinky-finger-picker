@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { GameMode, IntensityLevel, Player, Settings, GameStats, Question, PlayerStats, UserProgress, Achievement, DailyChallengeProgress } from './src/types';
+import { GameMode, IntensityLevel, Player, Settings, GameStats, Question, PlayerStats, UserProgress, Achievement, DailyChallengeProgress, Screen } from './src/types';
 import ModeSelectionScreen from './src/screens/ModeSelectionScreen';
 import LevelSelectionScreen from './src/screens/LevelSelectionScreen';
 import GameScreen from './src/screens/GameScreen';
@@ -21,20 +21,6 @@ import { StorageService, defaultSettings, defaultStats, defaultUserProgress } fr
 import { soundManager } from './src/utils/sounds';
 import { checkAchievements } from './src/utils/achievements';
 import { isNewDay, resetDailyStats, updateChallengeProgress, getTotalXPReward } from './src/utils/dailyChallenges';
-
-type Screen =
-  | 'tutorial'
-  | 'mode'
-  | 'level'
-  | 'game'
-  | 'question'
-  | 'settings'
-  | 'stats'
-  | 'customQuestions'
-  | 'achievements'
-  | 'dailyChallenges'
-  | 'aiChat'
-  | 'aiGenerator';
 
 function LoadingScreen() {
   const spinValue = useRef(new Animated.Value(0)).current;

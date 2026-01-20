@@ -2,6 +2,8 @@ export type GameMode = 'hetero' | 'gay' | 'lesbian';
 
 export type IntensityLevel = 'mild' | 'spicy' | 'extreme';
 
+export type Screen = 'tutorial' | 'mode' | 'level' | 'game' | 'question' | 'settings' | 'stats' | 'customQuestions' | 'achievements' | 'dailyChallenges' | 'aiChat' | 'aiGenerator';
+
 export type QuestionCategory = 'classic' | 'romantic' | 'party' | 'nsfw' | 'custom';
 
 export interface Question {
