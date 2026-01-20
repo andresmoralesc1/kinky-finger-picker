@@ -10,15 +10,16 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Responsive } from '../utils/responsive';
 
-export interface SpringButtonProps extends TouchableOpacityProps {
+export interface SpringButtonProps extends Omit<TouchableOpacityProps, 'style'> {
   title: string;
-  colors?: string[];
+  colors?: readonly [string, string, ...string[]];
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
   fullWidth?: boolean;
+  style?: any;
 }
 
 /**
@@ -33,9 +34,9 @@ export interface SpringButtonProps extends TouchableOpacityProps {
  * - Disabled state
  * - Full width option
  */
-export const SpringButton: React.FC<SpringButtonProps> = {
+export const SpringButton: React.FC<SpringButtonProps> = ({
   title,
-  colors = ['#FF006E', '#8338EC'],
+  colors = ['#FF006E', '#8338EC'] as const,
   variant = 'primary',
   size = 'medium',
   disabled = false,

@@ -133,7 +133,7 @@ export default function AccessibleTouchable({
         accessible={true}
         style={scaleOnPress ? animatedStyle : undefined}
       >
-        {typeof children === 'function' ? children(isPressed) : children}
+        {children}
       </TouchableOpacity>
     </Animated.View>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { GameMode, IntensityLevel, Player, Settings, GameStats, Question, PlayerStats, UserProgress, Achievement, DailyChallengeProgress, Screen } from './src/types';
@@ -17,6 +17,7 @@ import DailyChallengesScreen from './src/screens/DailyChallengesScreen';
 import AIChatScreen from './src/screens/AIChatScreen';
 import AIQuestionGeneratorScreen from './src/screens/AIQuestionGeneratorScreen';
 import AchievementUnlockedModal from './src/components/AchievementUnlockedModal';
+import { ScreenTransition, TransitionType, TransitionDirection } from './src/components/ScreenTransition';
 import { StorageService, defaultSettings, defaultStats, defaultUserProgress } from './src/utils/storage';
 import { soundManager } from './src/utils/sounds';
 import { checkAchievements } from './src/utils/achievements';
@@ -100,8 +101,77 @@ const loadingStyles = StyleSheet.create({
   },
 });
 
+// Navigation flow configuration for transitions
+const NAVIGATION_FLOW: Record<Screen, Screen[]> = {
+  tutorial: ['mode'],
+  mode: ['level', 'settings', 'stats', 'achievements', 'dailyChallenges', 'aiChat', 'aiGenerator'],
+  level: ['mode', 'game'],
+  game: ['level', 'question'],
+  question: ['game'],
+  settings: ['mode', 'customQuestions'],
+  stats: ['mode'],
+  customQuestions: ['settings'],
+  achievements: ['mode'],
+  dailyChallenges: ['mode'],
+  aiChat: ['mode'],
+  aiGenerator: ['mode'],
+};
+
+// Get transition type between screens
+function getTransitionConfig(
+  from: Screen | null,
+  to: Screen
+): { type: TransitionType; direction: TransitionDirection } {
+  // Game flow transitions (horizontal slide)
+  if ((from === 'mode' && to === 'level') ||
+      (from === 'level' && to === 'game') ||
+      (from === 'game' && to === 'question')) {
+    return { type: 'slide-horizontal', direction: 'forward' };
+  }
+
+  // Reverse game flow
+  if ((from === 'level' && to === 'mode') ||
+      (from === 'game' && to === 'level') ||
+      (from === 'question' && to === 'game')) {
+    return { type: 'slide-horizontal', direction: 'backward' };
+  }
+
+  // Settings/screens from main menu (fade)
+  if (from === 'mode' && ['settings', 'stats', 'achievements', 'dailyChallenges', 'aiChat', 'aiGenerator'].includes(to)) {
+    return { type: 'fade', direction: 'forward' };
+  }
+
+  // Back to main menu
+  if (from && ['settings', 'stats', 'achievements', 'dailyChallenges', 'aiChat', 'aiGenerator'].includes(from) && to === 'mode') {
+    return { type: 'fade', direction: 'backward' };
+  }
+
+  // Tutorial to mode (fade)
+  if (from === 'tutorial' && to === 'mode') {
+    return { type: 'fade', direction: 'forward' };
+  }
+
+  // Question to game (scale for dramatic effect)
+  if (from === 'question' && to === 'game') {
+    return { type: 'scale', direction: 'backward' };
+  }
+
+  // Custom questions from settings (horizontal)
+  if (from === 'settings' && to === 'customQuestions') {
+    return { type: 'slide-horizontal', direction: 'forward' };
+  }
+
+  if (from === 'customQuestions' && to === 'settings') {
+    return { type: 'slide-horizontal', direction: 'backward' };
+  }
+
+  // Default fallback
+  return { type: 'fade', direction: 'forward' };
+}
+
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('tutorial');
+  const [previousScreen, setPreviousScreen] = useState<Screen | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>('hetero');
   const [intensityLevel, setIntensityLevel] = useState<IntensityLevel>('mild');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -120,6 +190,21 @@ export default function App() {
     loadData();
     soundManager.init();
   }, []);
+
+  // Navigate to screen with transition
+  const navigateToScreen = (screen: Screen) => {
+    setPreviousScreen(currentScreen);
+    setCurrentScreen(screen);
+  };
+
+  // Get transition config for a specific screen
+  const getScreenTransition = (screen: Screen) => {
+    // Only the current screen should be visible with transition
+    if (screen !== currentScreen) {
+      return { type: 'none' as TransitionType, direction: 'forward' as TransitionDirection };
+    }
+    return getTransitionConfig(previousScreen, currentScreen);
+  };
 
   const loadData = async () => {
     try {
@@ -152,13 +237,13 @@ export default function App() {
 
       // Show interactive onboarding if not seen
       if (!tutorialSeen && loadedSettings.showTutorial) {
-        setCurrentScreen('tutorial'); // Will use InteractiveOnboardingScreen
+        navigateToScreen('tutorial'); // Will use InteractiveOnboardingScreen
       } else {
-        setCurrentScreen('mode');
+        navigateToScreen('mode');
       }
     } catch (error) {
       console.error('Error loading data:', error);
-      setCurrentScreen('mode');
+      navigateToScreen('mode');
     } finally {
       setIsLoading(false);
     }
@@ -233,17 +318,17 @@ export default function App() {
 
   const handleTutorialComplete = async () => {
     await StorageService.setTutorialSeen();
-    setCurrentScreen('mode');
+    navigateToScreen('mode');
   };
 
   const handleModeSelect = (mode: GameMode) => {
     setGameMode(mode);
-    setCurrentScreen('level');
+    navigateToScreen('level');
   };
 
   const handleLevelSelect = (level: IntensityLevel) => {
     setIntensityLevel(level);
-    setCurrentScreen('game');
+    navigateToScreen('game');
   };
 
   const handlePlayerSelected = (player: Player) => {
@@ -285,7 +370,7 @@ export default function App() {
       });
     }
 
-    setCurrentScreen('question');
+    navigateToScreen('question');
   };
 
   const handleQuestionComplete = (questionId: string, category?: string) => {
@@ -346,7 +431,7 @@ export default function App() {
 
     // Move to next round
     setSelectedPlayer(null);
-    setCurrentScreen('game');
+    navigateToScreen('game');
   };
 
   const handleQuestionSkip = (questionId: string) => {
@@ -383,18 +468,18 @@ export default function App() {
 
     // Move to next round
     setSelectedPlayer(null);
-    setCurrentScreen('game');
+    navigateToScreen('game');
   };
 
   const handleBackToMode = () => {
-    setCurrentScreen('mode');
+    navigateToScreen('mode');
     setSelectedPlayer(null);
     setUsedQuestionIds([]);
     setPlayerSkipCounts(new Map());
   };
 
   const handleBackToLevel = () => {
-    setCurrentScreen('level');
+    navigateToScreen('level');
     setSelectedPlayer(null);
   };
 
@@ -404,7 +489,7 @@ export default function App() {
     } else if (intensityLevel === 'spicy') {
       setIntensityLevel('extreme');
     }
-    setCurrentScreen('game');
+    navigateToScreen('game');
   };
 
   const handleLevelDown = () => {
@@ -413,31 +498,31 @@ export default function App() {
     } else if (intensityLevel === 'spicy') {
       setIntensityLevel('mild');
     }
-    setCurrentScreen('game');
+    navigateToScreen('game');
   };
 
   const handleChangeLevel = () => {
-    setCurrentScreen('level');
+    navigateToScreen('level');
   };
 
   const handleOpenSettings = () => {
-    setCurrentScreen('settings');
+    navigateToScreen('settings');
   };
 
   const handleOpenStats = () => {
-    setCurrentScreen('stats');
+    navigateToScreen('stats');
   };
 
   const handleOpenAchievements = () => {
-    setCurrentScreen('achievements');
+    navigateToScreen('achievements');
   };
 
   const handleOpenCustomQuestions = () => {
-    setCurrentScreen('customQuestions');
+    navigateToScreen('customQuestions');
   };
 
   const handleOpenDailyChallenges = () => {
-    setCurrentScreen('dailyChallenges');
+    navigateToScreen('dailyChallenges');
   };
 
   const handleCloseAchievementModal = () => {
@@ -449,7 +534,7 @@ export default function App() {
     // Quick Play: Default to Hetero + Mild and jump straight to game
     setGameMode('hetero');
     setIntensityLevel('mild');
-    setCurrentScreen('game');
+    navigateToScreen('game');
     soundManager.playSound('tap');
   };
 
@@ -479,11 +564,23 @@ export default function App() {
     <>
       <StatusBar style="light" />
 
-      {currentScreen === 'tutorial' && (
+      {/* Tutorial Screen */}
+      <ScreenTransition
+        visible={currentScreen === 'tutorial'}
+        type={getScreenTransition('tutorial').type}
+        direction={getScreenTransition('tutorial').direction}
+        duration={300}
+      >
         <InteractiveOnboardingScreen onComplete={handleTutorialComplete} />
-      )}
+      </ScreenTransition>
 
-      {currentScreen === 'mode' && (
+      {/* Mode Selection Screen */}
+      <ScreenTransition
+        visible={currentScreen === 'mode'}
+        type={getScreenTransition('mode').type}
+        direction={getScreenTransition('mode').direction}
+        duration={300}
+      >
         <ModeSelectionScreen
           onSelectMode={handleModeSelect}
           onQuickPlay={handleQuickPlay}
@@ -491,19 +588,31 @@ export default function App() {
           onOpenStats={handleOpenStats}
           onOpenAchievements={handleOpenAchievements}
           onOpenDailyChallenges={handleOpenDailyChallenges}
-          onOpenAIChat={() => setCurrentScreen('aiChat')}
-          onOpenAIGenerator={() => setCurrentScreen('aiGenerator')}
+          onOpenAIChat={() => navigateToScreen('aiChat')}
+          onOpenAIGenerator={() => navigateToScreen('aiGenerator')}
         />
-      )}
+      </ScreenTransition>
 
-      {currentScreen === 'level' && (
+      {/* Level Selection Screen */}
+      <ScreenTransition
+        visible={currentScreen === 'level'}
+        type={getScreenTransition('level').type}
+        direction={getScreenTransition('level').direction}
+        duration={300}
+      >
         <LevelSelectionScreen
           onSelectLevel={handleLevelSelect}
           onBack={handleBackToMode}
         />
-      )}
+      </ScreenTransition>
 
-      {currentScreen === 'game' && (
+      {/* Game Screen */}
+      <ScreenTransition
+        visible={currentScreen === 'game'}
+        type={getScreenTransition('game').type}
+        direction={getScreenTransition('game').direction}
+        duration={300}
+      >
         <ImprovedGameScreen
           mode={gameMode}
           level={intensityLevel}
@@ -511,84 +620,136 @@ export default function App() {
           onBack={handleBackToLevel}
           onChangeLevel={handleChangeLevel}
         />
-      )}
+      </ScreenTransition>
 
-      {currentScreen === 'question' && selectedPlayer && (
-        <ImprovedQuestionScreen
-          player={selectedPlayer}
-          level={intensityLevel}
-          settings={settings}
-          usedQuestionIds={usedQuestionIds}
-          skipCount={playerSkipCounts.get(selectedPlayer.id) || 0}
-          onComplete={handleQuestionComplete}
-          onSkip={handleQuestionSkip}
-          onChangeLevelUp={handleLevelUp}
-          onChangeLevelDown={handleLevelDown}
-          canLevelUp={intensityLevel !== 'extreme'}
-          canLevelDown={intensityLevel !== 'mild'}
-        />
-      )}
+      {/* Question Screen */}
+      <ScreenTransition
+        visible={currentScreen === 'question'}
+        type={getScreenTransition('question').type}
+        direction={getScreenTransition('question').direction}
+        duration={300}
+      >
+        {selectedPlayer && (
+          <ImprovedQuestionScreen
+            player={selectedPlayer}
+            level={intensityLevel}
+            settings={settings}
+            usedQuestionIds={usedQuestionIds}
+            skipCount={playerSkipCounts.get(selectedPlayer.id) || 0}
+            onComplete={handleQuestionComplete}
+            onSkip={handleQuestionSkip}
+            onChangeLevelUp={handleLevelUp}
+            onChangeLevelDown={handleLevelDown}
+            canLevelUp={intensityLevel !== 'extreme'}
+            canLevelDown={intensityLevel !== 'mild'}
+          />
+        )}
+      </ScreenTransition>
 
-      {currentScreen === 'settings' && (
+      {/* Settings Screen */}
+      <ScreenTransition
+        visible={currentScreen === 'settings'}
+        type={getScreenTransition('settings').type}
+        direction={getScreenTransition('settings').direction}
+        duration={300}
+      >
         <SettingsScreen
           settings={settings}
           onUpdateSettings={saveSettings}
-          onBack={() => setCurrentScreen('mode')}
+          onBack={() => navigateToScreen('mode')}
           onResetStats={handleResetStats}
           onOpenCustomQuestions={handleOpenCustomQuestions}
         />
-      )}
+      </ScreenTransition>
 
-      {currentScreen === 'stats' && (
+      {/* Stats Screen */}
+      <ScreenTransition
+        visible={currentScreen === 'stats'}
+        type={getScreenTransition('stats').type}
+        direction={getScreenTransition('stats').direction}
+        duration={300}
+      >
         <StatsScreen
           stats={stats}
-          onBack={() => setCurrentScreen('mode')}
+          onBack={() => navigateToScreen('mode')}
         />
-      )}
+      </ScreenTransition>
 
-      {currentScreen === 'customQuestions' && (
+      {/* Custom Questions Screen */}
+      <ScreenTransition
+        visible={currentScreen === 'customQuestions'}
+        type={getScreenTransition('customQuestions').type}
+        direction={getScreenTransition('customQuestions').direction}
+        duration={300}
+      >
         <CustomQuestionsScreen
           customQuestions={customQuestions}
           onAddQuestion={handleAddCustomQuestion}
           onDeleteQuestion={handleDeleteCustomQuestion}
-          onBack={() => setCurrentScreen('settings')}
+          onBack={() => navigateToScreen('settings')}
         />
-      )}
+      </ScreenTransition>
 
-      {currentScreen === 'achievements' && (
+      {/* Achievements Screen */}
+      <ScreenTransition
+        visible={currentScreen === 'achievements'}
+        type={getScreenTransition('achievements').type}
+        direction={getScreenTransition('achievements').direction}
+        duration={300}
+      >
         <AchievementsScreen
           userProgress={userProgress}
-          onBack={() => setCurrentScreen('mode')}
+          onBack={() => navigateToScreen('mode')}
         />
+      </ScreenTransition>
+
+      {/* Daily Challenges Screen */}
+      {dailyChallenges && (
+        <ScreenTransition
+          visible={currentScreen === 'dailyChallenges'}
+          type={getScreenTransition('dailyChallenges').type}
+          direction={getScreenTransition('dailyChallenges').direction}
+          duration={300}
+        >
+          <DailyChallengesScreen
+            challengeProgress={dailyChallenges}
+            onBack={() => navigateToScreen('mode')}
+          />
+        </ScreenTransition>
       )}
 
-      {currentScreen === 'dailyChallenges' && dailyChallenges && (
-        <DailyChallengesScreen
-          challengeProgress={dailyChallenges}
-          onBack={() => setCurrentScreen('mode')}
-        />
-      )}
-
-      {currentScreen === 'aiChat' && (
+      {/* AI Chat Screen */}
+      <ScreenTransition
+        visible={currentScreen === 'aiChat'}
+        type={getScreenTransition('aiChat').type}
+        direction={getScreenTransition('aiChat').direction}
+        duration={300}
+      >
         <AIChatScreen
           level={intensityLevel}
           mode={gameMode}
           playerCount={stats.totalPlayers}
-          onBack={() => setCurrentScreen('mode')}
+          onBack={() => navigateToScreen('mode')}
         />
-      )}
+      </ScreenTransition>
 
-      {currentScreen === 'aiGenerator' && (
+      {/* AI Generator Screen */}
+      <ScreenTransition
+        visible={currentScreen === 'aiGenerator'}
+        type={getScreenTransition('aiGenerator').type}
+        direction={getScreenTransition('aiGenerator').direction}
+        duration={300}
+      >
         <AIQuestionGeneratorScreen
-          onBack={() => setCurrentScreen('mode')}
+          onBack={() => navigateToScreen('mode')}
           onAddQuestions={(questions) => {
             // Add generated questions to custom questions
             StorageService.saveCustomQuestions([...customQuestions, ...questions]);
             setCustomQuestions(prev => [...prev, ...questions]);
-            setCurrentScreen('mode');
+            navigateToScreen('mode');
           }}
         />
-      )}
+      </ScreenTransition>
 
       {/* Achievement Unlocked Modal */}
       {newlyUnlockedAchievements.length > 0 && (
