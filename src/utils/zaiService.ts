@@ -1,12 +1,13 @@
 /**
  * Z.ai API Service for Kinky Finger Picker
- * Integration with GLM-4.6 model for AI-powered features
+ * Integration with GLM-4.7 model for AI-powered features
  */
 
 // API Configuration
 const ZAI_CONFIG = {
   baseURL: 'https://api.z.ai/api/coding/paas/v4',
-  apiKey: '7fa72fc789e44077827a30054d99fed1.rXHDigZaDwAI5MxY',
+  // API Key must be set via environment variable EXPO_PUBLIC_ZAI_API_KEY
+  apiKey: process.env.EXPO_PUBLIC_ZAI_API_KEY || '',
   model: 'glm-4.7',
   maxTokens: 1000,
   temperature: 0.9, // High creativity for varied questions
@@ -40,6 +41,11 @@ class ZAIService {
    * Generate completion using Z.ai API
    */
   private async generateCompletion(messages: AIMessage[]): Promise<string> {
+    // Validate API key is configured
+    if (!this.config.apiKey) {
+      throw new Error('Z.ai API key is not configured. Please set EXPO_PUBLIC_ZAI_API_KEY environment variable.');
+    }
+
     try {
       const response = await fetch(`${this.config.baseURL}/chat/completions`, {
         method: 'POST',

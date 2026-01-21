@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import ModeSelectionScreen from '../ModeSelectionScreen';
 import { GameMode } from '../../types';
 
@@ -108,17 +108,27 @@ describe('ModeSelectionScreen', () => {
     expect(getByText('⚙️')).toBeTruthy();
   });
 
-  it('should call onOpenSettings when settings button is pressed', () => {
-    const { getByText } = render(
+  it('should call onOpenSettings when settings button is pressed', async () => {
+    const { getAllByRole } = render(
       <ModeSelectionScreen
         onSelectMode={mockOnSelectMode}
         onOpenSettings={mockOnOpenSettings}
       />
     );
 
-    fireEvent.press(getByText('⚙️'));
+    // Get all buttons and find the settings one
+    const buttons = getAllByRole('button');
+    const settingsButton = buttons.find(btn => {
+      const props = btn.props;
+      return props?.accessibilityLabel === 'Settings';
+    });
 
-    expect(mockOnOpenSettings).toHaveBeenCalledTimes(1);
+    fireEvent.press(settingsButton!);
+
+    // Wait for the setTimeout in AccessibleTouchable to complete
+    await waitFor(() => {
+      expect(mockOnOpenSettings).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('should render stats icon button when onOpenStats is provided', () => {
