@@ -94,12 +94,12 @@ const loadingStyles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#FF006E',
+    color: '#E50914',
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#BBB',
+    color: '#FFF',
   },
 });
 

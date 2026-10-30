@@ -132,7 +132,7 @@ export default function ModeSelectionScreen({
               style={styles.quickPlayTouchable}
             >
               <LinearGradient
-                colors={['#FF006E', '#8338EC'] as const}
+                colors={['#E50914', '#B81D24'] as const}
                 style={styles.quickPlayGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
@@ -164,7 +164,7 @@ export default function ModeSelectionScreen({
               accessibilityHint="Choose Hetero mode with split screen for female and male players"
             >
               <LinearGradient
-                colors={['#FF006E', '#FF1744'] as const}
+                colors={['#E50914', '#8E0E00'] as const}
                 style={styles.cardGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -185,7 +185,7 @@ export default function ModeSelectionScreen({
               accessibilityHint="Choose Gay mode with full screen for male players"
             >
               <LinearGradient
-                colors={['#3A86FF', '#8338EC'] as const}
+                colors={['#B81D24', '#4A0E17'] as const}
                 style={styles.cardGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -206,7 +206,7 @@ export default function ModeSelectionScreen({
               accessibilityHint="Choose Lesbian mode with full screen for female players"
             >
               <LinearGradient
-                colors={['#FF6D00', '#FFBE0B'] as const}
+                colors={['#FF2A3A', '#9B0014'] as const}
                 style={styles.cardGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -235,7 +235,7 @@ export default function ModeSelectionScreen({
                     accessibilityLabel="AI Chat Assistant"
                   >
                     <LinearGradient
-                      colors={['rgba(131, 56, 236, 0.25)', 'rgba(58, 134, 255, 0.25)'] as const}
+                      colors={['rgba(229, 9, 20, 0.25)', 'rgba(255, 255, 255, 0.08)'] as const}
                       style={styles.aiPillGradient}
                     >
                       <Text style={styles.aiPillEmoji}>💬</Text>
@@ -253,7 +253,7 @@ export default function ModeSelectionScreen({
                     accessibilityLabel="AI Question Generator"
                   >
                     <LinearGradient
-                      colors={['rgba(255, 0, 110, 0.25)', 'rgba(131, 56, 236, 0.25)'] as const}
+                      colors={['rgba(255, 42, 58, 0.25)', 'rgba(229, 9, 20, 0.25)'] as const}
                       style={styles.aiPillGradient}
                     >
                       <Text style={styles.aiPillEmoji}>✨</Text>
@@ -300,15 +300,15 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   badge: {
-    backgroundColor: 'rgba(255, 0, 110, 0.15)',
+    backgroundColor: 'rgba(229, 9, 20, 0.15)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 0, 110, 0.4)',
+    borderColor: 'rgba(229, 9, 20, 0.5)',
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   badgeText: {
-    color: '#FF006E',
+    color: '#FF2A3A',
     fontSize: 11,
     fontWeight: 'bold',
     letterSpacing: 0.5,
@@ -348,12 +348,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '900',
-    color: '#FF006E',
+    color: '#E50914',
     letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 13,
-    color: '#999',
+    color: '#ccc',
     marginTop: 2,
   },
   quickPlayTouchable: {
@@ -362,9 +362,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 18,
     elevation: 8,
-    shadowColor: '#FF006E',
+    shadowColor: '#E50914',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
+    shadowOpacity: 0.45,
     shadowRadius: 10,
   },
   quickPlayGradient: {
