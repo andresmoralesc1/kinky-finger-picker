@@ -26,36 +26,19 @@ export default function ModeSelectionScreen({
   onOpenAIGenerator,
 }: Props) {
   const logoScale = React.useRef(new Animated.Value(1)).current;
-  const fadeAnim = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.spring(logoScale, {
-        toValue: 1,
-        tension: 50,
-        friction: 7,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
     const pulseAnimation = Animated.loop(
       Animated.sequence([
-        Animated.spring(logoScale, {
+        Animated.timing(logoScale, {
           toValue: 1.05,
-          tension: 20,
-          friction: 5,
-          useNativeDriver: true,
+          duration: 900,
+          useNativeDriver: false,
         }),
-        Animated.spring(logoScale, {
+        Animated.timing(logoScale, {
           toValue: 1,
-          tension: 20,
-          friction: 5,
-          useNativeDriver: true,
+          duration: 900,
+          useNativeDriver: false,
         }),
       ])
     );
@@ -64,7 +47,7 @@ export default function ModeSelectionScreen({
   }, []);
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+    <View style={styles.container}>
       <ScrollView
         style={styles.scrollWrapper}
         contentContainerStyle={styles.scrollContent}
@@ -283,7 +266,7 @@ export default function ModeSelectionScreen({
           )}
         </View>
       </ScrollView>
-    </Animated.View>
+    </View>
   );
 }
 

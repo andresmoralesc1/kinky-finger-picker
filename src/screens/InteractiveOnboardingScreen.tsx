@@ -68,13 +68,12 @@ export default function InteractiveOnboardingScreen({ onComplete }: Props) {
 
   const handleStart = () => {
     soundManager.playSound('tap');
+    setStep('touch');
     Animated.timing(overlayOpacity, {
       toValue: 0.7,
       duration: 300,
-      useNativeDriver: true,
-    }).start(() => {
-      setStep('touch');
-    });
+      useNativeDriver: false,
+    }).start();
   };
 
   const panResponder = useRef(

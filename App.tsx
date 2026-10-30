@@ -172,7 +172,7 @@ function getTransitionConfig(
 }
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<Screen>('tutorial');
+  const [currentScreen, setCurrentScreen] = useState<Screen>('mode');
   const [previousScreen, setPreviousScreen] = useState<Screen | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>('hetero');
   const [intensityLevel, setIntensityLevel] = useState<IntensityLevel>('mild');
@@ -237,12 +237,8 @@ export default function App() {
       soundManager.setSoundEnabled(loadedSettings.soundEnabled);
       soundManager.setMusicEnabled(loadedSettings.musicEnabled);
 
-      // Show interactive onboarding if not seen
-      if (!tutorialSeen && loadedSettings.showTutorial) {
-        navigateToScreen('tutorial'); // Will use InteractiveOnboardingScreen
-      } else {
-        navigateToScreen('mode');
-      }
+      // Always land directly on Home (Mode Selection)
+      navigateToScreen('mode');
     } catch (error) {
       console.error('Error loading data:', error);
       navigateToScreen('mode');
