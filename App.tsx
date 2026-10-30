@@ -3,9 +3,10 @@ import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { GameMode, IntensityLevel, Player, Settings, GameStats, Question, PlayerStats, UserProgress, Achievement, DailyChallengeProgress, Screen } from './src/types';
+// Note: Navigation uses a lightweight hand-rolled state machine (useState<Screen> + ScreenTransition)
+// rather than @react-navigation to optimize bundle size and startup speed for mobile and web.
 import ModeSelectionScreen from './src/screens/ModeSelectionScreen';
 import LevelSelectionScreen from './src/screens/LevelSelectionScreen';
-import GameScreen from './src/screens/GameScreen';
 import ImprovedGameScreen from './src/screens/ImprovedGameScreen';
 import ImprovedQuestionScreen from './src/screens/ImprovedQuestionScreen';
 import TutorialScreen from './src/screens/TutorialScreen';

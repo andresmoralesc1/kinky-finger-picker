@@ -2,7 +2,7 @@
   "version": 2,
   "name": "kinky-finger-picker",
   "buildCommand": "npm run build:web",
-  "outputDirectory": "web-build",
+  "outputDirectory": "dist",
   "framework": null,
   "rewrites": [
     {

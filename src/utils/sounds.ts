@@ -44,9 +44,10 @@ class SoundManager {
     if (!this.soundEnabled) return;
 
     try {
-      // Using web audio API for simple tones
-      // In production app, load actual sound files from assets
-      const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+      if (typeof window === 'undefined') return;
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const context = new AudioCtx();
       const oscillator = context.createOscillator();
       const gainNode = context.createGain();
 

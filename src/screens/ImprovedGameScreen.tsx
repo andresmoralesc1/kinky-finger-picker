@@ -127,16 +127,57 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   const handleTouchStart = (evt: GestureResponderEvent) => {
     if (isSelecting) return;
 
-    const touches = evt.nativeEvent.touches as unknown as Touch[];
+    const nativeEvt = evt.nativeEvent as any;
+    const rawTouches = (nativeEvt?.touches || []) as unknown as Touch[];
 
-    // Process all current touches
-    touches.forEach((touch: Touch) => {
-      const touchId = touch.identifier;
+    if (rawTouches.length > 0) {
+      // Process all current touches (mobile / tablet / touch devices)
+      rawTouches.forEach((touch: Touch) => {
+        const touchId = touch.identifier;
 
-      // Only add if we haven't already tracked this touch
-      if (!activeTouches.current.has(touchId)) {
-        const x = touch.pageX;
-        const y = touch.pageY;
+        // Only add if we haven't already tracked this touch
+        if (!activeTouches.current.has(touchId)) {
+          const x = touch.pageX;
+          const y = touch.pageY;
+          const color = getRandomColor(usedColors.current);
+          usedColors.current.push(color);
+
+          const player: Player = {
+            id: touchId,
+            x,
+            y,
+            color,
+            gender: mode === 'hetero' ? (x < screenWidth / 2 ? 'female' : 'male') : undefined,
+          };
+
+          activeTouches.current.set(touchId, player);
+          addRipple(x, y, color);
+        }
+      });
+    } else if (typeof nativeEvt?.pageX === 'number') {
+      // Desktop / mouse support: clicking places or removes a virtual finger
+      const x = nativeEvt.pageX;
+      const y = nativeEvt.pageY;
+      const existingId = Array.from(activeTouches.current.entries()).find(([_, p]) => {
+        const dx = p.x - x;
+        const dy = p.y - y;
+        return Math.sqrt(dx * dx + dy * dy) < 40;
+      })?.[0];
+
+      if (existingId !== undefined) {
+        activeTouches.current.delete(existingId);
+        const allPlayers = Array.from(activeTouches.current.values());
+        setPlayers(allPlayers);
+        if (allPlayers.length < 2) {
+          setCountdown(null);
+          if (countdownTimeout.current) {
+            clearTimeout(countdownTimeout.current);
+            countdownTimeout.current = null;
+          }
+        }
+        return;
+      } else {
+        const touchId = Date.now();
         const color = getRandomColor(usedColors.current);
         usedColors.current.push(color);
 
@@ -151,7 +192,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
         activeTouches.current.set(touchId, player);
         addRipple(x, y, color);
       }
-    });
+    }
 
     // Update players state with all active touches
     const allPlayers = Array.from(activeTouches.current.values());
@@ -173,7 +214,9 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   const handleTouchMove = (evt: GestureResponderEvent) => {
     if (isSelecting) return;
 
-    const touches = evt.nativeEvent.touches as unknown as Touch[];
+    const nativeEvt = evt.nativeEvent as any;
+    const touches = (nativeEvt?.touches || []) as unknown as Touch[];
+    if (touches.length === 0) return;
 
     // Update positions of existing touches
     touches.forEach((touch: Touch) => {
@@ -196,8 +239,12 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   const handleTouchEnd = (evt: GestureResponderEvent) => {
     if (isSelecting) return;
 
+    const nativeEvt = evt.nativeEvent as any;
+    const changedTouches = (nativeEvt?.changedTouches || []) as unknown as Touch[];
+    // On desktop mouse clicks, changedTouches is empty so keep pins placed
+    if (changedTouches.length === 0) return;
+
     // Remove touches that ended
-    const changedTouches = evt.nativeEvent.changedTouches as unknown as Touch[];
     changedTouches.forEach((touch: Touch) => {
       activeTouches.current.delete(touch.identifier);
     });
@@ -332,7 +379,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
               All players touch the screen with one finger
             </Text>
             <Text style={styles.instructionSubtext}>
-              Minimum 2 players
+              Minimum 2 players (or click on desktop)
             </Text>
           </View>
         </BounceAnimation>
