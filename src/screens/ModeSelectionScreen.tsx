@@ -1,11 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, Animated, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Animated, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GameMode } from '../types';
-import { SpringButton } from '../components/SpringButton';
 import AccessibleTouchable from '../components/AccessibleTouchable';
-
-const { width, height } = Dimensions.get('window');
 
 interface Props {
   onSelectMode: (mode: GameMode) => void;
@@ -18,16 +15,6 @@ interface Props {
   onOpenAIGenerator?: () => void;
 }
 
-/**
- * Enhanced mode selection screen with improved animations and micro-interactions
- *
- * Features:
- * - Animated logo with pulse effect
- * - Spring buttons for all interactive elements
- * - Improved accessibility labels
- * - Smooth hover/press states
- * - Enhanced visual hierarchy
- */
 export default function ModeSelectionScreen({
   onSelectMode,
   onQuickPlay,
@@ -36,17 +23,16 @@ export default function ModeSelectionScreen({
   onOpenAchievements,
   onOpenDailyChallenges,
   onOpenAIChat,
-  onOpenAIGenerator
+  onOpenAIGenerator,
 }: Props) {
   const logoScale = React.useRef(new Animated.Value(1)).current;
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
-    // Initial animations
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 600,
+        duration: 500,
         useNativeDriver: true,
       }),
       Animated.spring(logoScale, {
@@ -57,7 +43,6 @@ export default function ModeSelectionScreen({
       }),
     ]).start();
 
-    // Subtle logo pulse
     const pulseAnimation = Animated.loop(
       Animated.sequence([
         Animated.spring(logoScale, {
@@ -75,7 +60,6 @@ export default function ModeSelectionScreen({
       ])
     );
     pulseAnimation.start();
-
     return () => pulseAnimation.stop();
   }, []);
 
@@ -87,205 +71,216 @@ export default function ModeSelectionScreen({
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.cardWrapper}>
-          {/* Header buttons */}
-          <View style={styles.headerButtons}>
-            {onOpenDailyChallenges && (
-              <AccessibleTouchable
-                style={styles.iconButton}
-                onPress={onOpenDailyChallenges}
-                accessibilityLabel="Daily Challenges"
-                accessibilityHint="View your daily challenges and rewards"
-                accessibilityRole="button"
-              >
-                <Text style={styles.iconButtonText}>🎯</Text>
-              </AccessibleTouchable>
-            )}
-            {onOpenAchievements && (
-              <AccessibleTouchable
-                style={styles.iconButton}
-                onPress={onOpenAchievements}
-                accessibilityLabel="Achievements"
-                accessibilityHint="View your unlocked achievements"
-                accessibilityRole="button"
-              >
-                <Text style={styles.iconButtonText}>🏆</Text>
-              </AccessibleTouchable>
-            )}
-            {onOpenStats && (
-              <AccessibleTouchable
-                style={styles.iconButton}
-                onPress={onOpenStats}
-                accessibilityLabel="Statistics"
-                accessibilityHint="View your game statistics"
-                accessibilityRole="button"
-              >
-                <Text style={styles.iconButtonText}>📊</Text>
-              </AccessibleTouchable>
-            )}
-            {onOpenSettings && (
-              <AccessibleTouchable
-                style={styles.iconButton}
-                onPress={onOpenSettings}
-                accessibilityLabel="Settings"
-                accessibilityHint="Open settings to customize the game"
-                accessibilityRole="button"
-              >
-                <Text style={styles.iconButtonText}>⚙️</Text>
-              </AccessibleTouchable>
-            )}
+          {/* Top Bar: Badge left, Action Icons right */}
+          <View style={styles.topBar}>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>🌶️ 18+ PARTY GAME</Text>
+            </View>
+
+            <View style={styles.headerButtons}>
+              {onOpenDailyChallenges && (
+                <AccessibleTouchable
+                  style={styles.iconButton}
+                  onPress={onOpenDailyChallenges}
+                  accessibilityLabel="Daily Challenges"
+                  accessibilityHint="View your daily challenges and rewards"
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.iconButtonText}>🎯</Text>
+                </AccessibleTouchable>
+              )}
+              {onOpenAchievements && (
+                <AccessibleTouchable
+                  style={styles.iconButton}
+                  onPress={onOpenAchievements}
+                  accessibilityLabel="Achievements"
+                  accessibilityHint="View your unlocked achievements"
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.iconButtonText}>🏆</Text>
+                </AccessibleTouchable>
+              )}
+              {onOpenStats && (
+                <AccessibleTouchable
+                  style={styles.iconButton}
+                  onPress={onOpenStats}
+                  accessibilityLabel="Statistics"
+                  accessibilityHint="View your game statistics"
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.iconButtonText}>📊</Text>
+                </AccessibleTouchable>
+              )}
+              {onOpenSettings && (
+                <AccessibleTouchable
+                  style={styles.iconButton}
+                  onPress={onOpenSettings}
+                  accessibilityLabel="Settings"
+                  accessibilityHint="Open settings to customize the game"
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.iconButtonText}>⚙️</Text>
+                </AccessibleTouchable>
+              )}
+            </View>
           </View>
 
-          <Text style={styles.title}>Kinky Finger Picker</Text>
-
-          {/* Logo with animation */}
-          <Animated.Image
-            source={require('../../assets/logo.png')}
-            style={[styles.logo, { transform: [{ scale: logoScale }] }]}
-            resizeMode="contain"
-          />
-
-          {/* Quick Play Button */}
-          {onQuickPlay && (
-            <View style={styles.quickPlayContainer}>
-              <TouchableOpacity
-                onPress={onQuickPlay}
-                activeOpacity={0.9}
-                accessibilityRole="button"
-                accessibilityLabel="Quick Play"
-                accessibilityHint="Start a game immediately with Hetero mode and Mild level"
-                style={styles.quickPlayTouchable}
-              >
-                <LinearGradient
-                  colors={['#FF006E', '#8338EC'] as const}
-                  style={styles.quickPlayButton}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <Text style={styles.quickPlayEmoji}>🚀</Text>
-                  <Text style={styles.quickPlayText}>QUICK PLAY</Text>
-                  <Text style={styles.quickPlaySubtext}>Hetero • Mild</Text>
-                </LinearGradient>
-              </TouchableOpacity>
+          {/* Compact Brand Header */}
+          <View style={styles.heroSection}>
+            <Animated.Image
+              source={require('../../assets/logo.png')}
+              style={[styles.logo, { transform: [{ scale: logoScale }] }]}
+              resizeMode="contain"
+            />
+            <View style={styles.titleContainer}>
+              <Text style={styles.title}>Kinky Finger Picker</Text>
+              <Text style={styles.subtitle}>Put fingers on screen & break the ice</Text>
             </View>
+          </View>
+
+          {/* Compact Quick Play Button */}
+          {onQuickPlay && (
+            <TouchableOpacity
+              onPress={onQuickPlay}
+              activeOpacity={0.88}
+              accessibilityRole="button"
+              accessibilityLabel="Quick Play"
+              accessibilityHint="Start a game immediately with Hetero mode and Mild level"
+              style={styles.quickPlayTouchable}
+            >
+              <LinearGradient
+                colors={['#FF006E', '#8338EC'] as const}
+                style={styles.quickPlayGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Text style={styles.quickPlayEmoji}>🚀</Text>
+                <View style={styles.quickPlayTextGroup}>
+                  <Text style={styles.quickPlayTitle}>QUICK PLAY</Text>
+                  <Text style={styles.quickPlaySub}>Hetero • Mild</Text>
+                </View>
+                <Text style={styles.quickPlayArrow}>→</Text>
+              </LinearGradient>
+            </TouchableOpacity>
           )}
 
-          <Text style={styles.subtitle}>Or choose your mode</Text>
+          {/* Section Divider: Modes */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>CHOOSE GAME MODE</Text>
+          </View>
 
-          <View style={styles.buttonsContainer}>
-            {/* Hetero Mode Button */}
+          {/* Modes Grid: 3 columns side by side */}
+          <View style={styles.modesGrid}>
+            {/* Hetero */}
             <TouchableOpacity
-              style={styles.button}
+              style={styles.gridCard}
               onPress={() => onSelectMode('hetero')}
-              activeOpacity={0.9}
+              activeOpacity={0.85}
               accessibilityRole="button"
               accessibilityLabel="Hetero mode"
               accessibilityHint="Choose Hetero mode with split screen for female and male players"
             >
               <LinearGradient
                 colors={['#FF006E', '#FF1744'] as const}
-                style={styles.gradient}
+                style={styles.cardGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.buttonEmoji}>♀️♂️</Text>
-                <Text style={styles.buttonText}>Hetero</Text>
-                <Text style={styles.buttonSubtext}>Split screen mode</Text>
+                <Text style={styles.cardEmoji}>♀️♂️</Text>
+                <Text style={styles.cardTitle}>Hetero</Text>
+                <Text style={styles.cardSub}>Split screen</Text>
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* Gay Mode Button */}
+            {/* Gay */}
             <TouchableOpacity
-              style={styles.button}
+              style={styles.gridCard}
               onPress={() => onSelectMode('gay')}
-              activeOpacity={0.9}
+              activeOpacity={0.85}
               accessibilityRole="button"
               accessibilityLabel="Gay mode"
               accessibilityHint="Choose Gay mode with full screen for male players"
             >
               <LinearGradient
                 colors={['#3A86FF', '#8338EC'] as const}
-                style={styles.gradient}
+                style={styles.cardGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.buttonEmoji}>♂️♂️</Text>
-                <Text style={styles.buttonText}>Gay</Text>
-                <Text style={styles.buttonSubtext}>Full screen mode</Text>
+                <Text style={styles.cardEmoji}>♂️♂️</Text>
+                <Text style={styles.cardTitle}>Gay</Text>
+                <Text style={styles.cardSub}>All guys</Text>
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* Lesbian Mode Button */}
+            {/* Lesbian */}
             <TouchableOpacity
-              style={styles.button}
+              style={styles.gridCard}
               onPress={() => onSelectMode('lesbian')}
-              activeOpacity={0.9}
+              activeOpacity={0.85}
               accessibilityRole="button"
               accessibilityLabel="Lesbian mode"
               accessibilityHint="Choose Lesbian mode with full screen for female players"
             >
               <LinearGradient
                 colors={['#FF6D00', '#FFBE0B'] as const}
-                style={styles.gradient}
+                style={styles.cardGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.buttonEmoji}>♀️♀️</Text>
-                <Text style={styles.buttonText}>Lesbian</Text>
-                <Text style={styles.buttonSubtext}>Full screen mode</Text>
+                <Text style={styles.cardEmoji}>♀️♀️</Text>
+                <Text style={styles.cardTitle}>Lesbian</Text>
+                <Text style={styles.cardSub}>All girls</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
 
-          {/* AI Features Section */}
-          <Text style={styles.subtitle}>🤖 AI-Powered Features</Text>
+          {/* AI Features: Compact horizontal pills */}
+          {(onOpenAIChat || onOpenAIGenerator) && (
+            <View style={styles.aiSection}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>AI FEATURES</Text>
+              </View>
 
-          <View style={styles.aiButtonsContainer}>
-            {/* AI Chat Button */}
-            {onOpenAIChat && (
-              <TouchableOpacity
-                style={styles.aiButton}
-                onPress={onOpenAIChat}
-                activeOpacity={0.9}
-                accessibilityRole="button"
-                accessibilityLabel="AI Chat Assistant"
-                accessibilityHint="Chat with AI assistant for suggestions and advice"
-              >
-                <LinearGradient
-                  colors={['#8338EC', '#3A86FF'] as const}
-                  style={styles.aiGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <Text style={styles.aiEmoji}>💬</Text>
-                  <Text style={styles.aiText}>AI Chat</Text>
-                  <Text style={styles.aiSubtext}>Suggestions & advice</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            )}
+              <View style={styles.aiRow}>
+                {onOpenAIChat && (
+                  <TouchableOpacity
+                    style={styles.aiPill}
+                    onPress={onOpenAIChat}
+                    activeOpacity={0.85}
+                    accessibilityRole="button"
+                    accessibilityLabel="AI Chat Assistant"
+                  >
+                    <LinearGradient
+                      colors={['rgba(131, 56, 236, 0.25)', 'rgba(58, 134, 255, 0.25)'] as const}
+                      style={styles.aiPillGradient}
+                    >
+                      <Text style={styles.aiPillEmoji}>💬</Text>
+                      <Text style={styles.aiPillText}>AI Chat</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                )}
 
-            {/* AI Generator Button */}
-            {onOpenAIGenerator && (
-              <TouchableOpacity
-                style={styles.aiButton}
-                onPress={onOpenAIGenerator}
-                activeOpacity={0.9}
-                accessibilityRole="button"
-                accessibilityLabel="AI Question Generator"
-                accessibilityHint="Generate custom questions with AI"
-              >
-                <LinearGradient
-                  colors={['#FF006E', '#8338EC', '#3A86FF'] as const}
-                  style={styles.aiGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <Text style={styles.aiEmoji}>✨</Text>
-                  <Text style={styles.aiText}>AI Generator</Text>
-                  <Text style={styles.aiSubtext}>Create questions</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            )}
-          </View>
+                {onOpenAIGenerator && (
+                  <TouchableOpacity
+                    style={styles.aiPill}
+                    onPress={onOpenAIGenerator}
+                    activeOpacity={0.85}
+                    accessibilityRole="button"
+                    accessibilityLabel="AI Question Generator"
+                  >
+                    <LinearGradient
+                      colors={['rgba(255, 0, 110, 0.25)', 'rgba(131, 56, 236, 0.25)'] as const}
+                      style={styles.aiPillGradient}
+                    >
+                      <Text style={styles.aiPillEmoji}>✨</Text>
+                      <Text style={styles.aiPillText}>AI Generator</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
     </Animated.View>
@@ -295,7 +290,7 @@ export default function ModeSelectionScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#0a0a0f',
     width: '100%',
   },
   scrollWrapper: {
@@ -304,159 +299,193 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingVertical: 24,
+    justifyContent: 'center',
+    paddingVertical: 18,
     paddingHorizontal: 16,
     minHeight: '100%',
   },
   cardWrapper: {
     width: '100%',
-    maxWidth: 480,
+    maxWidth: 580,
     alignItems: 'center',
   },
-  headerButtons: {
+  topBar: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 12,
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 16,
-    zIndex: 10,
+  },
+  badge: {
+    backgroundColor: 'rgba(255, 0, 110, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 0, 110, 0.4)',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  badgeText: {
+    color: '#FF006E',
+    fontSize: 11,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 8,
   },
   iconButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
   },
   iconButtonText: {
-    fontSize: 22,
+    fontSize: 18,
   },
-  title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#FF006E',
-    marginBottom: 8,
-    textAlign: 'center',
+  heroSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    marginBottom: 18,
+    width: '100%',
+    paddingHorizontal: 4,
   },
   logo: {
-    width: 170,
-    height: 170,
-    marginBottom: 20,
+    width: 72,
+    height: 72,
   },
-  quickPlayContainer: {
-    width: '100%',
-    marginBottom: 24,
+  titleContainer: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: '900',
+    color: '#FF006E',
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    fontSize: 13,
+    color: '#999',
+    marginTop: 2,
   },
   quickPlayTouchable: {
     width: '100%',
-    borderRadius: 22,
+    borderRadius: 16,
     overflow: 'hidden',
-  },
-  quickPlayButton: {
-    width: '100%',
-    height: 130,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
+    marginBottom: 18,
+    elevation: 8,
     shadowColor: '#FF006E',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 12,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+  },
+  quickPlayGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    gap: 12,
   },
   quickPlayEmoji: {
-    fontSize: 44,
-    marginBottom: 6,
+    fontSize: 26,
   },
-  quickPlayText: {
-    fontSize: 28,
+  quickPlayTextGroup: {
+    flex: 1,
+  },
+  quickPlayTitle: {
+    fontSize: 17,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 4,
+    letterSpacing: 0.5,
+  },
+  quickPlaySub: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.85)',
+  },
+  quickPlayArrow: {
+    fontSize: 20,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  sectionHeader: {
+    width: '100%',
+    marginBottom: 10,
+  },
+  sectionTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#666',
     letterSpacing: 1,
   },
-  quickPlaySubtext: {
-    fontSize: 15,
-    color: '#fff',
-    opacity: 0.9,
-  },
-  subtitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#fff',
-    marginBottom: 16,
-    opacity: 0.85,
-    textAlign: 'center',
-  },
-  buttonsContainer: {
-    width: '100%',
-    gap: 16,
-    marginBottom: 28,
-  },
-  button: {
-    width: '100%',
-    height: 110,
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  gradient: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-  buttonEmoji: {
-    fontSize: 36,
-    marginBottom: 4,
-  },
-  buttonText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  buttonSubtext: {
-    fontSize: 13,
-    color: '#fff',
-    opacity: 0.9,
-  },
-  aiButtonsContainer: {
+  modesGrid: {
     width: '100%',
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 30,
+    gap: 10,
+    marginBottom: 16,
   },
-  aiButton: {
+  gridCard: {
     flex: 1,
-    height: 110,
-    borderRadius: 20,
+    height: 120,
+    borderRadius: 16,
     overflow: 'hidden',
   },
-  aiGradient: {
+  cardGradient: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 12,
+    padding: 10,
   },
-  aiEmoji: {
-    fontSize: 28,
-    marginBottom: 4,
+  cardEmoji: {
+    fontSize: 30,
+    marginBottom: 6,
   },
-  aiText: {
-    fontSize: 17,
+  cardTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 2,
   },
-  aiSubtext: {
-    fontSize: 12,
-    color: '#fff',
-    opacity: 0.85,
+  cardSub: {
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.85)',
     textAlign: 'center',
+  },
+  aiSection: {
+    width: '100%',
+    marginTop: 4,
+  },
+  aiRow: {
+    width: '100%',
+    flexDirection: 'row',
+    gap: 10,
+  },
+  aiPill: {
+    flex: 1,
+    height: 48,
+    borderRadius: 14,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  aiPillGradient: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 10,
+  },
+  aiPillEmoji: {
+    fontSize: 18,
+  },
+  aiPillText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#fff',
   },
 });

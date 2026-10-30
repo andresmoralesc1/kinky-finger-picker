@@ -85,9 +85,10 @@ export default function InteractiveOnboardingScreen({ onComplete }: Props) {
       onPanResponderGrant: (evt) => {
         if (step !== 'touch') return;
 
-        const touches = evt.nativeEvent.touches;
-        if (touches.length >= 2) {
-          const newPlayers: Player[] = touches.slice(0, 2).map((touch, index) => ({
+        const nativeEvt = evt.nativeEvent as any;
+        const rawTouches = (nativeEvt?.touches || []);
+        if (rawTouches.length >= 2) {
+          const newPlayers: Player[] = rawTouches.slice(0, 2).map((touch: any, index: number) => ({
             id: index,
             x: touch.pageX,
             y: touch.pageY,
@@ -99,6 +100,26 @@ export default function InteractiveOnboardingScreen({ onComplete }: Props) {
           soundManager.playSound('tap');
 
           // Hide overlay and start countdown
+          Animated.timing(overlayOpacity, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }).start();
+
+          startCountdown();
+        } else if (typeof nativeEvt?.pageX === 'number') {
+          // Desktop click support: simulate 2 test players
+          const x = nativeEvt.pageX;
+          const y = nativeEvt.pageY;
+          const newPlayers: Player[] = [
+            { id: 0, x: Math.max(50, x - 60), y, color: getRandomColor([]) },
+            { id: 1, x: x + 60, y, color: getRandomColor([]) },
+          ];
+
+          setPlayers(newPlayers);
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          soundManager.playSound('tap');
+
           Animated.timing(overlayOpacity, {
             toValue: 0,
             duration: 300,
@@ -167,6 +188,15 @@ export default function InteractiveOnboardingScreen({ onComplete }: Props) {
       />
 
       {showConfetti && <ConfettiEffect colors={['#FF006E', '#FFD700', '#fff']} />}
+
+      <TouchableOpacity
+        style={styles.skipButton}
+        onPress={onComplete}
+        accessibilityRole="button"
+        accessibilityLabel="Skip tutorial"
+      >
+        <Text style={styles.skipButtonText}>Skip ➔</Text>
+      </TouchableOpacity>
 
       {/* STEP 1: Welcome */}
       {step === 'welcome' && (
@@ -293,6 +323,23 @@ export default function InteractiveOnboardingScreen({ onComplete }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  skipButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+    zIndex: 100,
+  },
+  skipButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
   centerContent: {
     flex: 1,
