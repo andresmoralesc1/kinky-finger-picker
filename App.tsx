@@ -563,148 +563,166 @@ export default function App() {
       <StatusBar style="light" />
 
       {/* Tutorial Screen */}
-      <ScreenTransition
-        visible={currentScreen === 'tutorial'}
-        type={getScreenTransition('tutorial').type}
-        direction={getScreenTransition('tutorial').direction}
-        duration={300}
-      >
-        <InteractiveOnboardingScreen onComplete={handleTutorialComplete} />
-      </ScreenTransition>
+      {currentScreen === 'tutorial' && (
+        <ScreenTransition
+          visible={true}
+          type={getScreenTransition('tutorial').type}
+          direction={getScreenTransition('tutorial').direction}
+          duration={300}
+        >
+          <InteractiveOnboardingScreen onComplete={handleTutorialComplete} />
+        </ScreenTransition>
+      )}
 
       {/* Mode Selection Screen */}
-      <ScreenTransition
-        visible={currentScreen === 'mode'}
-        type={getScreenTransition('mode').type}
-        direction={getScreenTransition('mode').direction}
-        duration={300}
-      >
-        <ModeSelectionScreen
-          onSelectMode={handleModeSelect}
-          onQuickPlay={handleQuickPlay}
-          onOpenSettings={handleOpenSettings}
-          onOpenStats={handleOpenStats}
-          onOpenAchievements={handleOpenAchievements}
-          onOpenDailyChallenges={handleOpenDailyChallenges}
-          onOpenAIChat={() => navigateToScreen('aiChat')}
-          onOpenAIGenerator={() => navigateToScreen('aiGenerator')}
-        />
-      </ScreenTransition>
+      {currentScreen === 'mode' && (
+        <ScreenTransition
+          visible={true}
+          type={getScreenTransition('mode').type}
+          direction={getScreenTransition('mode').direction}
+          duration={300}
+        >
+          <ModeSelectionScreen
+            onSelectMode={handleModeSelect}
+            onQuickPlay={handleQuickPlay}
+            onOpenSettings={handleOpenSettings}
+            onOpenStats={handleOpenStats}
+            onOpenAchievements={handleOpenAchievements}
+            onOpenDailyChallenges={handleOpenDailyChallenges}
+            onOpenAIChat={() => navigateToScreen('aiChat')}
+            onOpenAIGenerator={() => navigateToScreen('aiGenerator')}
+          />
+        </ScreenTransition>
+      )}
 
       {/* Level Selection Screen */}
-      <ScreenTransition
-        visible={currentScreen === 'level'}
-        type={getScreenTransition('level').type}
-        direction={getScreenTransition('level').direction}
-        duration={300}
-      >
-        <LevelSelectionScreen
-          onSelectLevel={handleLevelSelect}
-          onBack={handleBackToMode}
-        />
-      </ScreenTransition>
+      {currentScreen === 'level' && (
+        <ScreenTransition
+          visible={true}
+          type={getScreenTransition('level').type}
+          direction={getScreenTransition('level').direction}
+          duration={300}
+        >
+          <LevelSelectionScreen
+            onSelectLevel={handleLevelSelect}
+            onBack={handleBackToMode}
+          />
+        </ScreenTransition>
+      )}
 
       {/* Game Screen */}
-      <ScreenTransition
-        visible={currentScreen === 'game'}
-        type={getScreenTransition('game').type}
-        direction={getScreenTransition('game').direction}
-        duration={300}
-      >
-        <ImprovedGameScreen
-          mode={gameMode}
-          level={intensityLevel}
-          onPlayerSelected={handlePlayerSelected}
-          onBack={handleBackToLevel}
-          onChangeLevel={handleChangeLevel}
-        />
-      </ScreenTransition>
+      {currentScreen === 'game' && (
+        <ScreenTransition
+          visible={true}
+          type={getScreenTransition('game').type}
+          direction={getScreenTransition('game').direction}
+          duration={300}
+        >
+          <ImprovedGameScreen
+            mode={gameMode}
+            level={intensityLevel}
+            onPlayerSelected={handlePlayerSelected}
+            onBack={handleBackToLevel}
+            onChangeLevel={handleChangeLevel}
+          />
+        </ScreenTransition>
+      )}
 
       {/* Question Screen */}
-      <ScreenTransition
-        visible={currentScreen === 'question'}
-        type={getScreenTransition('question').type}
-        direction={getScreenTransition('question').direction}
-        duration={300}
-      >
-        {selectedPlayer && (
-          <ImprovedQuestionScreen
-            player={selectedPlayer}
-            level={intensityLevel}
-            settings={settings}
-            usedQuestionIds={usedQuestionIds}
-            skipCount={playerSkipCounts.get(selectedPlayer.id) || 0}
-            onComplete={handleQuestionComplete}
-            onSkip={handleQuestionSkip}
-            onChangeLevelUp={handleLevelUp}
-            onChangeLevelDown={handleLevelDown}
-            canLevelUp={intensityLevel !== 'extreme'}
-            canLevelDown={intensityLevel !== 'mild'}
-          />
-        )}
-      </ScreenTransition>
+      {currentScreen === 'question' && (
+        <ScreenTransition
+          visible={true}
+          type={getScreenTransition('question').type}
+          direction={getScreenTransition('question').direction}
+          duration={300}
+        >
+          {selectedPlayer && (
+            <ImprovedQuestionScreen
+              player={selectedPlayer}
+              level={intensityLevel}
+              settings={settings}
+              usedQuestionIds={usedQuestionIds}
+              skipCount={playerSkipCounts.get(selectedPlayer.id) || 0}
+              onComplete={handleQuestionComplete}
+              onSkip={handleQuestionSkip}
+              onChangeLevelUp={handleLevelUp}
+              onChangeLevelDown={handleLevelDown}
+              canLevelUp={intensityLevel !== 'extreme'}
+              canLevelDown={intensityLevel !== 'mild'}
+            />
+          )}
+        </ScreenTransition>
+      )}
 
       {/* Settings Screen */}
-      <ScreenTransition
-        visible={currentScreen === 'settings'}
-        type={getScreenTransition('settings').type}
-        direction={getScreenTransition('settings').direction}
-        duration={300}
-      >
-        <SettingsScreen
-          settings={settings}
-          onUpdateSettings={saveSettings}
-          onBack={() => navigateToScreen('mode')}
-          onResetStats={handleResetStats}
-          onOpenCustomQuestions={handleOpenCustomQuestions}
-        />
-      </ScreenTransition>
+      {currentScreen === 'settings' && (
+        <ScreenTransition
+          visible={true}
+          type={getScreenTransition('settings').type}
+          direction={getScreenTransition('settings').direction}
+          duration={300}
+        >
+          <SettingsScreen
+            settings={settings}
+            onUpdateSettings={saveSettings}
+            onBack={() => navigateToScreen('mode')}
+            onResetStats={handleResetStats}
+            onOpenCustomQuestions={handleOpenCustomQuestions}
+          />
+        </ScreenTransition>
+      )}
 
       {/* Stats Screen */}
-      <ScreenTransition
-        visible={currentScreen === 'stats'}
-        type={getScreenTransition('stats').type}
-        direction={getScreenTransition('stats').direction}
-        duration={300}
-      >
-        <StatsScreen
-          stats={stats}
-          onBack={() => navigateToScreen('mode')}
-        />
-      </ScreenTransition>
+      {currentScreen === 'stats' && (
+        <ScreenTransition
+          visible={true}
+          type={getScreenTransition('stats').type}
+          direction={getScreenTransition('stats').direction}
+          duration={300}
+        >
+          <StatsScreen
+            stats={stats}
+            onBack={() => navigateToScreen('mode')}
+          />
+        </ScreenTransition>
+      )}
 
       {/* Custom Questions Screen */}
-      <ScreenTransition
-        visible={currentScreen === 'customQuestions'}
-        type={getScreenTransition('customQuestions').type}
-        direction={getScreenTransition('customQuestions').direction}
-        duration={300}
-      >
-        <CustomQuestionsScreen
-          customQuestions={customQuestions}
-          onAddQuestion={handleAddCustomQuestion}
-          onDeleteQuestion={handleDeleteCustomQuestion}
-          onBack={() => navigateToScreen('settings')}
-        />
-      </ScreenTransition>
+      {currentScreen === 'customQuestions' && (
+        <ScreenTransition
+          visible={true}
+          type={getScreenTransition('customQuestions').type}
+          direction={getScreenTransition('customQuestions').direction}
+          duration={300}
+        >
+          <CustomQuestionsScreen
+            customQuestions={customQuestions}
+            onAddQuestion={handleAddCustomQuestion}
+            onDeleteQuestion={handleDeleteCustomQuestion}
+            onBack={() => navigateToScreen('settings')}
+          />
+        </ScreenTransition>
+      )}
 
       {/* Achievements Screen */}
-      <ScreenTransition
-        visible={currentScreen === 'achievements'}
-        type={getScreenTransition('achievements').type}
-        direction={getScreenTransition('achievements').direction}
-        duration={300}
-      >
-        <AchievementsScreen
-          userProgress={userProgress}
-          onBack={() => navigateToScreen('mode')}
-        />
-      </ScreenTransition>
+      {currentScreen === 'achievements' && (
+        <ScreenTransition
+          visible={true}
+          type={getScreenTransition('achievements').type}
+          direction={getScreenTransition('achievements').direction}
+          duration={300}
+        >
+          <AchievementsScreen
+            userProgress={userProgress}
+            onBack={() => navigateToScreen('mode')}
+          />
+        </ScreenTransition>
+      )}
 
       {/* Daily Challenges Screen */}
-      {dailyChallenges && (
+      {dailyChallenges && currentScreen === 'dailyChallenges' && (
         <ScreenTransition
-          visible={currentScreen === 'dailyChallenges'}
+          visible={true}
           type={getScreenTransition('dailyChallenges').type}
           direction={getScreenTransition('dailyChallenges').direction}
           duration={300}
@@ -717,37 +735,41 @@ export default function App() {
       )}
 
       {/* AI Chat Screen */}
-      <ScreenTransition
-        visible={currentScreen === 'aiChat'}
-        type={getScreenTransition('aiChat').type}
-        direction={getScreenTransition('aiChat').direction}
-        duration={300}
-      >
-        <AIChatScreen
-          level={intensityLevel}
-          mode={gameMode}
-          playerCount={stats.totalPlayers}
-          onBack={() => navigateToScreen('mode')}
-        />
-      </ScreenTransition>
+      {currentScreen === 'aiChat' && (
+        <ScreenTransition
+          visible={true}
+          type={getScreenTransition('aiChat').type}
+          direction={getScreenTransition('aiChat').direction}
+          duration={300}
+        >
+          <AIChatScreen
+            level={intensityLevel}
+            mode={gameMode}
+            playerCount={stats.totalPlayers}
+            onBack={() => navigateToScreen('mode')}
+          />
+        </ScreenTransition>
+      )}
 
       {/* AI Generator Screen */}
-      <ScreenTransition
-        visible={currentScreen === 'aiGenerator'}
-        type={getScreenTransition('aiGenerator').type}
-        direction={getScreenTransition('aiGenerator').direction}
-        duration={300}
-      >
-        <AIQuestionGeneratorScreen
-          onBack={() => navigateToScreen('mode')}
-          onAddQuestions={(questions) => {
-            // Add generated questions to custom questions
-            StorageService.saveCustomQuestions([...customQuestions, ...questions]);
-            setCustomQuestions(prev => [...prev, ...questions]);
-            navigateToScreen('mode');
-          }}
-        />
-      </ScreenTransition>
+      {currentScreen === 'aiGenerator' && (
+        <ScreenTransition
+          visible={true}
+          type={getScreenTransition('aiGenerator').type}
+          direction={getScreenTransition('aiGenerator').direction}
+          duration={300}
+        >
+          <AIQuestionGeneratorScreen
+            onBack={() => navigateToScreen('mode')}
+            onAddQuestions={(questions) => {
+              // Add generated questions to custom questions
+              StorageService.saveCustomQuestions([...customQuestions, ...questions]);
+              setCustomQuestions(prev => [...prev, ...questions]);
+              navigateToScreen('mode');
+            }}
+          />
+        </ScreenTransition>
+      )}
 
       {/* Achievement Unlocked Modal */}
       {newlyUnlockedAchievements.length > 0 && (
