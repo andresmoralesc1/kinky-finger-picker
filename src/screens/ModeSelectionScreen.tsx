@@ -113,7 +113,7 @@ export default function ModeSelectionScreen({
             />
             <View style={styles.titleContainer}>
               <Text style={styles.title}>Kinky Finger Picker</Text>
-              <Text style={styles.subtitle}>Put fingers on screen & break the ice</Text>
+              <Text style={styles.subtitle}>Pon tus dedos en la pantalla y rompe el hielo</Text>
             </View>
           </View>
 
@@ -123,20 +123,20 @@ export default function ModeSelectionScreen({
               onPress={onQuickPlay}
               activeOpacity={0.88}
               accessibilityRole="button"
-              accessibilityLabel="Quick Play"
-              accessibilityHint="Start a game immediately with Hetero mode and Mild level"
+              accessibilityLabel="Partida Rápida"
+              accessibilityHint="Inicia una partida inmediata en modo Hetero y nivel Suave"
               style={styles.quickPlayTouchable}
             >
               <LinearGradient
-                colors={['#E50914', '#B81D24'] as const}
+                colors={['#E50914', '#9B0014'] as const}
                 style={styles.quickPlayGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-                <Text style={styles.quickPlayEmoji}>🚀</Text>
+                <Text style={styles.quickPlayEmoji}>⚡</Text>
                 <View style={styles.quickPlayTextGroup}>
-                  <Text style={styles.quickPlayTitle}>QUICK PLAY</Text>
-                  <Text style={styles.quickPlaySub}>Hetero • Mild</Text>
+                  <Text style={styles.quickPlayTitle}>PARTIDA RÁPIDA</Text>
+                  <Text style={styles.quickPlaySub}>Hetero • Suave</Text>
                 </View>
                 <Text style={styles.quickPlayArrow}>→</Text>
               </LinearGradient>
@@ -145,7 +145,7 @@ export default function ModeSelectionScreen({
 
           {/* Section Divider: Modes */}
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>CHOOSE GAME MODE</Text>
+            <Text style={styles.sectionTitle}>ELIGE MODO DE JUEGO</Text>
           </View>
 
           {/* Modes Grid: 3 columns side by side */}
@@ -156,18 +156,18 @@ export default function ModeSelectionScreen({
               onPress={() => onSelectMode('hetero')}
               activeOpacity={0.85}
               accessibilityRole="button"
-              accessibilityLabel="Hetero mode"
-              accessibilityHint="Choose Hetero mode with split screen for female and male players"
+              accessibilityLabel="Modo Hetero"
+              accessibilityHint="Modo mixto con pantalla dividida para mujeres y hombres"
             >
               <LinearGradient
-                colors={['#E50914', '#8E0E00'] as const}
+                colors={['#E50914', '#700508'] as const}
                 style={styles.cardGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
                 <Text style={styles.cardEmoji}>♀️♂️</Text>
                 <Text style={styles.cardTitle}>Hetero</Text>
-                <Text style={styles.cardSub}>Split screen</Text>
+                <Text style={styles.cardSub}>Pantalla dividida</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -177,8 +177,8 @@ export default function ModeSelectionScreen({
               onPress={() => onSelectMode('gay')}
               activeOpacity={0.85}
               accessibilityRole="button"
-              accessibilityLabel="Gay mode"
-              accessibilityHint="Choose Gay mode with full screen for male players"
+              accessibilityLabel="Modo Gay"
+              accessibilityHint="Modo completo para chicos"
             >
               <LinearGradient
                 colors={['#B81D24', '#4A0E17'] as const}
@@ -188,7 +188,7 @@ export default function ModeSelectionScreen({
               >
                 <Text style={styles.cardEmoji}>♂️♂️</Text>
                 <Text style={styles.cardTitle}>Gay</Text>
-                <Text style={styles.cardSub}>All guys</Text>
+                <Text style={styles.cardSub}>Solo chicos</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -198,18 +198,18 @@ export default function ModeSelectionScreen({
               onPress={() => onSelectMode('lesbian')}
               activeOpacity={0.85}
               accessibilityRole="button"
-              accessibilityLabel="Lesbian mode"
-              accessibilityHint="Choose Lesbian mode with full screen for female players"
+              accessibilityLabel="Modo Lesbiana"
+              accessibilityHint="Modo completo para chicas"
             >
               <LinearGradient
-                colors={['#FF2A3A', '#9B0014'] as const}
+                colors={['#FF2A3A', '#8B0010'] as const}
                 style={styles.cardGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
                 <Text style={styles.cardEmoji}>♀️♀️</Text>
-                <Text style={styles.cardTitle}>Lesbian</Text>
-                <Text style={styles.cardSub}>All girls</Text>
+                <Text style={styles.cardTitle}>Lesbiana</Text>
+                <Text style={styles.cardSub}>Solo chicas</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -357,14 +357,21 @@ const styles = StyleSheet.create({
   modesGrid: {
     width: '100%',
     flexDirection: 'row',
-    gap: 10,
+    gap: 12,
     marginBottom: 16,
   },
   gridCard: {
     flex: 1,
-    height: 120,
-    borderRadius: 16,
+    height: 126,
+    borderRadius: 18,
     overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.22)',
+    shadowColor: '#E50914',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 6,
   },
   cardGradient: {
     flex: 1,
@@ -377,15 +384,17 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 17,
+    fontWeight: '800',
     color: '#fff',
+    letterSpacing: 0.3,
     marginBottom: 2,
   },
   cardSub: {
     fontSize: 11,
     color: 'rgba(255, 255, 255, 0.85)',
     textAlign: 'center',
+    fontWeight: '500',
   },
   aiSection: {
     width: '100%',

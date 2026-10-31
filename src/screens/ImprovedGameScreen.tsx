@@ -473,23 +473,23 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
         <AccessibleTouchable
           style={styles.backButton}
           onPress={onBack}
-          accessibilityLabel="Go back"
-          accessibilityHint="Return to level selection"
+          accessibilityLabel="Volver"
+          accessibilityHint="Regresar a la selección de nivel"
           accessibilityRole="button"
         >
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Text style={styles.backButtonText}>← Volver</Text>
         </AccessibleTouchable>
 
         <AccessibleTouchable
           style={styles.levelButton}
           onPress={onChangeLevel}
-          accessibilityLabel={`Change intensity level. Current is ${level}`}
-          accessibilityHint="Tap to change the intensity level"
+          accessibilityLabel={`Cambiar nivel de intensidad. Actual es ${level}`}
+          accessibilityHint="Toca para cambiar la intensidad"
           accessibilityRole="button"
         >
           <GlowEffect color={getLevelColor()} intensity={15}>
             <Text style={[styles.levelText, { color: getLevelColor() }]}>
-              {getLevelEmoji()} {level.toUpperCase()}
+              {getLevelEmoji()} {level === 'mild' ? 'SUAVE' : level === 'spicy' ? 'PICANTE' : 'EXTREMO'}
             </Text>
           </GlowEffect>
         </AccessibleTouchable>
@@ -508,16 +508,16 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
       {players.length === 0 && !isSelecting && (
         <BounceAnimation trigger={true}>
           <View style={styles.instructionContainer} pointerEvents="none">
-            <Text style={styles.instructionTitle}>Ready to Play?</Text>
+            <Text style={styles.instructionTitle}>¿Listos para jugar?</Text>
             <Text style={styles.instructionText}>
               {Platform.OS === 'web'
                 ? 'Haz clic o toca la pantalla para colocar dedos (o teclas 1-0)'
-                : 'All players touch the screen with one finger'}
+                : 'Todos los jugadores coloquen un dedo en la pantalla'}
             </Text>
             <Text style={styles.instructionSubtext}>
               {Platform.OS === 'web'
                 ? 'Mínimo 2 jugadores • Arrastra para mover • [C] limpiar'
-                : 'Minimum 2 players'}
+                : 'Mínimo 2 jugadores para comenzar'}
             </Text>
           </View>
         </BounceAnimation>
@@ -597,12 +597,12 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
           pointerEvents="none"
         >
           <Text style={styles.playerCountText}>
-            {players.length === 0 ? 'Waiting for players...' :
-               players.length === 1 ? '1 player detected - need 1 more!' :
-               `${players.length} players detected - Get ready!`}
+            {players.length === 0 ? 'Esperando jugadores...' :
+               players.length === 1 ? '1 jugador detectado - ¡falta 1 más!' :
+               `¡${players.length} jugadores listos! Mantengan la posición`}
           </Text>
           <Text style={styles.playerCountSubtext}>
-            Hold still...
+            No se muevan...
           </Text>
         </Animated.View>
       )}
@@ -834,53 +834,57 @@ const styles = StyleSheet.create({
   },
   desktopHudContainer: {
     position: 'absolute',
-    bottom: 18,
-    left: 16,
-    right: 16,
+    bottom: 20,
+    left: 18,
+    right: 18,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     zIndex: 30,
   },
   desktopHudGroup: {
-    backgroundColor: 'rgba(15, 15, 22, 0.9)',
-    borderRadius: 14,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    backgroundColor: 'rgba(18, 18, 26, 0.88)',
+    borderRadius: 18,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
     borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.18)',
+    borderColor: 'rgba(255, 255, 255, 0.22)',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.5,
-    shadowRadius: 8,
+    shadowRadius: 10,
     elevation: 8,
   },
   desktopHudTitle: {
     color: '#fff',
     fontSize: 12,
-    fontWeight: '700',
-    marginBottom: 6,
-    letterSpacing: 0.5,
-    opacity: 0.9,
+    fontWeight: '800',
+    marginBottom: 8,
+    letterSpacing: 0.6,
+    opacity: 0.95,
   },
   desktopKeyRow: {
     flexDirection: 'row',
-    gap: 6,
+    gap: 8,
   },
   desktopKeyButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
+    width: 38,
+    height: 38,
+    borderRadius: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderWidth: 1.5,
     borderColor: 'rgba(255, 255, 255, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
   desktopKeyText: {
     color: '#fff',
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   desktopKeyTextActive: {
@@ -889,21 +893,21 @@ const styles = StyleSheet.create({
   },
   desktopClearButton: {
     backgroundColor: '#E50914',
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 18,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 20,
     borderWidth: 1.5,
-    borderColor: '#fff',
+    borderColor: 'rgba(255, 255, 255, 0.85)',
     shadowColor: '#E50914',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.6,
-    shadowRadius: 6,
-    elevation: 6,
+    shadowRadius: 10,
+    elevation: 8,
   },
   desktopClearButtonText: {
     color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 0.6,
   },
 });

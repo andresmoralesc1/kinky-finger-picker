@@ -30,7 +30,7 @@ describe('ModeSelectionScreen', () => {
 
     expect(getByText('Hetero')).toBeTruthy();
     expect(getByText('Gay')).toBeTruthy();
-    expect(getByText('Lesbian')).toBeTruthy();
+    expect(getByText('Lesbiana')).toBeTruthy();
   });
 
   it('should call onSelectMode with "hetero" when Hetero button is pressed', () => {
@@ -59,7 +59,7 @@ describe('ModeSelectionScreen', () => {
       <ModeSelectionScreen onSelectMode={mockOnSelectMode} />
     );
 
-    fireEvent.press(getByText('Lesbian'));
+    fireEvent.press(getByText('Lesbiana'));
 
     expect(mockOnSelectMode).toHaveBeenCalledWith('lesbian');
   });
@@ -72,8 +72,8 @@ describe('ModeSelectionScreen', () => {
       />
     );
 
-    expect(getByText('QUICK PLAY')).toBeTruthy();
-    expect(getByText('Hetero • Mild')).toBeTruthy();
+    expect(getByText('PARTIDA RÁPIDA')).toBeTruthy();
+    expect(getByText('Hetero • Suave')).toBeTruthy();
   });
 
   it('should call onQuickPlay when Quick Play button is pressed', () => {
@@ -84,7 +84,7 @@ describe('ModeSelectionScreen', () => {
       />
     );
 
-    fireEvent.press(getByText('QUICK PLAY'));
+    fireEvent.press(getByText('PARTIDA RÁPIDA'));
 
     expect(mockOnQuickPlay).toHaveBeenCalledTimes(1);
   });
@@ -94,7 +94,7 @@ describe('ModeSelectionScreen', () => {
       <ModeSelectionScreen onSelectMode={mockOnSelectMode} />
     );
 
-    expect(queryByText('QUICK PLAY')).toBeNull();
+    expect(queryByText('PARTIDA RÁPIDA')).toBeNull();
   });
 
   it('should render settings icon button when onOpenSettings is provided', () => {
@@ -176,7 +176,7 @@ describe('ModeSelectionScreen', () => {
       />
     );
 
-    expect(getByText('QUICK PLAY')).toBeTruthy();
+    expect(getByText('PARTIDA RÁPIDA')).toBeTruthy();
     expect(getByText('⚙️')).toBeTruthy();
     expect(getByText('📊')).toBeTruthy();
     expect(getByText('🏆')).toBeTruthy();
@@ -188,9 +188,9 @@ describe('ModeSelectionScreen', () => {
       <ModeSelectionScreen onSelectMode={mockOnSelectMode} />
     );
 
-    expect(getByLabelText('Hetero mode')).toBeTruthy();
-    expect(getByLabelText('Gay mode')).toBeTruthy();
-    expect(getByLabelText('Lesbian mode')).toBeTruthy();
+    expect(getByLabelText('Modo Hetero')).toBeTruthy();
+    expect(getByLabelText('Modo Gay')).toBeTruthy();
+    expect(getByLabelText('Modo Lesbiana')).toBeTruthy();
   });
 
   it('should have proper accessibility label on Quick Play button', () => {
@@ -201,6 +201,6 @@ describe('ModeSelectionScreen', () => {
       />
     );
 
-    expect(getByLabelText('Quick Play')).toBeTruthy();
+    expect(getByLabelText('Partida Rápida')).toBeTruthy();
   });
 });

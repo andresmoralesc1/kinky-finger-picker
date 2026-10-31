@@ -156,9 +156,9 @@ export default function ImprovedQuestionScreen({
 
   const getLevelColor = (): readonly [string, string] => {
     switch (level) {
-      case 'mild': return ['#06FFA5', '#00E676'];
-      case 'spicy': return ['#FB5607', '#FF6D00'];
-      case 'extreme': return ['#FF006E', '#D500F9'];
+      case 'mild': return ['#0B1B14', '#1A0808'];
+      case 'spicy': return ['#2A0608', '#4A080C'];
+      case 'extreme': return ['#3A0004', '#150002'];
     }
   };
 
@@ -302,11 +302,11 @@ export default function ImprovedQuestionScreen({
           <AccessibleTouchable
             style={styles.timerButton}
             onPress={handleStartTimer}
-            accessibilityLabel="Start timer"
-            accessibilityHint={`Start ${settings.timerDuration} second countdown for the dare`}
+            accessibilityLabel="Iniciar cronómetro"
+            accessibilityHint={`Iniciar cuenta regresiva de ${settings.timerDuration} segundos para el reto`}
             accessibilityRole="button"
           >
-            <Text style={styles.timerButtonText}>⏱️ Start Timer</Text>
+            <Text style={styles.timerButtonText}>⏱️ Iniciar Temporizador</Text>
           </AccessibleTouchable>
         )}
 
@@ -315,26 +315,26 @@ export default function ImprovedQuestionScreen({
           <AccessibleTouchable
             style={[styles.levelButton, !canLevelDown && styles.levelButtonDisabled]}
             onPress={canLevelDown ? onChangeLevelDown : undefined}
-            accessibilityLabel="Make question milder"
-            accessibilityHint={canLevelDown ? "Decrease intensity level" : "Already at mildest level"}
+            accessibilityLabel="Hacer más suave"
+            accessibilityHint={canLevelDown ? "Disminuir intensidad" : "Ya está en el nivel más suave"}
             accessibilityRole="button"
             accessibilityState={{ disabled: !canLevelDown }}
           >
             <Text style={[styles.levelButtonText, !canLevelDown && styles.levelButtonTextDisabled]}>
-              ⬇️ Milder
+              ⬇️ Más Suave
             </Text>
           </AccessibleTouchable>
 
           <AccessibleTouchable
             style={[styles.levelButton, !canLevelUp && styles.levelButtonDisabled]}
             onPress={canLevelUp ? onChangeLevelUp : undefined}
-            accessibilityLabel="Make question hotter"
-            accessibilityHint={canLevelUp ? "Increase intensity level" : "Already at hottest level"}
+            accessibilityLabel="Hacer más picante"
+            accessibilityHint={canLevelUp ? "Aumentar intensidad" : "Ya está en el nivel más caliente"}
             accessibilityRole="button"
             accessibilityState={{ disabled: !canLevelUp }}
           >
             <Text style={[styles.levelButtonText, !canLevelUp && styles.levelButtonTextDisabled]}>
-              Hotter ⬆️
+              Más Picante ⬆️
             </Text>
           </AccessibleTouchable>
         </View>
@@ -344,25 +344,25 @@ export default function ImprovedQuestionScreen({
           <AccessibleTouchable
             style={[styles.skipButton, !canSkip && styles.skipButtonDisabled]}
             onPress={handleSkip}
-            accessibilityLabel={`Skip dare. ${settings.skipLimit - skipCount} skips remaining`}
-            accessibilityHint="Skip this dare without earning XP"
+            accessibilityLabel={`Saltar reto. Quedan ${settings.skipLimit - skipCount} cambios`}
+            accessibilityHint="Pasar de este reto"
             accessibilityRole="button"
             accessibilityState={{ disabled: !canSkip }}
           >
             <Text style={[styles.skipButtonText, !canSkip && styles.skipButtonTextDisabled]}>
-              Skip ({settings.skipLimit - skipCount} left)
+              Pasar ({settings.skipLimit - skipCount})
             </Text>
           </AccessibleTouchable>
 
           <AccessibleTouchable
             style={styles.completeButton}
             onPress={handleComplete}
-            accessibilityLabel="Complete dare"
-            accessibilityHint="Mark this dare as completed and earn XP"
+            accessibilityLabel="Completar reto"
+            accessibilityHint="Marcar reto como cumplido y sumar experiencia"
             accessibilityRole="button"
           >
             <Text style={styles.completeButtonText}>
-              {timeLeft === 0 ? "Time's Up! →" : 'Completed! →'}
+              {timeLeft === 0 ? "¡Tiempo Cumplido! →" : '¡Completado! →'}
             </Text>
           </AccessibleTouchable>
         </View>
@@ -508,65 +508,78 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   questionContainer: {
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    borderRadius: 20,
-    padding: 25,
-    marginBottom: 20,
-    minHeight: 160,
+    backgroundColor: 'rgba(20, 20, 28, 0.75)',
+    borderRadius: 24,
+    padding: 26,
+    marginBottom: 22,
+    minHeight: 180,
+    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.22)',
+    shadowColor: '#E50914',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
   questionType: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 15,
-    opacity: 0.9,
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#FF2A3A',
+    marginBottom: 12,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
   },
   questionText: {
-    fontSize: 20,
+    fontSize: 22,
     color: '#fff',
     textAlign: 'center',
-    lineHeight: 28,
-    fontWeight: '600',
+    lineHeight: 32,
+    fontWeight: '700',
   },
   timerButton: {
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    paddingHorizontal: 30,
+    backgroundColor: 'rgba(229, 9, 20, 0.15)',
+    paddingHorizontal: 28,
     paddingVertical: 12,
     borderRadius: 25,
-    marginBottom: 20,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.3)',
+    marginBottom: 18,
+    borderWidth: 1.5,
+    borderColor: 'rgba(229, 9, 20, 0.6)',
   },
   timerButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   levelControls: {
     flexDirection: 'row',
     gap: 12,
     marginBottom: 20,
+    width: '100%',
   },
   levelButton: {
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    paddingHorizontal: 20,
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     paddingVertical: 12,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   levelButtonDisabled: {
-    opacity: 0.3,
+    opacity: 0.25,
   },
   levelButtonText: {
     color: '#fff',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   levelButtonTextDisabled: {
-    opacity: 0.5,
+    opacity: 0.4,
   },
   actionButtons: {
     flexDirection: 'row',
@@ -575,12 +588,12 @@ const styles = StyleSheet.create({
   },
   skipButton: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
     paddingVertical: 16,
-    borderRadius: 25,
+    borderRadius: 22,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.28)',
   },
   skipButtonDisabled: {
     opacity: 0.3,
@@ -588,26 +601,29 @@ const styles = StyleSheet.create({
   skipButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   skipButtonTextDisabled: {
     opacity: 0.5,
   },
   completeButton: {
-    flex: 1,
-    backgroundColor: '#fff',
+    flex: 1.4,
+    backgroundColor: '#E50914',
     paddingVertical: 16,
-    borderRadius: 25,
+    borderRadius: 22,
     alignItems: 'center',
-    shadowColor: '#000',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.85)',
+    shadowColor: '#E50914',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
     elevation: 8,
   },
   completeButtonText: {
-    color: '#000',
+    color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '900',
+    letterSpacing: 0.5,
   },
 });

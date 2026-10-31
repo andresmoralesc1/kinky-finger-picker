@@ -56,15 +56,15 @@ export default function LevelSelectionScreen({ onSelectLevel, onBack }: Props) {
         <AccessibleTouchable
           style={styles.backButton}
           onPress={onBack}
-          accessibilityLabel="Go back"
-          accessibilityHint="Return to mode selection"
+          accessibilityLabel="Volver"
+          accessibilityHint="Regresar a la selección de modo"
           accessibilityRole="button"
         >
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Text style={styles.backButtonText}>← Volver</Text>
         </AccessibleTouchable>
 
-        <Text style={styles.title}>Choose Intensity</Text>
-        <Text style={styles.subtitle}>How kinky do you want to start?</Text>
+        <Text style={styles.title}>Elige la Intensidad</Text>
+        <Text style={styles.subtitle}>¿Qué tan caliente quieres empezar?</Text>
 
         <View style={styles.buttonsContainer}>
           <Animated.View style={{ opacity: mildAnim, flex: 1 }}>
@@ -73,18 +73,18 @@ export default function LevelSelectionScreen({ onSelectLevel, onBack }: Props) {
               onPress={() => onSelectLevel('mild')}
               activeOpacity={0.9}
               accessibilityRole="button"
-              accessibilityLabel="Mild intensity level"
-              accessibilityHint="Flirty and playful questions for beginners"
+              accessibilityLabel="Nivel Suave"
+              accessibilityHint="Preguntas coquetas y divertidas para romper el hielo"
             >
               <LinearGradient
-                colors={['#06FFA5', '#00E676'] as const}
+                colors={['#06FFA5', '#00B894'] as const}
                 style={styles.gradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
                 <Text style={styles.buttonEmoji}>🌶️</Text>
-                <Text style={styles.buttonText}>Mild</Text>
-                <Text style={styles.buttonSubtext}>Flirty & playful</Text>
+                <Text style={styles.buttonText}>Suave</Text>
+                <Text style={styles.buttonSubtext}>Coqueto y divertido</Text>
               </LinearGradient>
             </TouchableOpacity>
           </Animated.View>
@@ -95,18 +95,18 @@ export default function LevelSelectionScreen({ onSelectLevel, onBack }: Props) {
               onPress={() => onSelectLevel('spicy')}
               activeOpacity={0.9}
               accessibilityRole="button"
-              accessibilityLabel="Spicy intensity level"
-              accessibilityHint="Getting hot with kisses and dares"
+              accessibilityLabel="Nivel Picante"
+              accessibilityHint="Subiendo la temperatura con besos y retos directos"
             >
               <LinearGradient
-                colors={['#FB5607', '#FF6D00'] as const}
+                colors={['#FF5722', '#D84315'] as const}
                 style={styles.gradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
                 <Text style={styles.buttonEmoji}>🌶️🌶️</Text>
-                <Text style={styles.buttonText}>Spicy</Text>
-                <Text style={styles.buttonSubtext}>Getting hot</Text>
+                <Text style={styles.buttonText}>Picante</Text>
+                <Text style={styles.buttonSubtext}>Subiendo el calor</Text>
               </LinearGradient>
             </TouchableOpacity>
           </Animated.View>
@@ -117,24 +117,24 @@ export default function LevelSelectionScreen({ onSelectLevel, onBack }: Props) {
               onPress={() => onSelectLevel('extreme')}
               activeOpacity={0.9}
               accessibilityRole="button"
-              accessibilityLabel="Extreme intensity level"
-              accessibilityHint="No limits! Adult only content 18+"
+              accessibilityLabel="Nivel Extremo"
+              accessibilityHint="¡Sin filtros ni límites! Solo adultos 18+"
             >
               <LinearGradient
-                colors={['#FF006E', '#D500F9'] as const}
+                colors={['#E50914', '#8E0E00'] as const}
                 style={styles.gradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
                 <Text style={styles.buttonEmoji}>🌶️🌶️🌶️</Text>
-                <Text style={styles.buttonText}>Extreme</Text>
-                <Text style={styles.buttonSubtext}>No limits! 18+</Text>
+                <Text style={styles.buttonText}>Extremo</Text>
+                <Text style={styles.buttonSubtext}>Sin límites • +18</Text>
               </LinearGradient>
             </TouchableOpacity>
           </Animated.View>
         </View>
 
-        <Text style={styles.note}>You can change level during the game</Text>
+        <Text style={styles.note}>Puedes cambiar de nivel en cualquier momento del juego</Text>
       </Animated.View>
     </SwipeableScreen>
   );
@@ -161,36 +161,44 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   title: {
-    fontSize: 42,
-    fontWeight: 'bold',
+    fontSize: 38,
+    fontWeight: '900',
     color: '#E50914',
-    marginBottom: 10,
+    marginBottom: 8,
     textAlign: 'center',
+    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 18,
-    color: '#fff',
-    marginBottom: 60,
-    opacity: 0.85,
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.85)',
+    marginBottom: 45,
+    textAlign: 'center',
   },
   buttonsContainer: {
     width: '100%',
     maxWidth: 720,
     flexDirection: 'row',
-    gap: 20,
+    gap: 16,
     alignSelf: 'center',
   },
   button: {
     flex: 1,
-    height: 160,
-    borderRadius: 20,
+    height: 165,
+    borderRadius: 22,
     overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 8,
   },
   gradient: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 16,
   },
   buttonEmoji: {
     fontSize: 40,
