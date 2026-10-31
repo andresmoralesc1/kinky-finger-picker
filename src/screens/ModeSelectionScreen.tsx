@@ -11,8 +11,6 @@ interface Props {
   onOpenStats?: () => void;
   onOpenAchievements?: () => void;
   onOpenDailyChallenges?: () => void;
-  onOpenAIChat?: () => void;
-  onOpenAIGenerator?: () => void;
 }
 
 export default function ModeSelectionScreen({
@@ -22,8 +20,6 @@ export default function ModeSelectionScreen({
   onOpenStats,
   onOpenAchievements,
   onOpenDailyChallenges,
-  onOpenAIChat,
-  onOpenAIGenerator,
 }: Props) {
   const logoScale = React.useRef(new Animated.Value(1)).current;
 
@@ -217,53 +213,6 @@ export default function ModeSelectionScreen({
               </LinearGradient>
             </TouchableOpacity>
           </View>
-
-          {/* AI Features: Compact horizontal pills */}
-          {(onOpenAIChat || onOpenAIGenerator) && (
-            <View style={styles.aiSection}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>AI FEATURES</Text>
-              </View>
-
-              <View style={styles.aiRow}>
-                {onOpenAIChat && (
-                  <TouchableOpacity
-                    style={styles.aiPill}
-                    onPress={onOpenAIChat}
-                    activeOpacity={0.85}
-                    accessibilityRole="button"
-                    accessibilityLabel="AI Chat Assistant"
-                  >
-                    <LinearGradient
-                      colors={['rgba(229, 9, 20, 0.25)', 'rgba(255, 255, 255, 0.08)'] as const}
-                      style={styles.aiPillGradient}
-                    >
-                      <Text style={styles.aiPillEmoji}>💬</Text>
-                      <Text style={styles.aiPillText}>AI Chat</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                )}
-
-                {onOpenAIGenerator && (
-                  <TouchableOpacity
-                    style={styles.aiPill}
-                    onPress={onOpenAIGenerator}
-                    activeOpacity={0.85}
-                    accessibilityRole="button"
-                    accessibilityLabel="AI Question Generator"
-                  >
-                    <LinearGradient
-                      colors={['rgba(255, 42, 58, 0.25)', 'rgba(229, 9, 20, 0.25)'] as const}
-                      style={styles.aiPillGradient}
-                    >
-                      <Text style={styles.aiPillEmoji}>✨</Text>
-                      <Text style={styles.aiPillText}>AI Generator</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-          )}
         </View>
       </ScrollView>
     </View>

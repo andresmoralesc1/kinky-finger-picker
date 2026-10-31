@@ -249,73 +249,73 @@ export const questions: Question[] = [
     category: 'party'
   },
 
-  // SPICY LEVEL - CLASSIC
+  // SPICY LEVEL - CLASSIC (Hot, Sensual & Direct Interaction)
   {
     id: 'spicy_classic_1',
-    text: 'Kiss someone in the group on the cheek',
+    text: 'Dale a {target} un beso suave en el cuello o en la comisura de los labios.',
     level: 'spicy',
     type: 'dare',
     category: 'classic'
   },
   {
     id: 'spicy_classic_2',
-    text: 'What is your favorite position?',
+    text: '¿Cuál es tu posición íntima favorita y por qué te enciende tanto?',
     level: 'spicy',
     type: 'question',
     category: 'classic'
   },
   {
     id: 'spicy_classic_3',
-    text: 'Take off one piece of clothing',
+    text: 'Quítate una prenda de vestir (a tu elección o a elección de {target}).',
     level: 'spicy',
     type: 'dare',
     category: 'classic'
   },
   {
     id: 'spicy_classic_4',
-    text: 'Describe your last intimate moment (no names)',
+    text: 'Describe el momento más apasionado o candente que has vivido recientemente.',
     level: 'spicy',
     type: 'question',
     category: 'classic'
   },
   {
     id: 'spicy_classic_5',
-    text: 'Give someone a sensual 30-second massage',
+    text: 'Hazle a {target} un masaje sensual de hombros o espalda durante 30 segundos.',
     level: 'spicy',
     type: 'dare',
     category: 'classic'
   },
   {
     id: 'spicy_classic_6',
-    text: 'What is your wildest fantasy?',
+    text: '¿Cuál es tu fantasía erótica más recurrente que aún no has cumplido?',
     level: 'spicy',
     type: 'question',
     category: 'classic'
   },
   {
     id: 'spicy_classic_7',
-    text: 'Sit on someone\'s lap for the next round',
+    text: 'Siéntate en las piernas de {target} durante toda la siguiente ronda.',
     level: 'spicy',
     type: 'dare',
     category: 'classic'
   },
   {
     id: 'spicy_classic_8',
-    text: 'Have you ever had a one-night stand? Tell the story',
+    text: '¿Alguna vez has tenido una aventura de una noche o romance prohibido? Cuenta la anécdota.',
     level: 'spicy',
     type: 'question',
     category: 'classic'
   },
   {
     id: 'spicy_classic_9',
-    text: 'Kiss the neck of the person next to you',
+    text: 'Acércate al oído de {target} y dale un mordisquito suave en el lóbulo de la oreja.',
     level: 'spicy',
     type: 'dare',
     category: 'classic'
   },
   {
     id: 'spicy_classic_10',
-    text: 'What is the kinkiest thing you have done?',
+    text: '¿Qué es lo más kinky o atrevido que has hecho en la intimidad?',
     level: 'spicy',
     type: 'question',
     category: 'classic'
@@ -324,72 +324,93 @@ export const questions: Question[] = [
   // SPICY LEVEL - ROMANTIC
   {
     id: 'spicy_romantic_1',
-    text: 'Kiss someone on the lips (quick peck)',
+    text: 'Dale a {target} un beso en los labios de al menos 3 segundos.',
     level: 'spicy',
     type: 'dare',
     category: 'romantic'
   },
   {
     id: 'spicy_romantic_2',
-    text: 'What is the sexiest thing a partner has said to you?',
+    text: '¿Qué es lo más sexy o provocador que te han susurrado al oído en la cama?',
     level: 'spicy',
     type: 'question',
     category: 'romantic'
   },
   {
     id: 'spicy_romantic_3',
-    text: 'Give someone a passionate hug for 10 seconds',
+    text: 'Dale a {target} un abrazo apretado y apasionado cuerpo a cuerpo durante 10 segundos.',
     level: 'spicy',
     type: 'dare',
     category: 'romantic'
   },
   {
     id: 'spicy_romantic_4',
-    text: 'Describe your ideal way to be seduced',
+    text: 'Describe cómo sería la manera infalible en la que te gustaría ser seducido/a hoy.',
     level: 'spicy',
     type: 'question',
     category: 'romantic'
   },
   {
     id: 'spicy_romantic_5',
-    text: 'Trace your finger along someone\'s arm slowly',
+    text: 'Pasa tus dedos lentamente por el brazo y cuello de {target} mirándole fijamente a los ojos.',
     level: 'spicy',
     type: 'dare',
+    category: 'romantic'
+  },
+  {
+    id: 'spicy_romantic_6',
+    text: '¿Qué parte del cuerpo de {target} te parece más atractiva y provocativa?',
+    level: 'spicy',
+    type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'spicy_romantic_7',
+    text: 'Acaricia suavemente el rostro y labios de {target} con ambas manos durante 10 segundos.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'romantic'
+  },
+  {
+    id: 'spicy_romantic_8',
+    text: 'Confiesa con sinceridad qué pensamiento atrevido se te cruzó por la mente al ver a {target} hoy.',
+    level: 'spicy',
+    type: 'question',
     category: 'romantic'
   },
 
   // SPICY LEVEL - PARTY
   {
     id: 'spicy_party_1',
-    text: 'Do a sexy dance for 20 seconds',
+    text: 'Báilale de forma sensual y provocativa a {target} durante 20 segundos.',
     level: 'spicy',
     type: 'dare',
     category: 'party'
   },
   {
     id: 'spicy_party_2',
-    text: 'What is your go-to move to seduce someone?',
+    text: '¿Cuál es tu táctica secreta para ligar cuando alguien te atrae de verdad?',
     level: 'spicy',
     type: 'question',
     category: 'party'
   },
   {
     id: 'spicy_party_3',
-    text: 'Let someone feed you something sensually',
+    text: 'Dale de probar un trago o bebida a {target} de la manera más sensual posible.',
     level: 'spicy',
     type: 'dare',
     category: 'party'
   },
   {
     id: 'spicy_party_4',
-    text: 'Have you ever hooked up with someone you just met?',
+    text: '¿Alguna vez te has liado con alguien nada más conocerlo/a en una fiesta? Cuenta cómo fue.',
     level: 'spicy',
     type: 'question',
     category: 'party'
   },
   {
     id: 'spicy_party_5',
-    text: 'Whisper something dirty to someone',
+    text: 'Susúrrale al oído a {target} tu fantasía más picante con voz muy seductora.',
     level: 'spicy',
     type: 'dare',
     category: 'party'
@@ -398,72 +419,72 @@ export const questions: Question[] = [
   // SPICY LEVEL - NSFW
   {
     id: 'spicy_nsfw_1',
-    text: 'What is your favorite way to be touched?',
+    text: '¿Cuál es tu zona erógena favorita o dónde más te enciende que te toquen?',
     level: 'spicy',
     type: 'question',
     category: 'nsfw'
   },
   {
     id: 'spicy_nsfw_2',
-    text: 'Describe your biggest turn-on in detail',
+    text: 'Describe en detalle qué aroma, actitud o gesto te excita de inmediato.',
     level: 'spicy',
     type: 'question',
     category: 'nsfw'
   },
   {
     id: 'spicy_nsfw_3',
-    text: 'Have you ever sent explicit photos? Any regrets?',
+    text: '¿Tienes fotos íntimas o has hecho sexting con alguien? ¿Alguna experiencia loca?',
     level: 'spicy',
     type: 'question',
     category: 'nsfw'
   },
   {
     id: 'spicy_nsfw_4',
-    text: 'What is something you want to try in bed?',
+    text: '¿Qué práctica traviesa o fetiche te gustaría experimentar en la intimidad?',
     level: 'spicy',
     type: 'question',
     category: 'nsfw'
   },
   {
     id: 'spicy_nsfw_5',
-    text: 'Rate your bedroom skills from 1-10 and explain why',
+    text: 'Puntúa tus habilidades en la intimidad del 1 al 10 y dinos por qué te das esa nota.',
     level: 'spicy',
     type: 'question',
     category: 'nsfw'
   },
 
-  // EXTREME LEVEL - CLASSIC
+  // EXTREME LEVEL - CLASSIC (Explicit, Wild & Daring 18+)
   {
     id: 'extreme_classic_1',
-    text: 'Describe in detail what you would do to someone here',
+    text: 'Describe con lujo de detalles qué te gustaría hacer a solas en una habitación con {target}.',
     level: 'extreme',
     type: 'question',
     category: 'classic'
   },
   {
     id: 'extreme_classic_2',
-    text: 'Remove two pieces of clothing',
+    text: 'Quítate dos prendas frente a {target} sin titubear.',
     level: 'extreme',
     type: 'dare',
     category: 'classic'
   },
   {
     id: 'extreme_classic_3',
-    text: 'Give someone a sensual lap dance for 30 seconds',
+    text: 'Hazle un baile erótico (lap dance) a {target} durante 30 segundos.',
     level: 'extreme',
     type: 'dare',
     category: 'classic'
   },
   {
     id: 'extreme_classic_4',
-    text: 'What is your dirtiest secret?',
+    text: '¿Cuál es tu secreto más oscuro, perverso o inconfesable en la cama?',
     level: 'extreme',
     type: 'question',
     category: 'classic'
   },
   {
     id: 'extreme_classic_5',
-    text: 'Kiss someone passionately for 10 seconds',
+    text: 'Dale a {target} un beso apasionado de lengua durante 10 segundos.',
     level: 'extreme',
     type: 'dare',
     category: 'classic'
@@ -472,35 +493,35 @@ export const questions: Question[] = [
   // EXTREME LEVEL - PARTY
   {
     id: 'extreme_party_1',
-    text: 'Do a striptease dance (underwear minimum)',
+    text: 'Haz un striptease sensual y divertido frente a {target} al ritmo que elijan.',
     level: 'extreme',
     type: 'dare',
     category: 'party'
   },
   {
     id: 'extreme_party_2',
-    text: 'Have you ever had sex in public? Where?',
+    text: '¿Has tenido relaciones en algún lugar público o arriesgado? ¿Dónde fue exactamente?',
     level: 'extreme',
     type: 'question',
     category: 'party'
   },
   {
     id: 'extreme_party_3',
-    text: 'Let someone give you a body shot',
+    text: 'Tómate un shot o trago directamente del cuerpo o cuello de {target}.',
     level: 'extreme',
     type: 'dare',
     category: 'party'
   },
   {
     id: 'extreme_party_4',
-    text: 'What is the craziest place you have had sex?',
+    text: '¿Cuál ha sido la situación más extrema o insólita donde te pillaron o casi te pillan en el acto?',
     level: 'extreme',
     type: 'question',
     category: 'party'
   },
   {
     id: 'extreme_party_5',
-    text: 'Demonstrate your best bedroom move',
+    text: 'Demuestra con mímica seductora cuál es tu movimiento estrella en la cama.',
     level: 'extreme',
     type: 'dare',
     category: 'party'
@@ -509,70 +530,70 @@ export const questions: Question[] = [
   // EXTREME LEVEL - NSFW
   {
     id: 'extreme_nsfw_1',
-    text: 'Have you ever been to a sex club or swingers party? Details!',
+    text: '¿Alguna vez has hecho o fantaseado con un trío o fiesta privada para adultos? Cuenta los detalles.',
     level: 'extreme',
     type: 'question',
     category: 'nsfw'
   },
   {
     id: 'extreme_nsfw_2',
-    text: 'What is the most people you have been with at once?',
+    text: '¿Cuál es el récord de veces que has tenido acción en un solo día o noche?',
     level: 'extreme',
     type: 'question',
     category: 'nsfw'
   },
   {
     id: 'extreme_nsfw_3',
-    text: 'Let someone give you a hickey wherever they want',
+    text: 'Deja que {target} te deje una marca de beso o mordisquito en el cuello donde prefiera.',
     level: 'extreme',
     type: 'dare',
     category: 'nsfw'
   },
   {
     id: 'extreme_nsfw_4',
-    text: 'Describe your last sexual encounter in detail',
+    text: 'Describe cómo fue tu último encuentro íntimo con todos los detalles candentes.',
     level: 'extreme',
     type: 'question',
     category: 'nsfw'
   },
   {
     id: 'extreme_nsfw_5',
-    text: 'What is your deepest, darkest fantasy?',
+    text: 'Confiesa tu fetiche más salvaje o prohibido que jamás le has contado a nadie.',
     level: 'extreme',
     type: 'question',
     category: 'nsfw'
   },
   {
     id: 'extreme_nsfw_6',
-    text: 'Have you ever tried role play? What was the scenario?',
+    text: '¿Has probado juegos de rol (disfraces, sumisión o dominación)? Cuéntanos qué tal fue.',
     level: 'extreme',
     type: 'question',
     category: 'nsfw'
   },
   {
     id: 'extreme_nsfw_7',
-    text: 'What is the kinkiest thing you want to try?',
+    text: '¿Qué es lo más extremo o sin límites que estarías dispuesto/a a experimentar hoy?',
     level: 'extreme',
     type: 'question',
     category: 'nsfw'
   },
   {
     id: 'extreme_nsfw_8',
-    text: 'Confess your most taboo turn-on',
+    text: 'Deja que {target} pase sus manos libremente por tu cuerpo (sobre la ropa) por 15 segundos.',
     level: 'extreme',
-    type: 'question',
+    type: 'dare',
     category: 'nsfw'
   },
   {
     id: 'extreme_nsfw_9',
-    text: 'Let someone touch you anywhere (over clothes)',
+    text: 'Bésale lentamente el abdomen o el cuello a {target} durante 15 segundos.',
     level: 'extreme',
     type: 'dare',
     category: 'nsfw'
   },
   {
     id: 'extreme_nsfw_10',
-    text: 'Make out with someone for 30 seconds',
+    text: 'Bésense intensamente con {target} durante 30 segundos sin detenerse.',
     level: 'extreme',
     type: 'dare',
     category: 'nsfw'

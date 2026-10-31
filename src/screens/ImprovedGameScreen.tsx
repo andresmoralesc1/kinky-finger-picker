@@ -59,6 +59,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
 
   // Track active touches by their identifier
   const activeTouches = useRef<Map<number, Player>>(new Map());
+  const activeMouseTouchId = useRef<number | null>(null);
   const countdownTimeout = useRef<NodeJS.Timeout | null>(null);
   const rippleTimeouts = useRef<Set<NodeJS.Timeout>>(new Set());
 
@@ -243,12 +244,13 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
     if (rawTouches.length > 0) {
       // Process all current touches (mobile / tablet / touch devices)
       rawTouches.forEach((touch: Touch) => {
+        const t = touch as any;
         const touchId = touch.identifier;
+        const x = t.pageX ?? t.clientX ?? 0;
+        const y = t.pageY ?? t.clientY ?? 0;
 
         // Only add if we haven't already tracked this touch
         if (!activeTouches.current.has(touchId)) {
-          const x = touch.pageX;
-          const y = touch.pageY;
           const color = getRandomColor(usedColors.current);
           usedColors.current.push(color);
 
@@ -264,18 +266,21 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
           addRipple(x, y, color);
         }
       });
-    } else if (typeof nativeEvt?.pageX === 'number') {
-      // Desktop / mouse support: clicking places or removes a virtual finger
-      const x = nativeEvt.pageX;
-      const y = nativeEvt.pageY;
-      const existingId = Array.from(activeTouches.current.entries()).find(([_, p]) => {
+    } else if (typeof nativeEvt?.pageX === 'number' || typeof nativeEvt?.clientX === 'number') {
+      // Desktop / mouse support: clicking places a pin right at the cursor, or removes if clicked on existing
+      const x = nativeEvt.pageX ?? nativeEvt.clientX;
+      const y = nativeEvt.pageY ?? nativeEvt.clientY;
+
+      const existingEntry = Array.from(activeTouches.current.entries()).find(([_, p]) => {
         const dx = p.x - x;
         const dy = p.y - y;
-        return Math.sqrt(dx * dx + dy * dy) < 40;
-      })?.[0];
+        return Math.sqrt(dx * dx + dy * dy) < 45;
+      });
 
-      if (existingId !== undefined) {
+      if (existingEntry) {
+        const [existingId] = existingEntry;
         activeTouches.current.delete(existingId);
+        activeMouseTouchId.current = null;
         const allPlayers = Array.from(activeTouches.current.values());
         setPlayers(allPlayers);
         if (allPlayers.length < 2) {
@@ -288,6 +293,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
         return;
       } else {
         const touchId = Date.now();
+        activeMouseTouchId.current = touchId;
         const color = getRandomColor(usedColors.current);
         usedColors.current.push(color);
 
@@ -326,27 +332,45 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
 
     const nativeEvt = evt.nativeEvent as any;
     const touches = (nativeEvt?.touches || []) as unknown as Touch[];
-    if (touches.length === 0) return;
 
-    // Update positions of existing touches
-    touches.forEach((touch: Touch) => {
-      const touchId = touch.identifier;
-      const existingPlayer = activeTouches.current.get(touchId);
+    if (touches.length > 0) {
+      // Update positions of existing touches on touch devices
+      touches.forEach((touch: Touch) => {
+        const touchId = touch.identifier;
+        const existingPlayer = activeTouches.current.get(touchId);
 
+        if (existingPlayer) {
+          const t = touch as any;
+          const x = t.pageX ?? t.clientX ?? 0;
+          const y = t.pageY ?? t.clientY ?? 0;
+          activeTouches.current.set(touchId, {
+            ...existingPlayer,
+            x,
+            y,
+            gender: mode === 'hetero' ? (x < screenWidth / 2 ? 'female' : 'male') : existingPlayer.gender,
+          });
+        }
+      });
+      setPlayers(Array.from(activeTouches.current.values()));
+    } else if (activeMouseTouchId.current !== null && (typeof nativeEvt?.pageX === 'number' || typeof nativeEvt?.clientX === 'number')) {
+      // Follow mouse cursor smoothly on desktop drag
+      const existingPlayer = activeTouches.current.get(activeMouseTouchId.current);
       if (existingPlayer) {
-        activeTouches.current.set(touchId, {
+        const x = nativeEvt.pageX ?? nativeEvt.clientX;
+        const y = nativeEvt.pageY ?? nativeEvt.clientY;
+        activeTouches.current.set(activeMouseTouchId.current, {
           ...existingPlayer,
-          x: touch.pageX,
-          y: touch.pageY,
+          x,
+          y,
+          gender: mode === 'hetero' ? (x < screenWidth / 2 ? 'female' : 'male') : existingPlayer.gender,
         });
+        setPlayers(Array.from(activeTouches.current.values()));
       }
-    });
-
-    const allPlayers = Array.from(activeTouches.current.values());
-    setPlayers(allPlayers);
+    }
   };
 
   const handleTouchEnd = (evt: GestureResponderEvent) => {
+    activeMouseTouchId.current = null;
     if (isSelecting) return;
 
     const nativeEvt = evt.nativeEvent as any;
@@ -354,7 +378,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
     // On desktop mouse clicks, changedTouches is empty so keep pins placed
     if (changedTouches.length === 0) return;
 
-    // Remove touches that ended
+    // Remove touches that ended on mobile
     changedTouches.forEach((touch: Touch) => {
       activeTouches.current.delete(touch.identifier);
     });
@@ -473,7 +497,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
 
       {/* Split screen divider for hetero mode */}
       {mode === 'hetero' && (
-        <View style={[styles.divider, { left: screenWidth / 2 }]}>
+        <View style={[styles.divider, { left: screenWidth / 2 }]} pointerEvents="none">
           <View style={styles.dividerLine} />
           <Text style={styles.dividerTextLeft}>♀️</Text>
           <Text style={styles.dividerTextRight}>♂️</Text>
@@ -483,16 +507,16 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
       {/* Instruction text */}
       {players.length === 0 && !isSelecting && (
         <BounceAnimation trigger={true}>
-          <View style={styles.instructionContainer}>
+          <View style={styles.instructionContainer} pointerEvents="none">
             <Text style={styles.instructionTitle}>Ready to Play?</Text>
             <Text style={styles.instructionText}>
               {Platform.OS === 'web'
-                ? 'Presiona teclas 1-5 (izq) y 6-0 (der) o toca la pantalla'
+                ? 'Haz clic o toca la pantalla para colocar dedos (o teclas 1-0)'
                 : 'All players touch the screen with one finger'}
             </Text>
             <Text style={styles.instructionSubtext}>
               {Platform.OS === 'web'
-                ? 'Mínimo 2 jugadores • [C] para reiniciar'
+                ? 'Mínimo 2 jugadores • Arrastra para mover • [C] limpiar'
                 : 'Minimum 2 players'}
             </Text>
           </View>
@@ -508,6 +532,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
               transform: [{ scale: countdownAnim }],
             },
           ]}
+          pointerEvents="none"
         >
           <GlowEffect color="#FF006E" intensity={20}>
             <Text style={styles.countdownText}>{countdown}</Text>
@@ -517,7 +542,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
 
       {/* Player touch indicators with pulse */}
       {players.map((player) => (
-        <View key={player.id}>
+        <View key={player.id} pointerEvents="none">
           <View
             style={[
               styles.touchIndicator,
@@ -529,11 +554,11 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
             ]}
           >
             <View style={styles.touchInner}>
-              {player.id >= 1001 && player.id <= 1010 && (
-                <Text style={styles.touchKeyText}>
-                  {player.id === 1010 ? '0' : String(player.id - 1000)}
-                </Text>
-              )}
+              <Text style={styles.touchKeyText}>
+                {player.id >= 1001 && player.id <= 1010
+                  ? (player.id === 1010 ? '0' : String(player.id - 1000))
+                  : (player.gender === 'female' ? '♀️' : player.gender === 'male' ? '♂️' : '✋')}
+              </Text>
             </View>
           </View>
           {/* Pulsing effect while waiting */}
@@ -569,6 +594,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
             styles.playerCountContainer,
             { transform: [{ translateY: playerCountAnim }] },
           ]}
+          pointerEvents="none"
         >
           <Text style={styles.playerCountText}>
             {players.length === 0 ? 'Waiting for players...' :

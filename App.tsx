@@ -16,8 +16,6 @@ import StatsScreen from './src/screens/StatsScreen';
 import CustomQuestionsScreen from './src/screens/CustomQuestionsScreen';
 import AchievementsScreen from './src/screens/AchievementsScreen';
 import DailyChallengesScreen from './src/screens/DailyChallengesScreen';
-import AIChatScreen from './src/screens/AIChatScreen';
-import AIQuestionGeneratorScreen from './src/screens/AIQuestionGeneratorScreen';
 import AchievementUnlockedModal from './src/components/AchievementUnlockedModal';
 import { ScreenTransition, TransitionType, TransitionDirection } from './src/components/ScreenTransition';
 import { StorageService, defaultSettings, defaultStats, defaultUserProgress } from './src/utils/storage';
@@ -106,7 +104,7 @@ const loadingStyles = StyleSheet.create({
 // Navigation flow configuration for transitions
 const NAVIGATION_FLOW: Record<Screen, Screen[]> = {
   tutorial: ['mode'],
-  mode: ['level', 'settings', 'stats', 'achievements', 'dailyChallenges', 'aiChat', 'aiGenerator'],
+  mode: ['level', 'settings', 'stats', 'achievements', 'dailyChallenges'],
   level: ['mode', 'game'],
   game: ['level', 'question'],
   question: ['game'],
@@ -139,12 +137,12 @@ function getTransitionConfig(
   }
 
   // Settings/screens from main menu (fade)
-  if (from === 'mode' && ['settings', 'stats', 'achievements', 'dailyChallenges', 'aiChat', 'aiGenerator'].includes(to)) {
+  if (from === 'mode' && ['settings', 'stats', 'achievements', 'dailyChallenges'].includes(to)) {
     return { type: 'fade', direction: 'forward' };
   }
 
   // Back to main menu
-  if (from && ['settings', 'stats', 'achievements', 'dailyChallenges', 'aiChat', 'aiGenerator'].includes(from) && to === 'mode') {
+  if (from && ['settings', 'stats', 'achievements', 'dailyChallenges'].includes(from) && to === 'mode') {
     return { type: 'fade', direction: 'backward' };
   }
 
@@ -606,8 +604,6 @@ export default function App() {
             onOpenStats={handleOpenStats}
             onOpenAchievements={handleOpenAchievements}
             onOpenDailyChallenges={handleOpenDailyChallenges}
-            onOpenAIChat={() => navigateToScreen('aiChat')}
-            onOpenAIGenerator={() => navigateToScreen('aiGenerator')}
           />
         </ScreenTransition>
       )}
@@ -749,43 +745,6 @@ export default function App() {
           <DailyChallengesScreen
             challengeProgress={dailyChallenges}
             onBack={() => navigateToScreen('mode')}
-          />
-        </ScreenTransition>
-      )}
-
-      {/* AI Chat Screen */}
-      {currentScreen === 'aiChat' && (
-        <ScreenTransition
-          visible={true}
-          type={getScreenTransition('aiChat').type}
-          direction={getScreenTransition('aiChat').direction}
-          duration={300}
-        >
-          <AIChatScreen
-            level={intensityLevel}
-            mode={gameMode}
-            playerCount={stats.totalPlayers}
-            onBack={() => navigateToScreen('mode')}
-          />
-        </ScreenTransition>
-      )}
-
-      {/* AI Generator Screen */}
-      {currentScreen === 'aiGenerator' && (
-        <ScreenTransition
-          visible={true}
-          type={getScreenTransition('aiGenerator').type}
-          direction={getScreenTransition('aiGenerator').direction}
-          duration={300}
-        >
-          <AIQuestionGeneratorScreen
-            onBack={() => navigateToScreen('mode')}
-            onAddQuestions={(questions) => {
-              // Add generated questions to custom questions
-              StorageService.saveCustomQuestions([...customQuestions, ...questions]);
-              setCustomQuestions(prev => [...prev, ...questions]);
-              navigateToScreen('mode');
-            }}
           />
         </ScreenTransition>
       )}
