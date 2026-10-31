@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
@@ -40,8 +40,24 @@ export default function ImprovedQuestionScreen({
   canLevelUp,
   canLevelDown,
 }: Props) {
-  const [question] = useState(() => getRandomQuestion(level, settings.categories, usedQuestionIds));
-  const formattedQuestionText = formatQuestionForPair(question.text, player, targetPlayer);
+  const [question, setQuestion] = useState(() =>
+    getRandomQuestion(level, settings.categories, usedQuestionIds)
+  );
+
+  // Stable level change listener: only picks new question when levelUp or levelDown is clicked
+  const currentLevelRef = useRef(level);
+  useEffect(() => {
+    if (currentLevelRef.current !== level) {
+      currentLevelRef.current = level;
+      setQuestion(getRandomQuestion(level, settings.categories, usedQuestionIds));
+    }
+  }, [level, settings.categories, usedQuestionIds]);
+
+  const formattedQuestionText = useMemo(
+    () => formatQuestionForPair(question.text, player, targetPlayer),
+    [question.text, player, targetPlayer]
+  );
+
   const [showConfetti, setShowConfetti] = useState(true);
   const [timeLeft, setTimeLeft] = useState(settings.timerDuration);
   const [isTimerActive, setIsTimerActive] = useState(false);

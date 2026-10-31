@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
@@ -24,7 +24,7 @@ export default function QuestionScreen({
   canLevelUp,
   canLevelDown,
 }: Props) {
-  const question = getRandomQuestion(level);
+  const [question] = useState(() => getRandomQuestion(level));
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
