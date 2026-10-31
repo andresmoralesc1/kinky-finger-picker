@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { Player, IntensityLevel, Question, QuestionCategory, Settings } from '../types';
-import { getRandomQuestion } from '../data/questions';
+import { Player, IntensityLevel, Question, QuestionCategory, Settings, GameMode } from '../types';
+import { getRandomQuestion, formatQuestionForPair } from '../data/questions';
 import ConfettiEffect from '../components/ConfettiEffect';
 import { soundManager } from '../utils/sounds';
 import AccessibleTouchable from '../components/AccessibleTouchable';
@@ -11,6 +11,8 @@ import { SwipeGesture } from '../components/SwipeGesture';
 
 interface Props {
   player: Player;
+  targetPlayer?: Player | null;
+  mode?: GameMode;
   level: IntensityLevel;
   settings: Settings;
   usedQuestionIds: string[];
@@ -25,6 +27,8 @@ interface Props {
 
 export default function ImprovedQuestionScreen({
   player,
+  targetPlayer,
+  mode = 'hetero',
   level,
   settings,
   usedQuestionIds,
@@ -36,7 +40,8 @@ export default function ImprovedQuestionScreen({
   canLevelUp,
   canLevelDown,
 }: Props) {
-  const question = getRandomQuestion(level, settings.categories, usedQuestionIds);
+  const [question] = useState(() => getRandomQuestion(level, settings.categories, usedQuestionIds));
+  const formattedQuestionText = formatQuestionForPair(question.text, player, targetPlayer);
   const [showConfetti, setShowConfetti] = useState(true);
   const [timeLeft, setTimeLeft] = useState(settings.timerDuration);
   const [isTimerActive, setIsTimerActive] = useState(false);
@@ -186,12 +191,58 @@ export default function ImprovedQuestionScreen({
             },
           ]}
         >
-        {/* Winner indicator */}
+        {/* Winner indicator / Interactive Pair indicator */}
         <View style={styles.winnerSection}>
-          <Text style={styles.winnerLabel}>Selected Player</Text>
-          <View style={[styles.winnerDot, { backgroundColor: player.color }]}>
-            <View style={styles.winnerDotInner} />
-          </View>
+          {targetPlayer ? (
+            <View style={styles.pairHeaderContainer}>
+              {/* Actor Player */}
+              <View style={styles.pairPlayerCard}>
+                <View style={[styles.winnerDot, { backgroundColor: player.color }]}>
+                  <Text style={styles.pairDotNumber}>
+                    {player.id >= 1001 && player.id <= 1010
+                      ? (player.id === 1010 ? '0' : player.id - 1000)
+                      : (player.gender === 'female' ? '♀️' : player.gender === 'male' ? '♂️' : '1')}
+                  </Text>
+                </View>
+                <Text style={styles.pairRoleTitle}>
+                  {player.gender === 'female' ? '♀️ Ella' : player.gender === 'male' ? '♂️ Él' : 'Jugador 1'}
+                </Text>
+                <Text style={styles.pairRoleSubtext}>
+                  {question.type === 'dare' ? 'Realiza el reto' : 'Pregunta'}
+                </Text>
+              </View>
+
+              {/* Interaction Arrow */}
+              <View style={styles.pairArrowContainer}>
+                <Text style={styles.pairArrow}>➔</Text>
+                <Text style={styles.pairArrowLabel}>hacia</Text>
+              </View>
+
+              {/* Target Player */}
+              <View style={styles.pairPlayerCard}>
+                <View style={[styles.winnerDot, { backgroundColor: targetPlayer.color }]}>
+                  <Text style={styles.pairDotNumber}>
+                    {targetPlayer.id >= 1001 && targetPlayer.id <= 1010
+                      ? (targetPlayer.id === 1010 ? '0' : targetPlayer.id - 1000)
+                      : (targetPlayer.gender === 'female' ? '♀️' : targetPlayer.gender === 'male' ? '♂️' : '2')}
+                  </Text>
+                </View>
+                <Text style={styles.pairRoleTitle}>
+                  {targetPlayer.gender === 'female' ? '♀️ Ella' : targetPlayer.gender === 'male' ? '♂️ Él' : 'Jugador 2'}
+                </Text>
+                <Text style={styles.pairRoleSubtext}>
+                  {question.type === 'dare' ? 'Recibe el reto' : 'Responde'}
+                </Text>
+              </View>
+            </View>
+          ) : (
+            <>
+              <Text style={styles.winnerLabel}>Jugador Seleccionado</Text>
+              <View style={[styles.winnerDot, { backgroundColor: player.color }]}>
+                <View style={styles.winnerDotInner} />
+              </View>
+            </>
+          )}
         </View>
 
         {/* Level and Category badges */}
@@ -225,9 +276,9 @@ export default function ImprovedQuestionScreen({
         {/* Question */}
         <View style={styles.questionContainer}>
           <Text style={styles.questionType}>
-            {question.type === 'dare' ? '💋 DARE' : '❓ QUESTION'}
+            {question.type === 'dare' ? '💋 RETO' : '❓ PREGUNTA / VERDAD'}
           </Text>
-          <Text style={styles.questionText}>{question.text}</Text>
+          <Text style={styles.questionText}>{formattedQuestionText}</Text>
         </View>
 
         {/* Start Timer Button */}
@@ -346,6 +397,61 @@ const styles = StyleSheet.create({
     height: 45,
     borderRadius: 22.5,
     backgroundColor: 'rgba(255,255,255,0.4)',
+  },
+  pairHeaderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    borderRadius: 24,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  pairPlayerCard: {
+    alignItems: 'center',
+    minWidth: 80,
+  },
+  pairDotNumber: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '900',
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  pairRoleTitle: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginTop: 6,
+  },
+  pairRoleSubtext: {
+    color: '#fff',
+    fontSize: 11,
+    opacity: 0.75,
+    marginTop: 2,
+    fontWeight: '600',
+  },
+  pairArrowContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  pairArrow: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: '900',
+    opacity: 0.9,
+  },
+  pairArrowLabel: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '700',
+    opacity: 0.7,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   badgesRow: {
     flexDirection: 'row',

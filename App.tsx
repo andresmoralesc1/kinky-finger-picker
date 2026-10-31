@@ -177,6 +177,7 @@ export default function App() {
   const [gameMode, setGameMode] = useState<GameMode>('hetero');
   const [intensityLevel, setIntensityLevel] = useState<IntensityLevel>('mild');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [targetPlayer, setTargetPlayer] = useState<Player | null>(null);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [stats, setStats] = useState<GameStats>(defaultStats);
   const [customQuestions, setCustomQuestions] = useState<Question[]>([]);
@@ -329,8 +330,9 @@ export default function App() {
     navigateToScreen('game');
   };
 
-  const handlePlayerSelected = (player: Player) => {
+  const handlePlayerSelected = (player: Player, target?: Player) => {
     setSelectedPlayer(player);
+    setTargetPlayer(target || null);
 
     // Update stats - track this player
     const newStats = { ...stats };
@@ -349,6 +351,21 @@ export default function App() {
       newStats.currentSession.push(playerStat);
     }
     playerStat.timesSelected += 1;
+
+    if (target) {
+      let targetStat = newStats.currentSession.find(p => p.playerId === target.id);
+      if (!targetStat) {
+        targetStat = {
+          playerId: target.id,
+          color: target.color,
+          timesSelected: 0,
+          daresCompleted: 0,
+          daresSkipped: 0,
+        };
+        newStats.currentSession.push(targetStat);
+      }
+      targetStat.timesSelected += 1;
+    }
 
     saveStats(newStats);
 
@@ -639,6 +656,8 @@ export default function App() {
           {selectedPlayer && (
             <ImprovedQuestionScreen
               player={selectedPlayer}
+              targetPlayer={targetPlayer}
+              mode={gameMode}
               level={intensityLevel}
               settings={settings}
               usedQuestionIds={usedQuestionIds}

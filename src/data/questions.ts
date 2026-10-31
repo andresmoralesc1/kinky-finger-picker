@@ -1,73 +1,105 @@
-import { Question, IntensityLevel, QuestionCategory } from '../types';
+import { Question, IntensityLevel, QuestionCategory, Player } from '../types';
+
+export function formatQuestionForPair(
+  rawText: string,
+  actor: Player,
+  target?: Player | null
+): string {
+  if (!target) return rawText;
+
+  const targetVocative =
+    target.gender === 'female'
+      ? 'a ella'
+      : target.gender === 'male'
+      ? 'a él'
+      : 'a tu pareja';
+
+  const targetPronoun =
+    target.gender === 'female'
+      ? 'ella'
+      : target.gender === 'male'
+      ? 'él'
+      : 'tu pareja';
+
+  return rawText
+    .replace(/\{target\}/gi, targetVocative)
+    .replace(/\{target_pronoun\}/gi, targetPronoun)
+    .replace(/the person on your right/gi, targetVocative)
+    .replace(/the person on your left/gi, targetVocative)
+    .replace(/the person across from you/gi, targetVocative)
+    .replace(/someone in the group/gi, targetVocative)
+    .replace(/someone here/gi, targetVocative)
+    .replace(/someone/gi, targetVocative);
+}
 
 export const questions: Question[] = [
-  // MILD LEVEL - CLASSIC
+  // MILD LEVEL - CLASSIC (100% Mild, Flirty & Icebreakers between Pair)
   {
     id: 'mild_classic_1',
-    text: 'Tell the group about your first kiss',
+    text: '¿Cuál fue tu primera impresión sincera de {target} al verle hoy?',
     level: 'mild',
     type: 'question',
     category: 'classic'
   },
   {
     id: 'mild_classic_2',
-    text: 'Give a compliment to the person on your right',
+    text: 'Dile {target} un cumplido honesto sobre su sonrisa, su mirada o su estilo.',
     level: 'mild',
     type: 'dare',
     category: 'classic'
   },
   {
     id: 'mild_classic_3',
-    text: 'What is your biggest turn-on?',
+    text: '¿Qué detalle sutil o gesto coqueto te hace sonreír al instante?',
     level: 'mild',
     type: 'question',
     category: 'classic'
   },
   {
     id: 'mild_classic_4',
-    text: 'Whisper something flirty to the person on your left',
+    text: 'Mírense fijamente a los ojos con {target} durante 10 segundos sin reírse.',
     level: 'mild',
     type: 'dare',
     category: 'classic'
   },
   {
     id: 'mild_classic_5',
-    text: 'What was your most embarrassing romantic moment?',
+    text: '¿Cuál ha sido la cita más divertida o inesperada que has tenido?',
     level: 'mild',
     type: 'question',
     category: 'classic'
   },
   {
     id: 'mild_classic_6',
-    text: 'Make eye contact with someone for 10 seconds without laughing',
+    text: 'Susúrrale al oído a {target} una frase divertida o juguetona.',
     level: 'mild',
     type: 'dare',
     category: 'classic'
   },
   {
     id: 'mild_classic_7',
-    text: 'Describe your ideal date night',
+    text: '¿Cómo describirías tu cita ideal perfecta para romper el hielo?',
     level: 'mild',
     type: 'question',
     category: 'classic'
   },
   {
     id: 'mild_classic_8',
-    text: 'Give someone a 5-second shoulder massage',
+    text: 'Haz reír a {target} en menos de 15 segundos sin tocarlo/a.',
     level: 'mild',
     type: 'dare',
     category: 'classic'
   },
   {
     id: 'mild_classic_9',
-    text: 'What physical feature do you notice first in someone?',
+    text: '¿Qué es lo primero en lo que te fijas cuando alguien te parece interesante?',
     level: 'mild',
     type: 'question',
     category: 'classic'
   },
   {
     id: 'mild_classic_10',
-    text: 'Blow a kiss to the person across from you',
+    text: 'Dedícale un guiño coqueto a {target} seguido de tu mejor pose divertida.',
     level: 'mild',
     type: 'dare',
     category: 'classic'
@@ -76,72 +108,142 @@ export const questions: Question[] = [
   // MILD LEVEL - ROMANTIC
   {
     id: 'mild_romantic_1',
-    text: 'What song reminds you of your first love?',
+    text: '¿Qué canción romántica o balada te hace pensar en un momento especial?',
     level: 'mild',
     type: 'question',
     category: 'romantic'
   },
   {
     id: 'mild_romantic_2',
-    text: 'Tell someone here what you find attractive about them',
+    text: 'Dile a {target} 2 cosas que te parezcan atractivas o agradables de su forma de ser.',
     level: 'mild',
     type: 'dare',
     category: 'romantic'
   },
   {
     id: 'mild_romantic_3',
-    text: 'What is the most romantic thing someone has done for you?',
+    text: '¿Cuál es el detalle romántico más lindo o considerado que han tenido contigo?',
     level: 'mild',
     type: 'question',
     category: 'romantic'
   },
   {
     id: 'mild_romantic_4',
-    text: 'Hold hands with someone for the next round',
+    text: 'Tómense de las manos con {target} durante 15 segundos mientras se miran y sonríen.',
     level: 'mild',
     type: 'dare',
     category: 'romantic'
   },
   {
     id: 'mild_romantic_5',
-    text: 'Describe your perfect romantic evening',
+    text: '¿Prefieres una cena tranquila a la luz de las velas o un paseo bajo las estrellas?',
     level: 'mild',
     type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_6',
+    text: 'Adivina qué tipo de música le gusta escuchar a {target} y que confirme si acertaste.',
+    level: 'mild',
+    type: 'dare',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_7',
+    text: '¿Crees en la química instantánea al conocer a alguien? Comparte tu opinión con {target}.',
+    level: 'mild',
+    type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_8',
+    text: 'Dale a {target} un abrazo cálido y cariñoso de 5 segundos.',
+    level: 'mild',
+    type: 'dare',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_9',
+    text: '¿Cuál es la película romántica o comedia que nunca te cansas de ver?',
+    level: 'mild',
+    type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_10',
+    text: 'Dedícale a {target} una frase poética o un piropo improvisado con mucha elegancia.',
+    level: 'mild',
+    type: 'dare',
     category: 'romantic'
   },
 
   // MILD LEVEL - PARTY
   {
     id: 'mild_party_1',
-    text: 'Do your best sexy dance move',
+    text: 'Hagan un choque de manos creativo o un saludo secreto de película con {target}.',
     level: 'mild',
     type: 'dare',
     category: 'party'
   },
   {
     id: 'mild_party_2',
-    text: 'What is the wildest party you have been to?',
+    text: '¿Cuál ha sido la anécdota más divertida que te ha pasado en una fiesta?',
     level: 'mild',
     type: 'question',
     category: 'party'
   },
   {
     id: 'mild_party_3',
-    text: 'Tell a flirty joke to the group',
+    text: 'Bailen lento juntos 15 segundos con {target} al ritmo de música imaginaria.',
     level: 'mild',
     type: 'dare',
     category: 'party'
   },
   {
     id: 'mild_party_4',
-    text: 'Have you ever made out at a party? Tell the story',
+    text: 'Si tú y {target} tuvieran que escapar de una fiesta aburrida, ¿a dónde propondrías ir?',
     level: 'mild',
     type: 'question',
     category: 'party'
   },
   {
     id: 'mild_party_5',
-    text: 'Wink at everyone in the group',
+    text: 'Lanza un beso al aire con estilo hacia {target}.',
+    level: 'mild',
+    type: 'dare',
+    category: 'party'
+  },
+  {
+    id: 'mild_party_6',
+    text: '¿Qué trago, cóctel o bebida pedirías para invitarle a {target}?',
+    level: 'mild',
+    type: 'question',
+    category: 'party'
+  },
+  {
+    id: 'mild_party_7',
+    text: 'Jueguen una ronda rápida de pulso de pulgares (thumb war) con {target}.',
+    level: 'mild',
+    type: 'dare',
+    category: 'party'
+  },
+  {
+    id: 'mild_party_8',
+    text: '¿Cuál es el juego de fiesta o ronda de preguntas que más te gusta jugar?',
+    level: 'mild',
+    type: 'question',
+    category: 'party'
+  },
+  {
+    id: 'mild_party_9',
+    text: 'Imita cómo caminaría o posaría {target} en una alfombra roja.',
+    level: 'mild',
+    type: 'dare',
+    category: 'party'
+  },
+  {
+    id: 'mild_party_10',
+    text: 'Chóquenle las palmas y dense un choque de puños con sonido explosivo.',
     level: 'mild',
     type: 'dare',
     category: 'party'

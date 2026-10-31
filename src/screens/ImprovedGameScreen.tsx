@@ -35,7 +35,7 @@ interface Touch {
 interface Props {
   mode: GameMode;
   level: IntensityLevel;
-  onPlayerSelected: (player: Player) => void;
+  onPlayerSelected: (player: Player, targetPlayer?: Player) => void;
   onBack: () => void;
   onChangeLevel: () => void;
 }
@@ -410,8 +410,8 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
     }, 1000);
   };
 
-  const handleRouletteComplete = (winner: Player) => {
-    onPlayerSelected(winner);
+  const handleRouletteComplete = (winner: Player, target?: Player) => {
+    onPlayerSelected(winner, target);
     setIsSelecting(false);
     setPlayers([]);
     setShowRoulette(false);
@@ -557,6 +557,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
       {showRoulette && (
         <RouletteAnimation
           players={players}
+          mode={mode}
           onComplete={handleRouletteComplete}
         />
       )}
