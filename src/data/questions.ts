@@ -21,7 +21,12 @@ export function formatQuestionForPair(
       ? 'él'
       : 'tu pareja';
 
-  return rawText
+  const formatted = rawText
+    .replace(/a\s+\{target\}/gi, targetVocative)
+    .replace(/de\s+\{target\}/gi, target.gender === 'female' ? 'de ella' : target.gender === 'male' ? 'de él' : 'de tu pareja')
+    .replace(/con\s+\{target\}/gi, target.gender === 'female' ? 'con ella' : target.gender === 'male' ? 'con él' : 'con tu pareja')
+    .replace(/hacia\s+\{target\}/gi, target.gender === 'female' ? 'hacia ella' : target.gender === 'male' ? 'hacia él' : 'hacia tu pareja')
+    .replace(/para\s+\{target\}/gi, target.gender === 'female' ? 'para ella' : target.gender === 'male' ? 'para él' : 'para tu pareja')
     .replace(/\{target\}/gi, targetVocative)
     .replace(/\{target_pronoun\}/gi, targetPronoun)
     .replace(/the person on your right/gi, targetVocative)
@@ -30,6 +35,8 @@ export function formatQuestionForPair(
     .replace(/someone in the group/gi, targetVocative)
     .replace(/someone here/gi, targetVocative)
     .replace(/someone/gi, targetVocative);
+
+  return formatted.replace(/\ba a\b/gi, 'a');
 }
 
 export const questions: Question[] = [
@@ -43,7 +50,7 @@ export const questions: Question[] = [
   },
   {
     id: 'mild_classic_2',
-    text: 'Dile {target} un cumplido honesto sobre su sonrisa, su mirada o su estilo.',
+    text: 'Dile a {target} un cumplido honesto sobre su sonrisa, su mirada o su estilo.',
     level: 'mild',
     type: 'dare',
     category: 'classic'
