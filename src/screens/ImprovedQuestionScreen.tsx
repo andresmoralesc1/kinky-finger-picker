@@ -314,6 +314,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 30,
+    width: '100%',
+    maxWidth: 620,
+    alignSelf: 'center',
   },
   winnerSection: {
     alignItems: 'center',

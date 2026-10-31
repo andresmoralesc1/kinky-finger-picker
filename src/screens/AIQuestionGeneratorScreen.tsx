@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
+  TextInput,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
@@ -216,7 +217,14 @@ export default function AIQuestionGeneratorScreen({ onBack, onAddQuestions }: Pr
           Add specific requirements for your questions...
         </Text>
         <View style={styles.inputContainer}>
-          <Text style={styles.input}>{customPrompt || 'Enter custom prompt...'}</Text>
+          <TextInput
+            style={styles.input}
+            value={customPrompt}
+            onChangeText={setCustomPrompt}
+            placeholder="e.g. focused on dancing, secret confessions..."
+            placeholderTextColor="#777"
+            multiline
+          />
         </View>
 
         {/* Generate Button */}
@@ -227,7 +235,7 @@ export default function AIQuestionGeneratorScreen({ onBack, onAddQuestions }: Pr
             disabled={isGenerating}
           >
             <LinearGradient
-              colors={['#FF006E', '#8338EC'] as const}
+              colors={['#E50914', '#B81D24'] as const}
               style={styles.generateButtonGradient}
             >
               {isGenerating ? (
@@ -243,7 +251,7 @@ export default function AIQuestionGeneratorScreen({ onBack, onAddQuestions }: Pr
             <ProgressLoading
               progress={generationProgress}
               message={`Creating ${count} ${selectedLevel} questions...`}
-              color="#FF006E"
+              color="#E50914"
               showPercentage={true}
             />
           )}

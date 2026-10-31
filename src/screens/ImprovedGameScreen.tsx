@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   GestureResponderEvent,
   NativeSyntheticEvent,
+  Platform,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -106,6 +107,115 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
       rippleTimeouts.current.clear();
     };
   }, []);
+
+  // Keyboard shortcut simulator for desktop:
+  // Keys 1-5 simulate left side (e.g. Female in hetero mode)
+  // Keys 6-0 simulate right side (e.g. Male in hetero mode)
+  const handleClearTouches = useCallback(() => {
+    activeTouches.current.clear();
+    setPlayers([]);
+    setCountdown(null);
+    if (countdownTimeout.current) {
+      clearTimeout(countdownTimeout.current);
+      countdownTimeout.current = null;
+    }
+  }, []);
+
+  const toggleVirtualTouch = useCallback((keyIndex: number) => {
+    if (isSelecting) return;
+
+    const virtualId = 1000 + keyIndex; // Distinct numeric ID for keys 1..10
+    const dims = getWindowDimensions();
+    const width = dims.width;
+    const height = dims.height;
+
+    if (activeTouches.current.has(virtualId)) {
+      // Remove player
+      activeTouches.current.delete(virtualId);
+      const remaining = Array.from(activeTouches.current.values());
+      setPlayers(remaining);
+      if (remaining.length < 2) {
+        setCountdown(null);
+        if (countdownTimeout.current) {
+          clearTimeout(countdownTimeout.current);
+          countdownTimeout.current = null;
+        }
+      }
+      return;
+    }
+
+    // Determine position based on side: 1-5 is left, 6-10 (0) is right
+    const isLeftSide = keyIndex <= 5;
+    const sideSlot = isLeftSide ? keyIndex - 1 : keyIndex - 6; // 0..4
+    const totalSlots = 5;
+
+    // Distribute Y vertically between 25% and 75% of screen height
+    const yMargin = height * 0.22;
+    const availableHeight = height * 0.56;
+    const y = yMargin + (availableHeight / (totalSlots - 1)) * sideSlot;
+
+    // Distribute X: left side is ~25% from left, right side is ~75% from left
+    const x = isLeftSide ? width * 0.25 : width * 0.75;
+
+    const color = getRandomColor(usedColors.current);
+    usedColors.current.push(color);
+
+    const player: Player = {
+      id: virtualId,
+      x,
+      y,
+      color,
+      gender: mode === 'hetero' ? (isLeftSide ? 'female' : 'male') : undefined,
+    };
+
+    activeTouches.current.set(virtualId, player);
+    addRipple(x, y, color);
+
+    const allPlayers = Array.from(activeTouches.current.values());
+    setPlayers(allPlayers);
+
+    if (allPlayers.length >= 2 && !countdown && countdownTimeout.current === null) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      soundManager.playSound('tap');
+      countdownTimeout.current = setTimeout(() => {
+        startCountdown();
+        countdownTimeout.current = null;
+      }, 300);
+    }
+  }, [isSelecting, countdown, mode]);
+
+  // Listen to keyboard on web
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input
+      const activeTag = (document.activeElement?.tagName || '').toLowerCase();
+      if (activeTag === 'input' || activeTag === 'textarea') return;
+
+      const key = e.key;
+      let slot: number | null = null;
+      if (['1', '2', '3', '4', '5'].includes(key)) {
+        slot = parseInt(key, 10);
+      } else if (['6', '7', '8', '9'].includes(key)) {
+        slot = parseInt(key, 10);
+      } else if (key === '0') {
+        slot = 10;
+      } else if (key === 'Escape' || key === 'c' || key === 'C') {
+        e.preventDefault();
+        handleClearTouches();
+        return;
+      }
+
+      if (slot !== null) {
+        e.preventDefault();
+        toggleVirtualTouch(slot);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toggleVirtualTouch, handleClearTouches]);
 
   const addRipple = (x: number, y: number, color: string) => {
     const ripple: RippleData = {
@@ -376,10 +486,14 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
           <View style={styles.instructionContainer}>
             <Text style={styles.instructionTitle}>Ready to Play?</Text>
             <Text style={styles.instructionText}>
-              All players touch the screen with one finger
+              {Platform.OS === 'web'
+                ? 'Presiona teclas 1-5 (izq) y 6-0 (der) o toca la pantalla'
+                : 'All players touch the screen with one finger'}
             </Text>
             <Text style={styles.instructionSubtext}>
-              Minimum 2 players (or click on desktop)
+              {Platform.OS === 'web'
+                ? 'Mínimo 2 jugadores • [C] para reiniciar'
+                : 'Minimum 2 players'}
             </Text>
           </View>
         </BounceAnimation>
@@ -414,7 +528,13 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
               },
             ]}
           >
-            <View style={styles.touchInner} />
+            <View style={styles.touchInner}>
+              {player.id >= 1001 && player.id <= 1010 && (
+                <Text style={styles.touchKeyText}>
+                  {player.id === 1010 ? '0' : String(player.id - 1000)}
+                </Text>
+              )}
+            </View>
           </View>
           {/* Pulsing effect while waiting */}
           {!showRoulette && countdown === null && (
@@ -458,6 +578,84 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
             Hold still...
           </Text>
         </Animated.View>
+      )}
+
+      {/* Desktop Keyboard HUD Bar */}
+      {Platform.OS === 'web' && (
+        <View style={styles.desktopHudContainer} pointerEvents="box-none">
+          <View style={styles.desktopHudGroup}>
+            <Text style={styles.desktopHudTitle}>
+              {mode === 'hetero' ? '♀️ Izquierda' : 'Izquierda'} [1 - 5]
+            </Text>
+            <View style={styles.desktopKeyRow}>
+              {[1, 2, 3, 4, 5].map((slot) => {
+                const active = players.find((p) => p.id === 1000 + slot);
+                return (
+                  <TouchableOpacity
+                    key={slot}
+                    style={[
+                      styles.desktopKeyButton,
+                      active ? { backgroundColor: active.color, borderColor: '#fff' } : null,
+                    ]}
+                    onPress={() => toggleVirtualTouch(slot)}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.desktopKeyText,
+                        active ? styles.desktopKeyTextActive : null,
+                      ]}
+                    >
+                      {slot}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
+          {players.length > 0 && (
+            <TouchableOpacity
+              style={styles.desktopClearButton}
+              onPress={handleClearTouches}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.desktopClearButtonText}>Limpiar (C)</Text>
+            </TouchableOpacity>
+          )}
+
+          <View style={styles.desktopHudGroup}>
+            <Text style={styles.desktopHudTitle}>
+              {mode === 'hetero' ? '♂️ Derecha' : 'Derecha'} [6 - 0]
+            </Text>
+            <View style={styles.desktopKeyRow}>
+              {[6, 7, 8, 9, 10].map((slot) => {
+                const active = players.find((p) => p.id === 1000 + slot);
+                const label = slot === 10 ? '0' : String(slot);
+                return (
+                  <TouchableOpacity
+                    key={slot}
+                    style={[
+                      styles.desktopKeyButton,
+                      active ? { backgroundColor: active.color, borderColor: '#fff' } : null,
+                    ]}
+                    onPress={() => toggleVirtualTouch(slot)}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.desktopKeyText,
+                        active ? styles.desktopKeyTextActive : null,
+                      ]}
+                    >
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+        </View>
       )}
     </Animated.View>
   );
@@ -581,10 +779,17 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     backgroundColor: 'rgba(255,255,255,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  touchKeyText: {
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: 'bold',
   },
   playerCountContainer: {
     position: 'absolute',
-    bottom: 100,
+    bottom: 110,
     left: 0,
     right: 0,
     alignItems: 'center',
@@ -599,5 +804,79 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#fff',
     opacity: 0.6,
+  },
+  desktopHudContainer: {
+    position: 'absolute',
+    bottom: 18,
+    left: 16,
+    right: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    zIndex: 30,
+  },
+  desktopHudGroup: {
+    backgroundColor: 'rgba(15, 15, 22, 0.9)',
+    borderRadius: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.18)',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  desktopHudTitle: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 6,
+    letterSpacing: 0.5,
+    opacity: 0.9,
+  },
+  desktopKeyRow: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  desktopKeyButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  desktopKeyText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+  desktopKeyTextActive: {
+    color: '#fff',
+    fontWeight: '900',
+  },
+  desktopClearButton: {
+    backgroundColor: '#E50914',
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: '#fff',
+    shadowColor: '#E50914',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  desktopClearButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
 });

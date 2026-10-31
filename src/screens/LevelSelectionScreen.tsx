@@ -143,7 +143,7 @@ export default function LevelSelectionScreen({ onSelectLevel, onBack }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#0a0a0f',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
@@ -153,15 +153,17 @@ const styles = StyleSheet.create({
     top: 50,
     left: 20,
     padding: 10,
+    zIndex: 10,
   },
   backButtonText: {
     color: '#fff',
     fontSize: 18,
+    fontWeight: 'bold',
   },
   title: {
     fontSize: 42,
     fontWeight: 'bold',
-    color: '#FF006E',
+    color: '#E50914',
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -169,12 +171,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#fff',
     marginBottom: 60,
-    opacity: 0.8,
+    opacity: 0.85,
   },
   buttonsContainer: {
     width: '100%',
+    maxWidth: 720,
     flexDirection: 'row',
     gap: 20,
+    alignSelf: 'center',
   },
   button: {
     flex: 1,

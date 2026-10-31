@@ -80,13 +80,14 @@ export default function AIChatScreen({
     }
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!inputText.trim() || isLoading) return;
+  const sendMessage = async (textToSend?: string) => {
+    const text = (typeof textToSend === 'string' ? textToSend : inputText).trim();
+    if (!text || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      text: inputText,
+      text,
       timestamp: Date.now(),
     };
 
@@ -96,7 +97,7 @@ export default function AIChatScreen({
     soundManager.playSound('tap');
 
     try {
-      const response = await zaiService.chat(inputText, { level, mode, playerCount });
+      const response = await zaiService.chat(text, { level, mode, playerCount });
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -121,8 +122,7 @@ export default function AIChatScreen({
   };
 
   const generateRandomQuestions = async () => {
-    setInputText(`Generate 3 ${level} questions for ${playerCount} players`);
-    setTimeout(() => sendMessage(), 100);
+    sendMessage(`Dame 3 retos o preguntas picantes (${level}) para ${playerCount} jugadores`);
   };
 
   return (
@@ -191,7 +191,7 @@ export default function AIChatScreen({
           accessibilityRole="button"
         >
           <LinearGradient
-            colors={['#FF006E', '#8338EC'] as const}
+            colors={['#E50914', '#B81D24'] as const}
             style={styles.quickActionGradient}
           >
             <Text style={styles.quickActionText}>🎲 Generate Questions</Text>
@@ -216,11 +216,11 @@ export default function AIChatScreen({
           />
           <TouchableOpacity
             style={[styles.sendButton, !inputText.trim() && styles.sendButtonDisabled]}
-            onPress={sendMessage}
+            onPress={() => sendMessage()}
             disabled={!inputText.trim() || isLoading}
           >
             <LinearGradient
-              colors={['#FF006E', '#8338EC'] as const}
+              colors={['#E50914', '#8E0E00'] as const}
               style={styles.sendButtonGradient}
             >
               <Text style={styles.sendButtonText}>Send</Text>
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
   userBubble: {
     alignSelf: 'flex-end',
-    backgroundColor: '#FF006E',
+    backgroundColor: '#E50914',
   },
   assistantBubble: {
     alignSelf: 'flex-start',
