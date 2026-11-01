@@ -72,7 +72,7 @@ function LoadingScreen() {
         resizeMode="contain"
       />
       <Text style={loadingStyles.title}>Kinky Finger Picker</Text>
-      <Text style={loadingStyles.subtitle}>Loading your game...</Text>
+      <Text style={loadingStyles.subtitle}>Cargando el juego...</Text>
     </View>
   );
 }

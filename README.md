@@ -7,364 +7,199 @@
   <h1>🌶️ Kinky Finger Picker</h1>
 
   <!-- Tagline -->
-  <p>The ultimate party game for unforgettable nights with friends</p>
+  <p>El juego social definitivo para parejas y fiestas inolvidables</p>
 
   <!-- Badges -->
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   [![React Native](https://img.shields.io/badge/React_Native-20232A?logo=react&logoColor=61DAFB)](https://reactnative.dev/)
   [![Expo](https://img.shields.io/badge/Expo-000020?logo=expo&logoColor=white)](https://expo.dev/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-  [![AI Powered](https://img.shields.io/badge/AI-Z.ai_GLM--blue.svg)](https://api.z.ai)
-
-  [![CI](https://github.com/andresmoralesc1/kinky-finger-picker/actions/workflows/ci.yml/badge.svg)](https://github.com/andresmoralesc1/kinky-finger-picker/actions/workflows/ci.yml)
   [![Tests](https://img.shields.io/badge/tests-67%2F67%20passing-brightgreen)](https://github.com/andresmoralesc1/kinky-finger-picker/actions)
   [![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)](https://github.com/andresmoralesc1/kinky-finger-picker)
-
-  <!-- Warning Badge -->
-  [![18+](https://img.shields.io/badge/Content-18%2B-red.svg)](https://github.com/andresmoralesc1/kinky-finger-picker)
+  [![18+](https://img.shields.io/badge/Contenido-18%2B-red.svg)](https://github.com/andresmoralesc1/kinky-finger-picker)
 
 </div>
 
 ---
 
-## ⚠️ Disclaimer
+## ⚠️ Advertencia y Consentimiento
 
-**This app contains adult content and is intended for consenting adults (18+) only.** Please play responsibly and always respect boundaries.
-
----
-
-## 🎮 About
-
-**Kinky Finger Picker** is a multiplayer party game that combines random finger selection with truth-or-dare style challenges. Perfect for breaking the ice and heating things up at parties!
-
-### ✨ Key Features
-
-| Feature | Description |
-|---------|-------------|
-| **🤖 AI-Powered** | Generate custom questions with Z.ai GLM-4.6 |
-| **🎯 Multi-Touch** | Advanced finger detection for 2-10 players |
-| **🎨 3 Game Modes** | Hetero, Gay, and Lesbian layouts |
-| **🌶️ 3 Intensity Levels** | Mild, Spicy, and Extreme |
-| **📊 Statistics** | Track rounds, rankings, and achievements |
-| **🏆 Gamification** | Unlock achievements, earn XP, level up |
-| **📱 Social Sharing** | Share epic moments with styled screenshots |
-| **⚙️ Customizable** | Create your own questions and settings |
+**Esta aplicación contiene contenido para adultos y está destinada exclusivamente a mayores de edad (+18).**
+El respeto, la comunicación y el consentimiento mutuo son siempre la prioridad. ¡Juega responsablemente!
 
 ---
 
-## 🚀 Quick Start
+## 🎮 Acerca del Juego
 
+**Kinky Finger Picker** es una experiencia multijugador interactiva que combina la selección táctil de dedos con retos y preguntas íntimas, picantes y atrevidas. Diseñada tanto para parejas como para grupos en fiestas y reuniones sociales.
+
+### ✨ Características Principales
+
+| Característica | Descripción |
+|----------------|-------------|
+| **🎯 Multitouch Real** | Motor táctil simultáneo de baja latencia para 2 a 10 jugadores en iOS, Android y Navegadores Web. |
+| **💻 Modo Escritorio** | Simulación de toques con teclado (`1-5` para el lado izquierdo/mujeres, `6-0` para el lado derecho/hombres, `C` para limpiar) y clic con mouse. |
+| **🔥 Interacción Dinámica** | Lógica de interacción donde los participantes de ambos lados de la pantalla interactúan entre sí. |
+| **🎨 Estética Rojo & Blanco** | Diseño moderno con efecto glassmorphism, gradientes rojo pasión (`#E50914`, `#9B0014`) y tipografía blanca de alto contraste. |
+| **🌶️ 3 Niveles de Intensidad** | Suave (*Mild*), Picante (*Spicy*) y Extremo (*Extreme*). |
+| **🏳️‍🌈 Modos de Juego** | Hetero (pantalla dividida para interacción entre géneros), Gay y Lésbico. |
+| **📊 Estadísticas y Logros** | Contador de rondas, niveles de XP, desbloqueo de medallas y desafíos diarios. |
+| **💯 100% en Español** | Todas las preguntas, retos y textos de la interfaz adaptados de forma nativa en español. |
+
+---
+
+## 🚀 Inicio Rápido
+
+### Prerrequisitos
+- Node.js (v18 o superior)
+- npm o pnpm
+
+### Instalación
 ```bash
-# Clone the repository
+# Clonar el repositorio
 git clone https://github.com/andresmoralesc1/kinky-finger-picker.git
 
-# Navigate to project
+# Entrar a la carpeta
 cd kinky-finger-picker
 
-# Install dependencies
+# Instalar dependencias
 npm install
-
-# Start the development server
-npm start
 ```
 
-**Then scan the QR code with Expo Go on your phone!**
+### Ejecutar en Desarrollo
+
+```bash
+# Iniciar servidor Expo (Web / Móvil)
+npm start
+
+# O directamente en el navegador web
+npm run web
+```
 
 ---
 
-## 🎯 How to Play
+## 🎯 ¿Cómo se Juega?
 
-1. **Place fingers** - All players touch the screen with one finger
-2. **Countdown** - 3-second suspenseful countdown
-3. **Selection** - Roulette animation randomly picks a player
-4. **Challenge** - Selected player gets a question or dare
-5. **Complete or Skip** - Do the dare or use a limited skip
-6. **Share** - Share funny moments with friends
-
----
-
-## 🤖 AI Features
-
-### 💬 AI Chat Assistant
-- Get personalized suggestions and advice
-- Context-aware recommendations based on game state
-- Real-time conversational interface
-
-### ✨ AI Question Generator
-- Create unlimited custom questions
-- Choose intensity, category, and quantity
-- Add custom prompts for specific requirements
-
-### 🔥 Powered by Z.ai GLM-4.6
-- 128k context window
-- Creative, varied responses
-- Fallback questions for offline mode
+1. **Colocar los dedos:** Cada participante coloca un dedo sobre la pantalla táctil (o usa el teclado/mouse en PC).
+2. **Conteo regresivo:** Se inicia un conteo sonoro y visual de 3 segundos mientras todos los dedos permanezcan en pantalla. Si alguien levanta el dedo antes de tiempo, el conteo se reinicia.
+3. **Ruleta de selección:** La animación de ruleta gira y resalta a los jugadores seleccionados.
+4. **Reto o Pregunta:** Se muestra la carta con el desafío adaptado a la interacción de los jugadores elegidos.
+5. **Cumplir o Saltar:** Completa el reto o usa un comodín de salto limitado.
+6. **Compartir:** Captura la carta estilizada para compartir los momentos más divertidos.
 
 ---
 
-## 🎨 Game Modes
+## 💻 Controles en Escritorio (PC / Laptop)
 
-| Mode | Layout | Description |
-|------|--------|-------------|
-| **Hetero** 🔥 | Split screen | Female left, Male right |
-| **Gay** 🌈 | Full screen | All players |
-| **Lesbian** 💖 | Full screen | All players |
+Para jugar o probar en una computadora sin pantalla táctil:
 
----
-
-## 🌶️ Intensity Levels
-
-| Level | Vibe | Examples |
-|-------|------|----------|
-| **Mild** 🌶️ | Flirty & playful | Compliments, fun questions |
-| **Spicy** 🌶️🌶️ | Getting hot | Kisses, touching, dares |
-| **Extreme** 🌶️🌶️🌶️ | No limits! | Full adult content (18+) |
+| Teclas / Acción | Función |
+|-----------------|---------|
+| `1`, `2`, `3`, `4`, `5` | Colocar o retirar toques en el **Lado Izquierdo** (Mujeres / Zona izquierda) |
+| `6`, `7`, `8`, `9`, `0` | Colocar o retirar toques en el **Lado Derecho** (Hombres / Zona derecha) |
+| `C` | Limpiar todos los toques activos en pantalla |
+| **Clic del Mouse** | Colocar un pin en cualquier posición de la pantalla o arrastrarlo libremente |
 
 ---
 
-## 📸 Screenshots
+## 🌶️ Niveles de Intensidad
 
-<!-- TODO: Add screenshots -->
-<div align="center">
-  <img src="assets/logo.png" alt="Game Logo" width="120">
-  <p>Screenshots coming soon!</p>
-</div>
+| Nivel | Tono | Tipo de retos |
+|-------|------|---------------|
+| **Suave (Mild)** 🌶️ | Coqueto y divertido | Preguntas picantes, miradas, cumplidos y caricias ligeras para romper el hielo |
+| **Picante (Spicy)** 🌶️🌶️ | Subiendo la temperatura | Besos, masajes, toques atrevidos y confesiones íntimas |
+| **Extremo (Extreme)** 🌶️🌶️🌶️ | Sin límites (+18) | Desafíos intensos y explícitos para adultos con máxima confianza |
 
 ---
 
-## 🛠️ Tech Stack
+## 🧪 Pruebas y Calidad de Código
+
+El proyecto cuenta con una suite completa de pruebas unitarias y de integración en Jest + React Native Testing Library:
+
+```bash
+# Ejecutar todas las pruebas
+npm test
+
+# Ejecutar pruebas en modo observador
+npm run test:watch
+
+# Generar reporte de cobertura
+npm run test:coverage
+
+# Verificación estricta de tipos en TypeScript
+npm run typecheck
+
+# Compilar exportación web de producción
+npm run build:web
+```
+
+> **Estado Actual:** 67 de 67 pruebas aprobadas ✅ (0 errores de tipado en TypeScript).
+
+---
+
+## 🛠️ Stack Tecnológico
 
 ```yaml
-Core:
+Núcleo:
   - React Native 0.81.5
   - Expo 54
   - TypeScript 5.9
 
-UI & Animations:
+Diseño y Animaciones:
   - expo-linear-gradient
   - react-native-reanimated
   - react-native-gesture-handler
   - react-native-view-shot
 
-Features:
-  - expo-av (audio)
-  - expo-haptics (vibration)
-  - expo-sharing (social sharing)
-  - @react-native-async-storage (persistence)
+Audio y Sensaciones:
+  - expo-av (efectos de sonido)
+  - expo-haptics (vibración háptica)
 
-AI:
-  - Z.ai GLM-4.6 API
-  - Custom AI service layer
+Almacenamiento:
+  - @react-native-async-storage/async-storage
 ```
 
 ---
 
-## 📁 Project Structure
+## 📁 Estructura del Proyecto
 
 ```
 kinky-finger-picker/
 ├── src/
-│   ├── components/          # 14 reusable components
-│   │   ├── ConfettiEffect.tsx
-│   │   ├── RouletteAnimation.tsx
-│   │   ├── ShareCard.tsx
-│   │   └── ...
-│   ├── screens/            # 11 game screens
-│   │   ├── AIChatScreen.tsx          🆕
-│   │   ├── AIQuestionGeneratorScreen.tsx  🆕
-│   │   ├── ImprovedGameScreen.tsx
+│   ├── components/          # Componentes reutilizables (Ruleta, HUD, Confeti, Cartas)
+│   ├── screens/             # Pantallas principales del flujo de juego
 │   │   ├── ModeSelectionScreen.tsx
-│   │   └── ...
-│   ├── utils/
-│   │   ├── zaiService.ts             🆕
-│   │   ├── sounds.ts
-│   │   ├── storage.ts
-│   │   └── achievements.ts
+│   │   ├── LevelSelectionScreen.tsx
+│   │   ├── ImprovedGameScreen.tsx
+│   │   ├── ImprovedQuestionScreen.tsx
+│   │   ├── SettingsScreen.tsx
+│   │   ├── StatsScreen.tsx
+│   │   └── AchievementsScreen.tsx
 │   ├── data/
-│   │   └── questions.ts    # 60+ questions
+│   │   └── questions.ts     # Banco de preguntas curadas en español
+│   ├── utils/
+│   │   ├── sounds.ts        # Gestor de efectos de audio
+│   │   ├── storage.ts       # Persistencia local de estadísticas y configuración
+│   │   └── achievements.ts  # Lógica de progreso y logros
 │   └── types/
-│       └── index.ts        # TypeScript definitions
-├── assets/
-│   └── logo.png            # App logo
-├── App.tsx                 # Main app
+│       └── index.ts         # Definiciones globales de TypeScript
+├── assets/                  # Logos, íconos y sonidos
+├── App.tsx                  # Punto de entrada y máquina de estados de navegación
 └── package.json
 ```
 
 ---
 
-## ⚙️ Configuration
+## 📜 Licencia
 
-### Environment Setup
-
-No configuration required! The app works out of the box.
-
-### AI Configuration (Optional)
-
-The app uses Z.ai's GLM-4.6 model for AI features. The API is pre-configured in `src/utils/zaiService.ts`.
-
-```typescript
-const ZAI_CONFIG = {
-  baseURL: 'https://api.z.ai/api/coding/paas/v4',
-  model: 'glm-4.6',
-  maxTokens: 1000,
-  temperature: 0.9,
-};
-```
-
----
-
-## 🧪 Testing
-
-```bash
-# Run tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Generate coverage report
-npm run test:coverage
-
-# Type checking
-npm run typecheck
-```
-
-**Current Status:** 67/67 tests passing ✅
-
----
-
-## 📱 Building for Production
-
-### Development Build
-```bash
-npm run android
-npm run ios
-```
-
-### Production Build with EAS
-```bash
-# Install EAS CLI
-npm install -g eas-cli
-
-# Build for Android
-eas build --platform android --profile production
-
-# Build for iOS
-eas build --platform ios --profile production
-```
-
-For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
-
----
-
-## 🎨 Customization
-
-### Add Your Own Questions
-
-```typescript
-// src/data/questions.ts
-{
-  id: 'custom_1',
-  text: 'Your question here',
-  level: 'mild' | 'spicy' | 'extreme',
-  type: 'question' | 'dare',
-  category: 'classic' | 'romantic' | 'party' | 'nsfw' | 'custom',
-}
-```
-
-### Customize Colors
-
-```typescript
-// src/utils/colors.ts
-export const PLAYER_COLORS = [
-  '#FF006E',  // Player 1
-  '#8338EC',  // Player 2
-  '#3A86FF',  // Player 3
-  // ... add more
-];
-```
-
----
-
-## 🗺️ Roadmap
-
-### ✅ Completed (v1.0)
-- [x] Core gameplay with multi-touch detection
-- [x] 3 game modes × 3 intensity levels
-- [x] 60+ built-in questions
-- [x] Statistics and achievements system
-- [x] Custom questions manager
-- [x] Visual themes (6 themes)
-- [x] Social sharing
-- [x] **AI-powered features** 🆕
-
-### 🚧 In Progress
-- [ ] Performance optimization
-- [ ] Additional accessibility features
-
-### 📋 Planned (v2.0)
-- [ ] Player profiles with names
-- [ ] Multiplayer over WiFi
-- [ ] Video dare recording
-- [ ] Image support for questions
-- [ ] Export/import question packs
-
----
-
-## 📊 Stats
-
-| Metric | Value |
-|--------|-------|
-| **Lines of Code** | ~9,300 |
-| **Test Coverage** | 97% |
-| **Tests Passing** | 67/67 |
-| **Dependencies** | 0 vulnerabilities |
-| **Platforms** | iOS, Android, Web |
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please feel free to submit issues or pull requests.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
-
----
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- **React Native & Expo** teams for amazing frameworks
-- **Z.ai** for the powerful GLM-4.6 API
-- **Claude (Anthropic)** for assistance in development
-
----
-
-## 💬 Support
-
-- 🐛 [Report a Bug](https://github.com/andresmoralesc1/kinky-finger-picker/issues/new?template=bug_report.md)
-- 💡 [Request a Feature](https://github.com/andresmoralesc1/kinky-finger-picker/issues/new?template=feature_request.md)
-- 💬 [Discussions](https://github.com/andresmoralesc1/kinky-finger-picker/discussions)
+Distribuido bajo la Licencia **MIT**. Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 ---
 
 <div align="center">
 
-  **Made with ❤️ and 🌶️ for unforgettable parties**
+  **Desarrollado con ❤️ y 🌶️ para noches inolvidables**
 
-  **⭐ Star us on GitHub — it helps!**
-
-  **Remember: Consent is sexy! Play safe & respect boundaries.** 🎉
+  *Recuerda: El consentimiento es clave. Juega con respeto y disfruta el momento.* 🎉
 
 </div>
