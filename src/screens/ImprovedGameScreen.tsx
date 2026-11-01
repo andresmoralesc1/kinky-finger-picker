@@ -58,9 +58,10 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   const rippleIdCounter = useRef(0);
 
   // Track active touches by their identifier
-  const activeTouches = useRef<Map<number, Player>>(new Map());
+  const activeTouches = useRef<Map<number | string, Player>>(new Map());
   const activeMouseTouchId = useRef<number | null>(null);
   const countdownTimeout = useRef<NodeJS.Timeout | null>(null);
+  const countdownInterval = useRef<NodeJS.Timeout | null>(null);
   const rippleTimeouts = useRef<Set<NodeJS.Timeout>>(new Set());
 
   const countdownAnim = useRef(new Animated.Value(1)).current;
@@ -99,9 +100,14 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      // Clear countdown timeout
+      // Clear countdown timeouts/intervals
       if (countdownTimeout.current) {
         clearTimeout(countdownTimeout.current);
+        countdownTimeout.current = null;
+      }
+      if (countdownInterval.current) {
+        clearInterval(countdownInterval.current);
+        countdownInterval.current = null;
       }
       // Clear all ripple timeouts
       rippleTimeouts.current.forEach(timeout => clearTimeout(timeout));
@@ -112,18 +118,117 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   // Keyboard shortcut simulator for desktop:
   // Keys 1-5 simulate left side (e.g. Female in hetero mode)
   // Keys 6-0 simulate right side (e.g. Male in hetero mode)
-  const handleClearTouches = useCallback(() => {
-    activeTouches.current.clear();
-    setPlayers([]);
-    setCountdown(null);
+  const cancelCountdown = useCallback(() => {
     if (countdownTimeout.current) {
       clearTimeout(countdownTimeout.current);
       countdownTimeout.current = null;
     }
+    if (countdownInterval.current) {
+      clearInterval(countdownInterval.current);
+      countdownInterval.current = null;
+    }
+    setCountdown(null);
+  }, []);
+
+  const handleClearTouches = useCallback(() => {
+    activeTouches.current.clear();
+    setPlayers([]);
+    cancelCountdown();
+    usedColors.current = [];
+  }, [cancelCountdown]);
+
+  const startCountdown = useCallback(() => {
+    if (countdownInterval.current) {
+      clearInterval(countdownInterval.current);
+    }
+    setCountdown(3);
+
+    countdownInterval.current = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev === null || prev <= 1) {
+          if (countdownInterval.current) {
+            clearInterval(countdownInterval.current);
+            countdownInterval.current = null;
+          }
+          setIsSelecting(true);
+          setShowRoulette(true);
+          return null;
+        }
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        soundManager.playSound('countdown');
+
+        // Bounce animation on countdown
+        Animated.sequence([
+          Animated.timing(countdownAnim, {
+            toValue: 1.2,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+          Animated.timing(countdownAnim, {
+            toValue: 1,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+        ]).start();
+
+        return prev - 1;
+      });
+    }, 1000);
+  }, [countdownAnim]);
+
+  const evaluateCountdownEligibility = useCallback((currentPlayers: Player[]) => {
+    if (currentPlayers.length < 2) {
+      cancelCountdown();
+      return false;
+    }
+
+    if (mode === 'hetero') {
+      const hasFemale = currentPlayers.some(p => p.gender === 'female');
+      const hasMale = currentPlayers.some(p => p.gender === 'male');
+      if (!hasFemale || !hasMale) {
+        cancelCountdown();
+        return false;
+      }
+    }
+
+    return true;
+  }, [mode, cancelCountdown]);
+
+  const checkCountdownTrigger = useCallback((currentPlayers: Player[]) => {
+    if (isSelecting || showRoulette) return;
+
+    const isEligible = evaluateCountdownEligibility(currentPlayers);
+    if (!isEligible) return;
+
+    if (countdown === null && countdownTimeout.current === null && countdownInterval.current === null) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      soundManager.playSound('tap');
+
+      countdownTimeout.current = setTimeout(() => {
+        countdownTimeout.current = null;
+        startCountdown();
+      }, 350);
+    }
+  }, [isSelecting, showRoulette, evaluateCountdownEligibility, countdown, startCountdown]);
+
+  const addRipple = useCallback((x: number, y: number, color: string) => {
+    const ripple: RippleData = {
+      id: rippleIdCounter.current++,
+      x,
+      y,
+      color,
+    };
+    setRipples(prev => [...prev, ripple]);
+
+    const timeout = setTimeout(() => {
+      setRipples(prev => prev.filter(r => r.id !== ripple.id));
+      rippleTimeouts.current.delete(timeout);
+    }, 600);
+    rippleTimeouts.current.add(timeout);
   }, []);
 
   const toggleVirtualTouch = useCallback((keyIndex: number) => {
-    if (isSelecting) return;
+    if (isSelecting || showRoulette) return;
 
     const virtualId = 1000 + keyIndex; // Distinct numeric ID for keys 1..10
     const dims = getWindowDimensions();
@@ -131,31 +236,24 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
     const height = dims.height;
 
     if (activeTouches.current.has(virtualId)) {
-      // Remove player
       activeTouches.current.delete(virtualId);
       const remaining = Array.from(activeTouches.current.values());
       setPlayers(remaining);
       if (remaining.length < 2) {
-        setCountdown(null);
-        if (countdownTimeout.current) {
-          clearTimeout(countdownTimeout.current);
-          countdownTimeout.current = null;
-        }
+        cancelCountdown();
+      } else {
+        checkCountdownTrigger(remaining);
       }
       return;
     }
 
-    // Determine position based on side: 1-5 is left, 6-10 (0) is right
     const isLeftSide = keyIndex <= 5;
     const sideSlot = isLeftSide ? keyIndex - 1 : keyIndex - 6; // 0..4
     const totalSlots = 5;
 
-    // Distribute Y vertically between 25% and 75% of screen height
     const yMargin = height * 0.22;
     const availableHeight = height * 0.56;
     const y = yMargin + (availableHeight / (totalSlots - 1)) * sideSlot;
-
-    // Distribute X: left side is ~25% from left, right side is ~75% from left
     const x = isLeftSide ? width * 0.25 : width * 0.75;
 
     const color = getRandomColor(usedColors.current);
@@ -174,23 +272,16 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
 
     const allPlayers = Array.from(activeTouches.current.values());
     setPlayers(allPlayers);
-
-    if (allPlayers.length >= 2 && !countdown && countdownTimeout.current === null) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      soundManager.playSound('tap');
-      countdownTimeout.current = setTimeout(() => {
-        startCountdown();
-        countdownTimeout.current = null;
-      }, 300);
+    if (allPlayers.length >= 2) {
+      checkCountdownTrigger(allPlayers);
     }
-  }, [isSelecting, countdown, mode]);
+  }, [isSelecting, showRoulette, mode, cancelCountdown, checkCountdownTrigger, addRipple]);
 
   // Listen to keyboard on web
   useEffect(() => {
     if (Platform.OS !== 'web' || typeof window === 'undefined') return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if user is typing in an input
       const activeTag = (document.activeElement?.tagName || '').toLowerCase();
       if (activeTag === 'input' || activeTag === 'textarea') return;
 
@@ -218,39 +309,35 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [toggleVirtualTouch, handleClearTouches]);
 
-  const addRipple = (x: number, y: number, color: string) => {
-    const ripple: RippleData = {
-      id: rippleIdCounter.current++,
-      x,
-      y,
-      color,
-    };
-    setRipples(prev => [...prev, ripple]);
+  // Multitouch synchronizer across Web & Native
+  const syncFingers = useCallback((rawTouches: any[], isEndEvent: boolean = false) => {
+    if (isSelecting || showRoulette) return;
 
-    // Remove ripple after animation - track timeout for cleanup
-    const timeout = setTimeout(() => {
-      setRipples(prev => prev.filter(r => r.id !== ripple.id));
-      rippleTimeouts.current.delete(timeout);
-    }, 600);
-    rippleTimeouts.current.add(timeout);
-  };
+    const currentScreenW = screenWidth || getWindowDimensions().width;
+    const activeFingerIds = new Set<string | number>();
+    let hasChanges = false;
 
-  const handleTouchStart = (evt: GestureResponderEvent) => {
-    if (isSelecting) return;
+    if (rawTouches && rawTouches.length > 0) {
+      for (let i = 0; i < rawTouches.length; i++) {
+        const touch = rawTouches[i];
+        if (!touch) continue;
+        const touchId = touch.identifier !== undefined ? touch.identifier : i;
+        activeFingerIds.add(touchId);
 
-    const nativeEvt = evt.nativeEvent as any;
-    const rawTouches = (nativeEvt?.touches || []) as unknown as Touch[];
+        const x = touch.pageX ?? touch.clientX ?? 0;
+        const y = touch.pageY ?? touch.clientY ?? 0;
 
-    if (rawTouches.length > 0) {
-      // Process all current touches (mobile / tablet / touch devices)
-      rawTouches.forEach((touch: Touch) => {
-        const t = touch as any;
-        const touchId = touch.identifier;
-        const x = t.pageX ?? t.clientX ?? 0;
-        const y = t.pageY ?? t.clientY ?? 0;
-
-        // Only add if we haven't already tracked this touch
-        if (!activeTouches.current.has(touchId)) {
+        const existingPlayer = activeTouches.current.get(touchId);
+        if (existingPlayer) {
+          if (Math.abs(existingPlayer.x - x) > 1 || Math.abs(existingPlayer.y - y) > 1) {
+            existingPlayer.x = x;
+            existingPlayer.y = y;
+            if (mode === 'hetero') {
+              existingPlayer.gender = x < currentScreenW / 2 ? 'female' : 'male';
+            }
+            hasChanges = true;
+          }
+        } else if (!isEndEvent) {
           const color = getRandomColor(usedColors.current);
           usedColors.current.push(color);
 
@@ -259,179 +346,176 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
             x,
             y,
             color,
-            gender: mode === 'hetero' ? (x < screenWidth / 2 ? 'female' : 'male') : undefined,
+            gender: mode === 'hetero' ? (x < currentScreenW / 2 ? 'female' : 'male') : undefined,
           };
 
           activeTouches.current.set(touchId, player);
           addRipple(x, y, color);
+          hasChanges = true;
         }
-      });
-    } else if (typeof nativeEvt?.pageX === 'number' || typeof nativeEvt?.clientX === 'number') {
-      // Desktop / mouse support: clicking places a pin right at the cursor, or removes if clicked on existing
-      const x = nativeEvt.pageX ?? nativeEvt.clientX;
-      const y = nativeEvt.pageY ?? nativeEvt.clientY;
+      }
+    }
 
-      const existingEntry = Array.from(activeTouches.current.entries()).find(([_, p]) => {
-        const dx = p.x - x;
-        const dy = p.y - y;
-        return Math.sqrt(dx * dx + dy * dy) < 45;
-      });
+    // Remove any physical touch that is no longer active
+    for (const [id] of activeTouches.current.entries()) {
+      if (typeof id === 'number' && id >= 1001 && id <= 1010) continue;
+      if (id === activeMouseTouchId.current && (!rawTouches || rawTouches.length === 0)) continue;
 
-      if (existingEntry) {
-        const [existingId] = existingEntry;
-        activeTouches.current.delete(existingId);
-        activeMouseTouchId.current = null;
-        const allPlayers = Array.from(activeTouches.current.values());
-        setPlayers(allPlayers);
-        if (allPlayers.length < 2) {
-          setCountdown(null);
-          if (countdownTimeout.current) {
-            clearTimeout(countdownTimeout.current);
-            countdownTimeout.current = null;
-          }
-        }
-        return;
+      if (!activeFingerIds.has(id)) {
+        activeTouches.current.delete(id);
+        hasChanges = true;
+      }
+    }
+
+    if (hasChanges) {
+      const allPlayers = Array.from(activeTouches.current.values());
+      setPlayers(allPlayers);
+      if (allPlayers.length < 2) {
+        cancelCountdown();
       } else {
-        const touchId = Date.now();
-        activeMouseTouchId.current = touchId;
-        const color = getRandomColor(usedColors.current);
-        usedColors.current.push(color);
-
-        const player: Player = {
-          id: touchId,
-          x,
-          y,
-          color,
-          gender: mode === 'hetero' ? (x < screenWidth / 2 ? 'female' : 'male') : undefined,
-        };
-
-        activeTouches.current.set(touchId, player);
-        addRipple(x, y, color);
+        checkCountdownTrigger(allPlayers);
       }
     }
+  }, [isSelecting, showRoulette, screenWidth, mode, addRipple, cancelCountdown, checkCountdownTrigger]);
 
-    // Update players state with all active touches
-    const allPlayers = Array.from(activeTouches.current.values());
-    setPlayers(allPlayers);
+  // Native DOM touch listeners for web to ensure rock-solid multi-finger tracking
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof window === 'undefined') return;
 
-    // Check if we have enough players to start countdown
-    if (allPlayers.length >= 2 && !countdown && countdownTimeout.current === null) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      soundManager.playSound('tap');
-
-      // Small delay to ensure all touches are registered
-      countdownTimeout.current = setTimeout(() => {
-        startCountdown();
-        countdownTimeout.current = null;
-      }, 300);
-    }
-  };
-
-  const handleTouchMove = (evt: GestureResponderEvent) => {
-    if (isSelecting) return;
-
-    const nativeEvt = evt.nativeEvent as any;
-    const touches = (nativeEvt?.touches || []) as unknown as Touch[];
-
-    if (touches.length > 0) {
-      // Update positions of existing touches on touch devices
-      touches.forEach((touch: Touch) => {
-        const touchId = touch.identifier;
-        const existingPlayer = activeTouches.current.get(touchId);
-
-        if (existingPlayer) {
-          const t = touch as any;
-          const x = t.pageX ?? t.clientX ?? 0;
-          const y = t.pageY ?? t.clientY ?? 0;
-          activeTouches.current.set(touchId, {
-            ...existingPlayer,
-            x,
-            y,
-            gender: mode === 'hetero' ? (x < screenWidth / 2 ? 'female' : 'male') : existingPlayer.gender,
-          });
-        }
-      });
-      setPlayers(Array.from(activeTouches.current.values()));
-    } else if (activeMouseTouchId.current !== null && (typeof nativeEvt?.pageX === 'number' || typeof nativeEvt?.clientX === 'number')) {
-      // Follow mouse cursor smoothly on desktop drag
-      const existingPlayer = activeTouches.current.get(activeMouseTouchId.current);
-      if (existingPlayer) {
-        const x = nativeEvt.pageX ?? nativeEvt.clientX;
-        const y = nativeEvt.pageY ?? nativeEvt.clientY;
-        activeTouches.current.set(activeMouseTouchId.current, {
-          ...existingPlayer,
-          x,
-          y,
-          gender: mode === 'hetero' ? (x < screenWidth / 2 ? 'female' : 'male') : existingPlayer.gender,
-        });
-        setPlayers(Array.from(activeTouches.current.values()));
+    const onNativeTouch = (e: TouchEvent) => {
+      // Don't intercept clicks on interactive header buttons
+      const target = e.target as HTMLElement | null;
+      if (target && (target.closest('button') || target.closest('[role="button"]'))) {
+        return;
       }
-    }
-  };
 
-  const handleTouchEnd = (evt: GestureResponderEvent) => {
-    activeMouseTouchId.current = null;
-    if (isSelecting) return;
+      if (e.cancelable) {
+        e.preventDefault();
+      }
 
-    const nativeEvt = evt.nativeEvent as any;
-    const changedTouches = (nativeEvt?.changedTouches || []) as unknown as Touch[];
-    // On desktop mouse clicks, changedTouches is empty so keep pins placed
-    if (changedTouches.length === 0) return;
+      const touches = Array.from(e.touches);
+      const isEnd = e.type === 'touchend' || e.type === 'touchcancel';
+      syncFingers(touches, isEnd);
+    };
 
-    // Remove touches that ended on mobile
-    changedTouches.forEach((touch: Touch) => {
-      activeTouches.current.delete(touch.identifier);
+    window.addEventListener('touchstart', onNativeTouch, { passive: false });
+    window.addEventListener('touchmove', onNativeTouch, { passive: false });
+    window.addEventListener('touchend', onNativeTouch, { passive: false });
+    window.addEventListener('touchcancel', onNativeTouch, { passive: false });
+
+    return () => {
+      window.removeEventListener('touchstart', onNativeTouch);
+      window.removeEventListener('touchmove', onNativeTouch);
+      window.removeEventListener('touchend', onNativeTouch);
+      window.removeEventListener('touchcancel', onNativeTouch);
+    };
+  }, [syncFingers]);
+
+  const handleMouseClick = (nativeEvt: any) => {
+    if (isSelecting || showRoulette) return;
+    const x = nativeEvt.pageX ?? nativeEvt.clientX;
+    const y = nativeEvt.pageY ?? nativeEvt.clientY;
+    if (typeof x !== 'number' || typeof y !== 'number') return;
+
+    const existingEntry = Array.from(activeTouches.current.entries()).find(([_, p]) => {
+      const dx = p.x - x;
+      const dy = p.y - y;
+      return Math.sqrt(dx * dx + dy * dy) < 45;
     });
 
-    // If we lost players, reset
-    const remainingPlayers = Array.from(activeTouches.current.values());
-
-    if (remainingPlayers.length < 2) {
-      setPlayers(remainingPlayers);
-      setCountdown(null);
-      usedColors.current = [];
-
-      if (countdownTimeout.current) {
-        clearTimeout(countdownTimeout.current);
-        countdownTimeout.current = null;
+    if (existingEntry) {
+      const [existingId] = existingEntry;
+      activeTouches.current.delete(existingId);
+      activeMouseTouchId.current = null;
+      const allPlayers = Array.from(activeTouches.current.values());
+      setPlayers(allPlayers);
+      if (allPlayers.length < 2) {
+        cancelCountdown();
+      } else {
+        checkCountdownTrigger(allPlayers);
       }
-    } else {
-      setPlayers(remainingPlayers);
+      return;
+    }
+
+    const touchId = Date.now();
+    activeMouseTouchId.current = touchId;
+    const color = getRandomColor(usedColors.current);
+    usedColors.current.push(color);
+
+    const player: Player = {
+      id: touchId,
+      x,
+      y,
+      color,
+      gender: mode === 'hetero' ? (x < screenWidth / 2 ? 'female' : 'male') : undefined,
+    };
+
+    activeTouches.current.set(touchId, player);
+    addRipple(x, y, color);
+
+    const allPlayers = Array.from(activeTouches.current.values());
+    setPlayers(allPlayers);
+    if (allPlayers.length >= 2) {
+      checkCountdownTrigger(allPlayers);
     }
   };
 
-  const startCountdown = () => {
-    setIsSelecting(true);
-    setCountdown(3);
+  const handleMouseMove = (nativeEvt: any) => {
+    if (isSelecting || showRoulette || activeMouseTouchId.current === null) return;
+    const x = nativeEvt.pageX ?? nativeEvt.clientX;
+    const y = nativeEvt.pageY ?? nativeEvt.clientY;
+    if (typeof x !== 'number' || typeof y !== 'number') return;
 
-    const interval = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev === null || prev <= 1) {
-          clearInterval(interval);
-          // Start roulette animation
-          setShowRoulette(true);
-          return null;
-        }
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        soundManager.playSound('countdown');
-
-        // Bounce animation on countdown
-        Animated.sequence([
-          Animated.timing(countdownAnim, {
-            toValue: 1.2,
-            duration: 100,
-            useNativeDriver: true,
-          }),
-          Animated.timing(countdownAnim, {
-            toValue: 1,
-            duration: 100,
-            useNativeDriver: true,
-          }),
-        ]).start();
-
-        return prev - 1;
+    const existingPlayer = activeTouches.current.get(activeMouseTouchId.current);
+    if (existingPlayer) {
+      activeTouches.current.set(activeMouseTouchId.current, {
+        ...existingPlayer,
+        x,
+        y,
+        gender: mode === 'hetero' ? (x < screenWidth / 2 ? 'female' : 'male') : existingPlayer.gender,
       });
-    }, 1000);
+      setPlayers(Array.from(activeTouches.current.values()));
+    }
+  };
+
+  const handleResponderStart = (evt: GestureResponderEvent) => {
+    const nativeEvt = evt.nativeEvent as any;
+    const rawTouches = (nativeEvt?.touches || []) as unknown as Touch[];
+    if (rawTouches.length > 0) {
+      syncFingers(rawTouches as any, false);
+    } else if (typeof nativeEvt?.pageX === 'number' || typeof nativeEvt?.clientX === 'number') {
+      handleMouseClick(nativeEvt);
+    }
+  };
+
+  const handleResponderMove = (evt: GestureResponderEvent) => {
+    const nativeEvt = evt.nativeEvent as any;
+    const rawTouches = (nativeEvt?.touches || []) as unknown as Touch[];
+    if (rawTouches.length > 0) {
+      syncFingers(rawTouches as any, false);
+    } else if (activeMouseTouchId.current !== null && (typeof nativeEvt?.pageX === 'number' || typeof nativeEvt?.clientX === 'number')) {
+      handleMouseMove(nativeEvt);
+    }
+  };
+
+  const handleResponderEnd = (evt: GestureResponderEvent) => {
+    const nativeEvt = evt.nativeEvent as any;
+    const rawTouches = (nativeEvt?.touches || []) as unknown as Touch[];
+    if (rawTouches.length > 0) {
+      syncFingers(rawTouches as any, true);
+    }
+  };
+
+  const handleResponderRelease = (evt: GestureResponderEvent) => {
+    activeMouseTouchId.current = null;
+    const nativeEvt = evt.nativeEvent as any;
+    const rawTouches = (nativeEvt?.touches || []) as unknown as Touch[];
+    syncFingers(rawTouches as any, true);
+  };
+
+  const handleResponderTerminate = () => {
+    activeMouseTouchId.current = null;
+    handleClearTouches();
   };
 
   const handleRouletteComplete = (winner: Player, target?: Player) => {
@@ -440,6 +524,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
     setPlayers([]);
     setShowRoulette(false);
     usedColors.current = [];
+    activeTouches.current.clear();
   };
 
   const getLevelColor = () => {
@@ -463,9 +548,12 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
       style={[styles.container, { opacity: fadeAnim }]}
       onStartShouldSetResponder={() => true}
       onMoveShouldSetResponder={() => true}
-      onResponderGrant={handleTouchStart}
-      onResponderMove={handleTouchMove}
-      onResponderRelease={handleTouchEnd}
+      onResponderGrant={handleResponderStart}
+      onResponderStart={handleResponderStart}
+      onResponderMove={handleResponderMove}
+      onResponderEnd={handleResponderEnd}
+      onResponderRelease={handleResponderRelease}
+      onResponderTerminate={handleResponderTerminate}
       onResponderTerminationRequest={() => false}
     >
       {/* Animated Header */}
