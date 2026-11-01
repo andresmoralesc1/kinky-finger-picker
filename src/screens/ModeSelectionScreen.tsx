@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Image, Animated, ScrollView }
 import { LinearGradient } from 'expo-linear-gradient';
 import { GameMode } from '../types';
 import AccessibleTouchable from '../components/AccessibleTouchable';
+import RainbowHeroTitle from '../components/RainbowHeroTitle';
 
 interface Props {
   onSelectMode: (mode: GameMode) => void;
@@ -24,17 +25,18 @@ export default function ModeSelectionScreen({
   const logoScale = React.useRef(new Animated.Value(1)).current;
 
   React.useEffect(() => {
+    if (process.env.NODE_ENV === 'test') return;
     const pulseAnimation = Animated.loop(
       Animated.sequence([
         Animated.timing(logoScale, {
           toValue: 1.05,
           duration: 900,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
         Animated.timing(logoScale, {
           toValue: 1,
           duration: 900,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
       ])
     );
@@ -104,7 +106,7 @@ export default function ModeSelectionScreen({
             </View>
           </View>
 
-          {/* Compact Brand Header */}
+          {/* Brand Header with 3D Layered Extrusion */}
           <View style={styles.heroSection}>
             <Animated.Image
               source={require('../../assets/logo.png')}
@@ -112,8 +114,10 @@ export default function ModeSelectionScreen({
               resizeMode="contain"
             />
             <View style={styles.titleContainer}>
-              <Text style={styles.title}>Kinky Finger Picker</Text>
-              <Text style={styles.subtitle}>Pon tus dedos en la pantalla y rompe el hielo</Text>
+              <RainbowHeroTitle
+                title="Kinky Finger Picker"
+                tagline="Pon tus dedos en la pantalla y rompe el hielo"
+              />
             </View>
           </View>
 

@@ -387,6 +387,11 @@ export default function App() {
   };
 
   const handleQuestionComplete = (questionId: string, category?: string) => {
+    if (!selectedPlayer) {
+      navigateToScreen('game');
+      return;
+    }
+
     // Mark question as used
     setUsedQuestionIds([...usedQuestionIds, questionId]);
 
@@ -394,7 +399,7 @@ export default function App() {
     const newStats = { ...stats };
     newStats.levelDistribution[intensityLevel] += 1;
 
-    const playerStat = newStats.currentSession.find(p => p.playerId === selectedPlayer!.id);
+    const playerStat = newStats.currentSession.find(p => p.playerId === selectedPlayer.id);
     if (playerStat) {
       playerStat.daresCompleted += 1;
     }
@@ -448,18 +453,23 @@ export default function App() {
   };
 
   const handleQuestionSkip = (questionId: string) => {
+    if (!selectedPlayer) {
+      navigateToScreen('game');
+      return;
+    }
+
     // Mark question as used
     setUsedQuestionIds([...usedQuestionIds, questionId]);
 
     // Update skip count for this player
     const newSkipCounts = new Map(playerSkipCounts);
-    const currentSkips = newSkipCounts.get(selectedPlayer!.id) || 0;
-    newSkipCounts.set(selectedPlayer!.id, currentSkips + 1);
+    const currentSkips = newSkipCounts.get(selectedPlayer.id) || 0;
+    newSkipCounts.set(selectedPlayer.id, currentSkips + 1);
     setPlayerSkipCounts(newSkipCounts);
 
     // Update stats
     const newStats = { ...stats };
-    const playerStat = newStats.currentSession.find(p => p.playerId === selectedPlayer!.id);
+    const playerStat = newStats.currentSession.find(p => p.playerId === selectedPlayer.id);
     if (playerStat) {
       playerStat.daresSkipped += 1;
     }

@@ -529,9 +529,9 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
 
   const getLevelColor = () => {
     switch (level) {
-      case 'mild': return '#06FFA5';
-      case 'spicy': return '#FB5607';
-      case 'extreme': return '#FF006E';
+      case 'mild': return '#FFFFFF';
+      case 'spicy': return '#FF4D5A';
+      case 'extreme': return '#E50914';
     }
   };
 

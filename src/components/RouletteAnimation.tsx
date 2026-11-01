@@ -36,15 +36,24 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
   const rightIdxRef = useRef(0);
   const aIdxRef = useRef(0);
   const bIdxRef = useRef(players.length > 1 ? 1 : 0);
+  const timeoutsRef = useRef<Set<NodeJS.Timeout>>(new Set());
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
     let delay = 100;
     let iterations = 0;
     const maxIterations = 16 + Math.floor(Math.random() * 8);
 
+    const safeTimeout = (cb: () => void, ms: number) => {
+      const id = setTimeout(() => {
+        timeoutsRef.current.delete(id);
+        cb();
+      }, ms);
+      timeoutsRef.current.add(id);
+      return id;
+    };
+
     const cycle = () => {
-      interval = setTimeout(() => {
+      safeTimeout(() => {
         iterations++;
 
         if (iterations > maxIterations * 0.7) {
@@ -90,7 +99,7 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
           cycle();
         } else {
           setIsDone(true);
-          setTimeout(() => {
+          safeTimeout(() => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             soundManager.playSound('winner');
 
@@ -107,7 +116,7 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
                 useNativeDriver: true,
               }),
             ]).start(() => {
-              setTimeout(() => {
+              safeTimeout(() => {
                 let actor: Player;
                 let target: Player;
 
@@ -134,7 +143,8 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
     cycle();
 
     return () => {
-      if (interval) clearTimeout(interval);
+      timeoutsRef.current.forEach(t => clearTimeout(t));
+      timeoutsRef.current.clear();
     };
   }, []);
 

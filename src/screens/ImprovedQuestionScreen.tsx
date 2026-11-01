@@ -87,7 +87,8 @@ export default function ImprovedQuestionScreen({
     ]).start();
 
     // Hide confetti after 2 seconds
-    setTimeout(() => setShowConfetti(false), 2000);
+    const confettiTimer = setTimeout(() => setShowConfetti(false), 2000);
+    return () => clearTimeout(confettiTimer);
   }, []);
 
   useEffect(() => {
@@ -171,9 +172,9 @@ export default function ImprovedQuestionScreen({
   };
 
   const getTimerColor = () => {
-    if (timeLeft > 30) return '#06FFA5';
-    if (timeLeft > 10) return '#FFBE0B';
-    return '#FF006E';
+    if (timeLeft > 30) return '#FFFFFF';
+    if (timeLeft > 10) return '#FF4D5A';
+    return '#E50914';
   };
 
   const canSkip = skipCount < settings.skipLimit;
