@@ -63,6 +63,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   const countdownTimeout = useRef<NodeJS.Timeout | null>(null);
   const countdownInterval = useRef<NodeJS.Timeout | null>(null);
   const rippleTimeouts = useRef<Set<NodeJS.Timeout>>(new Set());
+  const containerRef = useRef<View>(null);
 
   const countdownAnim = useRef(new Animated.Value(1)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -309,6 +310,40 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [toggleVirtualTouch, handleClearTouches]);
 
+  // Calibrate coordinates relative to container
+  const getCoordinatesFromEvent = useCallback((evt: any): { x: number; y: number } | null => {
+    if (!evt) return null;
+
+    // 1. If native responder event with locationX/locationY (React Native standard)
+    if (typeof evt.locationX === 'number' && typeof evt.locationY === 'number') {
+      return { x: evt.locationX, y: evt.locationY };
+    }
+
+    // 2. On Web, calibrate relative to containerRef bounding client rect
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && containerRef.current) {
+      const el = containerRef.current as any;
+      if (typeof el.getBoundingClientRect === 'function') {
+        const rect = el.getBoundingClientRect();
+        const clientX = typeof evt.clientX === 'number' ? evt.clientX : evt.pageX;
+        const clientY = typeof evt.clientY === 'number' ? evt.clientY : evt.pageY;
+        if (typeof clientX === 'number' && typeof clientY === 'number') {
+          return {
+            x: clientX - rect.left,
+            y: clientY - rect.top,
+          };
+        }
+      }
+    }
+
+    const x = evt.clientX ?? evt.pageX;
+    const y = evt.clientY ?? evt.pageY;
+    if (typeof x === 'number' && typeof y === 'number') {
+      return { x, y };
+    }
+
+    return null;
+  }, []);
+
   // Multitouch synchronizer across Web & Native
   const syncFingers = useCallback((rawTouches: any[], isEndEvent: boolean = false) => {
     if (isSelecting || showRoulette) return;
@@ -324,8 +359,9 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
         const touchId = touch.identifier !== undefined ? touch.identifier : i;
         activeFingerIds.add(touchId);
 
-        const x = touch.pageX ?? touch.clientX ?? 0;
-        const y = touch.pageY ?? touch.clientY ?? 0;
+        const coords = getCoordinatesFromEvent(touch);
+        if (!coords) continue;
+        const { x, y } = coords;
 
         const existingPlayer = activeTouches.current.get(touchId);
         if (existingPlayer) {
@@ -376,7 +412,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
         checkCountdownTrigger(allPlayers);
       }
     }
-  }, [isSelecting, showRoulette, screenWidth, mode, addRipple, cancelCountdown, checkCountdownTrigger]);
+  }, [isSelecting, showRoulette, screenWidth, mode, getCoordinatesFromEvent, addRipple, cancelCountdown, checkCountdownTrigger]);
 
   // Native DOM touch listeners for web to ensure rock-solid multi-finger tracking
   useEffect(() => {
@@ -413,9 +449,10 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
 
   const handleMouseClick = (nativeEvt: any) => {
     if (isSelecting || showRoulette) return;
-    const x = nativeEvt.pageX ?? nativeEvt.clientX;
-    const y = nativeEvt.pageY ?? nativeEvt.clientY;
-    if (typeof x !== 'number' || typeof y !== 'number') return;
+    const coords = getCoordinatesFromEvent(nativeEvt);
+    if (!coords) return;
+    const { x, y } = coords;
+    if (y < 85) return; // Don't place pin inside header area
 
     const existingEntry = Array.from(activeTouches.current.entries()).find(([_, p]) => {
       const dx = p.x - x;
@@ -462,9 +499,9 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
 
   const handleMouseMove = (nativeEvt: any) => {
     if (isSelecting || showRoulette || activeMouseTouchId.current === null) return;
-    const x = nativeEvt.pageX ?? nativeEvt.clientX;
-    const y = nativeEvt.pageY ?? nativeEvt.clientY;
-    if (typeof x !== 'number' || typeof y !== 'number') return;
+    const coords = getCoordinatesFromEvent(nativeEvt);
+    if (!coords) return;
+    const { x, y } = coords;
 
     const existingPlayer = activeTouches.current.get(activeMouseTouchId.current);
     if (existingPlayer) {
@@ -545,6 +582,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
 
   return (
     <Animated.View
+      ref={containerRef}
       style={[styles.container, { opacity: fadeAnim }]}
       onStartShouldSetResponder={() => true}
       onMoveShouldSetResponder={() => true}
@@ -628,43 +666,45 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
         </Animated.View>
       )}
 
-      {/* Player touch indicators with pulse */}
-      {players.map((player) => (
-        <View key={player.id} pointerEvents="none">
-          <View
-            style={[
-              styles.touchIndicator,
-              {
-                left: player.x - 40,
-                top: player.y - 40,
-                backgroundColor: player.color,
-              },
-            ]}
-          >
-            <View style={styles.touchInner}>
-              <Text style={styles.touchKeyText}>
-                {player.id >= 1001 && player.id <= 1010
-                  ? (player.id === 1010 ? '0' : String(player.id - 1000))
-                  : (player.gender === 'female' ? '♀️' : player.gender === 'male' ? '♂️' : '✋')}
-              </Text>
+      {/* Touch indicators, ripples & pulse overlay with exact coordinate matching */}
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+        {players.map((player) => (
+          <React.Fragment key={player.id}>
+            <View
+              style={[
+                styles.touchIndicator,
+                {
+                  left: player.x - 40,
+                  top: player.y - 40,
+                  backgroundColor: player.color,
+                },
+              ]}
+            >
+              <View style={styles.touchInner}>
+                <Text style={styles.touchKeyText}>
+                  {player.id >= 1001 && player.id <= 1010
+                    ? (player.id === 1010 ? '0' : String(player.id - 1000))
+                    : (player.gender === 'female' ? '♀️' : player.gender === 'male' ? '♂️' : '✋')}
+                </Text>
+              </View>
             </View>
-          </View>
-          {/* Pulsing effect while waiting */}
-          {!showRoulette && countdown === null && (
-            <PulsingCircle x={player.x} y={player.y} color={player.color} />
-          )}
-        </View>
-      ))}
+            {/* Pulsing effect while waiting */}
+            {!showRoulette && countdown === null && (
+              <PulsingCircle x={player.x} y={player.y} color={player.color} />
+            )}
+          </React.Fragment>
+        ))}
 
-      {/* Ripple effects */}
-      {ripples.map((ripple) => (
-        <RippleEffect
-          key={ripple.id}
-          x={ripple.x}
-          y={ripple.y}
-          color={ripple.color}
-        />
-      ))}
+        {/* Ripple effects */}
+        {ripples.map((ripple) => (
+          <RippleEffect
+            key={ripple.id}
+            x={ripple.x}
+            y={ripple.y}
+            color={ripple.color}
+          />
+        ))}
+      </View>
 
       {/* Roulette animation */}
       {showRoulette && (
