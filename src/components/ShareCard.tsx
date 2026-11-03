@@ -21,6 +21,12 @@ interface ShareCardProps {
 export default function ShareCard({ title, subtitle, emoji, stats, onClose }: ShareCardProps) {
   const viewShotRef = useRef<ViewShot>(null);
 
+  const LEVEL_LABELS: Record<IntensityLevel, string> = {
+    mild: 'Suave',
+    spicy: 'Picante',
+    extreme: 'Extremo',
+  };
+
   const getLevelEmoji = (level: IntensityLevel) => {
     switch (level) {
       case 'mild': return '🌶️';
@@ -42,14 +48,14 @@ export default function ShareCard({ title, subtitle, emoji, stats, onClose }: Sh
       if (isAvailable) {
         await Sharing.shareAsync(uri, {
           mimeType: 'image/png',
-          dialogTitle: 'Share your Kinky Finger Picker moment!',
+          dialogTitle: '¡Comparte tu momento en Kinky Finger Picker!',
         });
       } else {
-        Alert.alert('Sharing not available', 'Unable to share on this device');
+        Alert.alert('No disponible', 'No se puede compartir en este dispositivo');
       }
     } catch (error) {
       console.error('Error sharing:', error);
-      Alert.alert('Error', 'Could not share image');
+      Alert.alert('Error', 'No se pudo compartir la imagen');
     }
   };
 
@@ -57,7 +63,7 @@ export default function ShareCard({ title, subtitle, emoji, stats, onClose }: Sh
     <View style={styles.overlay}>
       <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 0.9 }}>
         <LinearGradient
-          colors={['#FF006E', '#8338EC', '#3A86FF']}
+          colors={['#E50914', '#9B0014']}
           style={styles.card}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -73,25 +79,25 @@ export default function ShareCard({ title, subtitle, emoji, stats, onClose }: Sh
               {stats.rounds !== undefined && (
                 <View style={styles.statItem}>
                   <Text style={styles.statValue}>{stats.rounds}</Text>
-                  <Text style={styles.statLabel}>Rounds</Text>
+                  <Text style={styles.statLabel}>Rondas</Text>
                 </View>
               )}
               {stats.level && (
                 <View style={styles.statItem}>
                   <Text style={styles.statValue}>{getLevelEmoji(stats.level)}</Text>
-                  <Text style={styles.statLabel}>{stats.level}</Text>
+                  <Text style={styles.statLabel}>{LEVEL_LABELS[stats.level] || stats.level}</Text>
                 </View>
               )}
               {stats.timesSelected !== undefined && (
                 <View style={styles.statItem}>
                   <Text style={styles.statValue}>{stats.timesSelected}x</Text>
-                  <Text style={styles.statLabel}>Selected</Text>
+                  <Text style={styles.statLabel}>Elegido</Text>
                 </View>
               )}
               {stats.completionRate !== undefined && (
                 <View style={styles.statItem}>
                   <Text style={styles.statValue}>{stats.completionRate}%</Text>
-                  <Text style={styles.statLabel}>Completed</Text>
+                  <Text style={styles.statLabel}>Completado</Text>
                 </View>
               )}
             </View>
@@ -107,10 +113,10 @@ export default function ShareCard({ title, subtitle, emoji, stats, onClose }: Sh
       {/* Action buttons (outside screenshot) */}
       <View style={styles.actions}>
         <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-          <Text style={styles.shareButtonText}>📱 Share</Text>
+          <Text style={styles.shareButtonText}>📱 Compartir</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Text style={styles.closeButtonText}>Close</Text>
+          <Text style={styles.closeButtonText}>Cerrar</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -217,7 +223,7 @@ const styles = StyleSheet.create({
   shareButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#8338EC',
+    color: '#E50914',
   },
   closeButton: {
     backgroundColor: 'rgba(255,255,255,0.2)',

@@ -31,16 +31,16 @@ export default function DailyChallengesScreen({
     <View style={styles.container}>
       {/* Header */}
       <LinearGradient
-        colors={['#FB5607', '#FF006E']}
+        colors={['#E50914', '#9B0014']}
         style={styles.header}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Text style={styles.backButtonText}>← Volver</Text>
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Daily Challenges</Text>
+        <Text style={styles.headerTitle}>Desafíos Diarios</Text>
 
         <View style={styles.headerStats}>
           <Text style={styles.headerStatsText}>
@@ -55,10 +55,10 @@ export default function DailyChallengesScreen({
         <View style={styles.statCard}>
           <Text style={styles.statIcon}>🔥</Text>
           <Text style={styles.statValue}>{challengeProgress.streak}</Text>
-          <Text style={styles.statLabel}>Day Streak</Text>
+          <Text style={styles.statLabel}>Racha de Días</Text>
           {challengeProgress.streak > 0 && (
             <Text style={styles.statBonus}>
-              +{Math.min(challengeProgress.streak * 50, 500)} XP Bonus
+              +{Math.min(challengeProgress.streak * 50, 500)} XP Bono
             </Text>
           )}
         </View>
@@ -67,9 +67,9 @@ export default function DailyChallengesScreen({
         <View style={styles.statCard}>
           <Text style={styles.statIcon}>⭐</Text>
           <Text style={styles.statValue}>{totalXP}</Text>
-          <Text style={styles.statLabel}>Total XP</Text>
+          <Text style={styles.statLabel}>XP Total</Text>
           {allCompleted && (
-            <Text style={styles.statBonus}>All Completed! 🎉</Text>
+            <Text style={styles.statBonus}>¡Completado! 🎉</Text>
           )}
         </View>
 
@@ -79,7 +79,7 @@ export default function DailyChallengesScreen({
           <Text style={styles.statValue}>
             {challengeProgress.totalChallengesCompleted}
           </Text>
-          <Text style={styles.statLabel}>All-Time</Text>
+          <Text style={styles.statLabel}>Histórico</Text>
         </View>
       </View>
 
@@ -89,10 +89,10 @@ export default function DailyChallengesScreen({
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.challengesList}>
-          <Text style={styles.sectionTitle}>Today's Challenges</Text>
+          <Text style={styles.sectionTitle}>Desafíos de Hoy</Text>
           <Text style={styles.sectionSubtitle}>
-            Complete challenges to earn bonus XP! {'\n'}
-            New challenges every day at midnight.
+            ¡Completa desafíos para ganar XP adicional! {'\n'}
+            Nuevos desafíos cada día a medianoche.
           </Text>
 
           {challengeProgress.challenges.map((challenge, index) => (
@@ -108,43 +108,43 @@ export default function DailyChallengesScreen({
             <View style={styles.completedCard}>
               <Text style={styles.completedEmoji}>🎊</Text>
               <Text style={styles.completedTitle}>
-                All Challenges Completed!
+                ¡Todos los Desafíos Completados!
               </Text>
               <Text style={styles.completedMessage}>
-                You've completed all daily challenges! {'\n'}
-                Come back tomorrow for new challenges.
+                ¡Has completado todos los desafíos del día! {'\n'}
+                Vuelve mañana por nuevos retos.
               </Text>
               <Text style={styles.completedXP}>
-                Total Earned Today: {totalXP} XP
+                Total Ganado Hoy: {totalXP} XP
               </Text>
             </View>
           )}
 
           {/* Tips Section */}
           <View style={styles.tipsSection}>
-            <Text style={styles.tipsTitle}>💡 Tips</Text>
+            <Text style={styles.tipsTitle}>💡 Consejos</Text>
             <View style={styles.tip}>
               <Text style={styles.tipBullet}>•</Text>
               <Text style={styles.tipText}>
-                Complete all challenges to maintain your streak
+                Completa todos los desafíos para mantener tu racha activa
               </Text>
             </View>
             <View style={styles.tip}>
               <Text style={styles.tipBullet}>•</Text>
               <Text style={styles.tipText}>
-                Streak bonus increases by +50 XP per day (max 500 XP)
+                El bono de racha aumenta +50 XP por día (máx. 500 XP)
               </Text>
             </View>
             <View style={styles.tip}>
               <Text style={styles.tipBullet}>•</Text>
               <Text style={styles.tipText}>
-                Challenges reset at midnight local time
+                Los desafíos se reinician a la medianoche hora local
               </Text>
             </View>
             <View style={styles.tip}>
               <Text style={styles.tipBullet}>•</Text>
               <Text style={styles.tipText}>
-                Epic challenges give the highest XP rewards
+                Los desafíos épicos otorgan las mayores recompensas de XP
               </Text>
             </View>
           </View>
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   },
   statBonus: {
     fontSize: 10,
-    color: '#06FFA5',
+    color: '#E50914',
     marginTop: 4,
     fontWeight: '600',
     textAlign: 'center',
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   completedCard: {
-    backgroundColor: '#06FFA5',
+    backgroundColor: '#E50914',
     borderRadius: 20,
     padding: 30,
     alignItems: 'center',
@@ -260,12 +260,12 @@ const styles = StyleSheet.create({
   completedTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#fff',
     marginBottom: 10,
   },
   completedMessage: {
     fontSize: 16,
-    color: '#000',
+    color: '#fff',
     textAlign: 'center',
     marginBottom: 15,
     lineHeight: 22,
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   completedXP: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#E50914',
     backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   tipBullet: {
-    color: '#06FFA5',
+    color: '#E50914',
     fontSize: 16,
     marginRight: 10,
     fontWeight: 'bold',

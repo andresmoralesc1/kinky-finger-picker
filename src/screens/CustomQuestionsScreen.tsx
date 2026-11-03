@@ -17,7 +17,7 @@ export default function CustomQuestionsScreen({ customQuestions, onAddQuestion, 
 
   const handleAdd = () => {
     if (questionText.trim().length === 0) {
-      Alert.alert('Error', 'Please enter a question or dare');
+      Alert.alert('Error', 'Por favor ingresa una pregunta o reto');
       return;
     }
 
@@ -36,13 +36,14 @@ export default function CustomQuestionsScreen({ customQuestions, onAddQuestion, 
   };
 
   const handleDelete = (id: string, text: string, type: 'question' | 'dare') => {
+    const typeLabel = type === 'dare' ? 'reto' : 'pregunta';
     Alert.alert(
-      'Delete Question',
-      `Are you sure you want to delete this ${type}?\n\n"${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`,
+      'Eliminar',
+      `¿Estás seguro de que deseas eliminar este ${typeLabel}?\n\n"${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Cancelar', style: 'cancel' },
         {
-          text: 'Delete',
+          text: 'Eliminar',
           style: 'destructive',
           onPress: () => onDeleteQuestion(id)
         }
@@ -50,13 +51,19 @@ export default function CustomQuestionsScreen({ customQuestions, onAddQuestion, 
     );
   };
 
+  const LEVEL_LABELS: Record<IntensityLevel, string> = {
+    mild: 'Suave',
+    spicy: 'Picante',
+    extreme: 'Extremo',
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Text style={styles.backButtonText}>← Volver</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Custom Questions</Text>
+        <Text style={styles.title}>Preguntas Personalizadas</Text>
         <TouchableOpacity onPress={() => setShowForm(!showForm)} style={styles.addButton}>
           <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
@@ -66,7 +73,7 @@ export default function CustomQuestionsScreen({ customQuestions, onAddQuestion, 
         <View style={styles.formContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Enter your question or dare..."
+            placeholder="Escribe tu pregunta o reto..."
             placeholderTextColor="#666"
             value={questionText}
             onChangeText={setQuestionText}
@@ -79,7 +86,7 @@ export default function CustomQuestionsScreen({ customQuestions, onAddQuestion, 
               onPress={() => setSelectedType('question')}
             >
               <Text style={[styles.typeButtonText, selectedType === 'question' && styles.typeButtonTextActive]}>
-                Question
+                Pregunta
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -87,7 +94,7 @@ export default function CustomQuestionsScreen({ customQuestions, onAddQuestion, 
               onPress={() => setSelectedType('dare')}
             >
               <Text style={[styles.typeButtonText, selectedType === 'dare' && styles.typeButtonTextActive]}>
-                Dare
+                Reto
               </Text>
             </TouchableOpacity>
           </View>
@@ -100,14 +107,14 @@ export default function CustomQuestionsScreen({ customQuestions, onAddQuestion, 
                 onPress={() => setSelectedLevel(level)}
               >
                 <Text style={[styles.levelButtonText, selectedLevel === level && styles.levelButtonTextActive]}>
-                  {level}
+                  {LEVEL_LABELS[level]}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
 
           <TouchableOpacity style={styles.submitButton} onPress={handleAdd}>
-            <Text style={styles.submitButtonText}>Add Question</Text>
+            <Text style={styles.submitButtonText}>Agregar</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -115,15 +122,15 @@ export default function CustomQuestionsScreen({ customQuestions, onAddQuestion, 
       <ScrollView style={styles.listContainer}>
         {customQuestions.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No custom questions yet</Text>
-            <Text style={styles.emptyStateSubtext}>Tap + to add your own!</Text>
+            <Text style={styles.emptyStateText}>No hay preguntas personalizadas aún</Text>
+            <Text style={styles.emptyStateSubtext}>¡Toca + para agregar la primera!</Text>
           </View>
         ) : (
           customQuestions.map(question => (
             <View key={question.id} style={styles.questionCard}>
               <View style={styles.questionCardHeader}>
                 <Text style={styles.questionCardType}>{question.type === 'dare' ? '💋' : '❓'}</Text>
-                <Text style={styles.questionCardLevel}>{question.level}</Text>
+                <Text style={styles.questionCardLevel}>{LEVEL_LABELS[question.level] || question.level}</Text>
                 <TouchableOpacity onPress={() => handleDelete(question.id, question.text, question.type)}>
                   <Text style={styles.deleteButton}>🗑️</Text>
                 </TouchableOpacity>
@@ -166,7 +173,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FF006E',
+    backgroundColor: '#E50914',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -203,7 +210,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   typeButtonActive: {
-    backgroundColor: '#FF006E',
+    backgroundColor: '#E50914',
   },
   typeButtonText: {
     color: '#BBB',
@@ -226,7 +233,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   levelButtonActive: {
-    backgroundColor: '#FB5607',
+    backgroundColor: '#E50914',
   },
   levelButtonText: {
     color: '#BBB',
@@ -237,7 +244,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   submitButton: {
-    backgroundColor: '#FF006E',
+    backgroundColor: '#E50914',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -281,7 +288,7 @@ const styles = StyleSheet.create({
   },
   questionCardLevel: {
     flex: 1,
-    color: '#FF006E',
+    color: '#E50914',
     fontSize: 12,
     fontWeight: 'bold',
     textTransform: 'uppercase',

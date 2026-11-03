@@ -70,6 +70,13 @@ export default function AchievementUnlockedModal({ achievement, onClose }: Props
     outputRange: [0.3, 0.8],
   });
 
+  const RARITY_LABELS: Record<string, string> = {
+    common: 'COMÚN',
+    rare: 'RARO',
+    epic: 'ÉPICO',
+    legendary: 'LEGENDARIO',
+  };
+
   return (
     <View style={styles.overlay}>
       <Animated.View
@@ -82,7 +89,7 @@ export default function AchievementUnlockedModal({ achievement, onClose }: Props
       />
 
       {/* Confetti */}
-      <ConfettiEffect colors={[rarityColor, '#FFD700', '#fff']} particleCount={80} />
+      <ConfettiEffect colors={[rarityColor, '#E50914', '#fff']} particleCount={80} />
 
       {/* Achievement Card */}
       <Animated.View
@@ -111,7 +118,7 @@ export default function AchievementUnlockedModal({ achievement, onClose }: Props
         >
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.unlockLabel}>🎉 ACHIEVEMENT UNLOCKED!</Text>
+            <Text style={styles.unlockLabel}>🎉 ¡LOGRO DESBLOQUEADO!</Text>
           </View>
 
           {/* Icon */}
@@ -137,19 +144,19 @@ export default function AchievementUnlockedModal({ achievement, onClose }: Props
           {/* Rarity Badge */}
           <View style={[styles.rarityBadge, { backgroundColor: rarityColor }]}>
             <Text style={styles.rarityText}>
-              {achievement.rarity.toUpperCase()}
+              {RARITY_LABELS[achievement.rarity] || achievement.rarity.toUpperCase()}
             </Text>
           </View>
 
           {/* XP Reward */}
           <View style={styles.xpContainer}>
-            <Text style={styles.xpLabel}>XP Earned</Text>
+            <Text style={styles.xpLabel}>XP Ganada</Text>
             <Text style={styles.xpValue}>+{achievement.xpReward}</Text>
           </View>
 
           {/* Close Button */}
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>Continue</Text>
+            <Text style={styles.closeButtonText}>Continuar</Text>
           </TouchableOpacity>
         </LinearGradient>
       </Animated.View>
@@ -279,12 +286,10 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   closeButton: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: '#E50914',
     paddingHorizontal: 40,
     paddingVertical: 15,
     borderRadius: 25,
-    borderWidth: 2,
-    borderColor: '#fff',
   },
   closeButtonText: {
     fontSize: 16,

@@ -24,11 +24,11 @@ export default function AchievementsScreen({ userProgress, onBack }: Props) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const categories = [
-    { id: 'all', name: 'All', emoji: '🏆' },
-    { id: 'milestone', name: 'Milestone', emoji: '🎯' },
-    { id: 'specialty', name: 'Specialty', emoji: '⭐' },
-    { id: 'collection', name: 'Collection', emoji: '📦' },
-    { id: 'challenge', name: 'Challenge', emoji: '⚔️' },
+    { id: 'all', name: 'Todos', emoji: '🏆' },
+    { id: 'milestone', name: 'Hitos', emoji: '🎯' },
+    { id: 'specialty', name: 'Especiales', emoji: '⭐' },
+    { id: 'collection', name: 'Colección', emoji: '📦' },
+    { id: 'challenge', name: 'Desafíos', emoji: '⚔️' },
   ];
 
   const filteredAchievements = userProgress.achievements.filter(
@@ -45,16 +45,16 @@ export default function AchievementsScreen({ userProgress, onBack }: Props) {
     <View style={styles.container}>
       {/* Header */}
       <LinearGradient
-        colors={['#8338EC', '#3A86FF']}
+        colors={['#E50914', '#9B0014']}
         style={styles.header}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Text style={styles.backButtonText}>← Volver</Text>
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Achievements</Text>
+        <Text style={styles.headerTitle}>Logros</Text>
 
         <View style={styles.headerStats}>
           <Text style={styles.headerStatsText}>
@@ -66,7 +66,7 @@ export default function AchievementsScreen({ userProgress, onBack }: Props) {
       {/* Level & XP Section */}
       <View style={styles.levelSection}>
         <View style={styles.levelInfo}>
-          <Text style={styles.levelLabel}>Level {userProgress.level}</Text>
+          <Text style={styles.levelLabel}>Nivel {userProgress.level}</Text>
           <Text style={styles.xpText}>
             {userProgress.xp} / {nextLevelXp} XP
           </Text>
@@ -120,7 +120,7 @@ export default function AchievementsScreen({ userProgress, onBack }: Props) {
 
         {filteredAchievements.length === 0 && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No achievements in this category yet</Text>
+            <Text style={styles.emptyStateText}>No hay logros en esta categoría todavía</Text>
           </View>
         )}
       </ScrollView>
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   },
   xpBarFill: {
     height: '100%',
-    backgroundColor: '#06FFA5',
+    backgroundColor: '#E50914',
     borderRadius: 4,
   },
   categoryFilters: {
@@ -294,8 +294,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   categoryButtonActive: {
-    backgroundColor: '#8338EC',
-    borderColor: '#8338EC',
+    backgroundColor: '#E50914',
+    borderColor: '#E50914',
   },
   categoryEmoji: {
     fontSize: 18,
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#06FFA5',
+    backgroundColor: '#E50914',
   },
   progressText: {
     fontSize: 11,
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
   },
   unlockedText: {
     fontSize: 12,
-    color: '#06FFA5',
+    color: '#E50914',
     fontWeight: '600',
   },
   rarityText: {

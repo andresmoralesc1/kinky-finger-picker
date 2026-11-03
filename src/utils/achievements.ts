@@ -5,8 +5,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   // MILESTONE ACHIEVEMENTS
   {
     id: 'first_blood',
-    title: 'First Blood',
-    description: 'Complete your first dare',
+    title: 'Primera Sangre',
+    description: 'Completa tu primer reto',
     category: 'milestone',
     rarity: 'common',
     icon: '🎯',
@@ -15,8 +15,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   },
   {
     id: 'party_starter',
-    title: 'Party Starter',
-    description: 'Play 10 rounds',
+    title: 'El Alma de la Fiesta',
+    description: 'Juega 10 rondas',
     category: 'milestone',
     rarity: 'common',
     icon: '🎉',
@@ -25,8 +25,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   },
   {
     id: 'party_animal',
-    title: 'Party Animal',
-    description: 'Play 50 rounds',
+    title: 'Fiestero Total',
+    description: 'Juega 50 rondas',
     category: 'milestone',
     rarity: 'rare',
     icon: '🦁',
@@ -35,8 +35,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   },
   {
     id: 'legend',
-    title: 'Legend',
-    description: 'Play 100 rounds',
+    title: 'Leyenda',
+    description: 'Juega 100 rondas',
     category: 'milestone',
     rarity: 'epic',
     icon: '👑',
@@ -45,8 +45,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   },
   {
     id: 'immortal',
-    title: 'Immortal',
-    description: 'Play 500 rounds',
+    title: 'Inmortal',
+    description: 'Juega 500 rondas',
     category: 'milestone',
     rarity: 'legendary',
     icon: '⚡',
@@ -57,8 +57,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   // SPECIALTY ACHIEVEMENTS
   {
     id: 'dare_devil',
-    title: 'Dare Devil',
-    description: 'Complete 10 dares without skipping',
+    title: 'Temerario',
+    description: 'Completa 10 retos sin saltar ninguno',
     category: 'specialty',
     rarity: 'rare',
     icon: '😈',
@@ -67,8 +67,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   },
   {
     id: 'lucky_one',
-    title: 'Lucky One',
-    description: 'Get selected 20 times',
+    title: 'El Afortunado',
+    description: 'Sé seleccionado 20 veces',
     category: 'specialty',
     rarity: 'common',
     icon: '🍀',
@@ -77,8 +77,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   },
   {
     id: 'brave_soul',
-    title: 'Brave Soul',
-    description: 'Complete a dare on Extreme level',
+    title: 'Alma Valiente',
+    description: 'Completa un reto en nivel Extremo',
     category: 'specialty',
     rarity: 'rare',
     icon: '🔥',
@@ -87,8 +87,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   },
   {
     id: 'speed_demon',
-    title: 'Speed Demon',
-    description: 'Complete a dare in under 10 seconds',
+    title: 'Demonio Veloz',
+    description: 'Completa un reto en menos de 10 segundos',
     category: 'specialty',
     rarity: 'epic',
     icon: '⚡',
@@ -97,8 +97,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   },
   {
     id: 'unstoppable',
-    title: 'Unstoppable',
-    description: 'Complete 5 consecutive dares without skipping',
+    title: 'Imparable',
+    description: 'Completa 5 retos consecutivos sin saltar',
     category: 'specialty',
     rarity: 'rare',
     icon: '💪',
@@ -109,8 +109,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   // COLLECTION ACHIEVEMENTS
   {
     id: 'explorer',
-    title: 'Explorer',
-    description: 'Play all 3 intensity levels',
+    title: 'Explorador',
+    description: 'Juega los 3 niveles de intensidad',
     category: 'collection',
     rarity: 'common',
     icon: '🗺️',
@@ -119,8 +119,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   },
   {
     id: 'versatile',
-    title: 'Versatile',
-    description: 'Answer questions from all categories',
+    title: 'Versátil',
+    description: 'Responde preguntas de todas las categorías',
     category: 'collection',
     rarity: 'rare',
     icon: '🎭',
@@ -129,8 +129,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   },
   {
     id: 'social_butterfly',
-    title: 'Social Butterfly',
-    description: 'Share 5 moments',
+    title: 'Mariposa Social',
+    description: 'Comparte 5 momentos',
     category: 'collection',
     rarity: 'common',
     icon: '📱',
@@ -140,7 +140,7 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   {
     id: 'influencer',
     title: 'Influencer',
-    description: 'Share 20 moments',
+    description: 'Comparte 20 momentos',
     category: 'collection',
     rarity: 'epic',
     icon: '📸',
@@ -151,8 +151,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   // CHALLENGE ACHIEVEMENTS
   {
     id: 'no_mercy',
-    title: 'No Mercy',
-    description: 'Complete a session without any skips',
+    title: 'Sin Piedad',
+    description: 'Completa una sesión sin ningún salto',
     category: 'challenge',
     rarity: 'epic',
     icon: '⚔️',
@@ -161,8 +161,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   },
   {
     id: 'marathon_player',
-    title: 'Marathon Player',
-    description: 'Play 30+ rounds in a single session',
+    title: 'Maratonista',
+    description: 'Juega 30 o más rondas en una sola sesión',
     category: 'challenge',
     rarity: 'rare',
     icon: '🏃',
@@ -171,8 +171,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   },
   {
     id: 'comeback_king',
-    title: 'Comeback King',
-    description: 'Get selected 3 times in a row',
+    title: 'Rey del Regreso',
+    description: 'Sé seleccionado 3 veces seguidas',
     category: 'challenge',
     rarity: 'epic',
     icon: '🎲',
@@ -181,8 +181,8 @@ export const ACHIEVEMENTS: Omit<Achievement, 'progress' | 'unlocked' | 'unlocked
   },
   {
     id: 'ultimate_champion',
-    title: 'Ultimate Champion',
-    description: 'Reach Level 10',
+    title: 'Campeón Definitivo',
+    description: 'Alcanza el Nivel 10',
     category: 'challenge',
     rarity: 'legendary',
     icon: '🏆',

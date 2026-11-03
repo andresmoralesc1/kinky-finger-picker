@@ -66,7 +66,7 @@ export default function DailyChallengeCard({ challenge, index }: Props) {
       <LinearGradient
         colors={
           challenge.completed
-            ? ['#06FFA5', '#00D084']
+            ? ['#E50914', '#9B0014']
             : ['#1a1a1a', '#2a2a2a']
         }
         style={styles.card}
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   completedIcon: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#06FFA5',
+    color: '#E50914',
   },
   iconContainer: {
     width: 60,
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   titleCompleted: {
-    color: '#000',
+    color: '#fff',
   },
   difficultyBadge: {
     paddingHorizontal: 10,
@@ -238,8 +238,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   descriptionCompleted: {
-    color: '#000',
-    opacity: 0.7,
+    color: '#fff',
+    opacity: 0.9,
   },
   progressSection: {
     marginBottom: 8,
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   progressTextCompleted: {
-    color: '#000',
+    color: '#fff',
     fontWeight: 'bold',
   },
   rewardSection: {
@@ -270,9 +270,9 @@ const styles = StyleSheet.create({
   rewardText: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#06FFA5',
+    color: '#E50914',
   },
   rewardTextCompleted: {
-    color: '#000',
+    color: '#fff',
   },
 });

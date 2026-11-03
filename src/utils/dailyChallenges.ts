@@ -14,8 +14,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'rounds_5',
     type: 'rounds',
-    title: 'Party Starter',
-    description: 'Play 5 rounds today',
+    title: 'El Alma de la Fiesta',
+    description: 'Juega 5 rondas hoy',
     difficulty: 'normal',
     requirement: 5,
     xpReward: 150,
@@ -24,8 +24,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'rounds_10',
     type: 'rounds',
-    title: 'Party Animal',
-    description: 'Play 10 rounds today',
+    title: 'Fiestero Total',
+    description: 'Juega 10 rondas hoy',
     difficulty: 'normal',
     requirement: 10,
     xpReward: 200,
@@ -34,8 +34,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'rounds_20',
     type: 'rounds',
-    title: 'Marathon Session',
-    description: 'Play 20 rounds today',
+    title: 'Sesión Maratónica',
+    description: 'Juega 20 rondas hoy',
     difficulty: 'hard',
     requirement: 20,
     xpReward: 350,
@@ -46,8 +46,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'mild_master',
     type: 'level_specific',
-    title: 'Mild Master',
-    description: 'Complete 5 dares on Mild level',
+    title: 'Maestro Suave',
+    description: 'Completa 5 retos en nivel Suave',
     difficulty: 'normal',
     requirement: 5,
     xpReward: 150,
@@ -57,8 +57,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'spicy_expert',
     type: 'level_specific',
-    title: 'Spicy Expert',
-    description: 'Complete 5 dares on Spicy level',
+    title: 'Experto Picante',
+    description: 'Completa 5 retos en nivel Picante',
     difficulty: 'normal',
     requirement: 5,
     xpReward: 200,
@@ -68,8 +68,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'extreme_brave',
     type: 'level_specific',
-    title: 'Extreme Bravery',
-    description: 'Complete 3 dares on Extreme level',
+    title: 'Valentía Extrema',
+    description: 'Completa 3 retos en nivel Extremo',
     difficulty: 'hard',
     requirement: 3,
     xpReward: 300,
@@ -81,8 +81,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'no_skip_5',
     type: 'consecutive',
-    title: 'No Mercy',
-    description: 'Complete 5 consecutive dares without skipping',
+    title: 'Sin Piedad',
+    description: 'Completa 5 retos consecutivos sin saltar',
     difficulty: 'normal',
     requirement: 5,
     xpReward: 200,
@@ -91,8 +91,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'no_skip_10',
     type: 'consecutive',
-    title: 'Unstoppable',
-    description: 'Complete 10 consecutive dares without skipping',
+    title: 'Imparable',
+    description: 'Completa 10 retos consecutivos sin saltar',
     difficulty: 'hard',
     requirement: 10,
     xpReward: 400,
@@ -103,8 +103,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'gay_mode',
     type: 'mode_specific',
-    title: 'Rainbow Party',
-    description: 'Play 5 rounds in Gay mode',
+    title: 'Fiesta Rainbow',
+    description: 'Juega 5 rondas en modo Gay',
     difficulty: 'normal',
     requirement: 5,
     xpReward: 150,
@@ -114,8 +114,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'lesbian_mode',
     type: 'mode_specific',
-    title: 'Sapphic Session',
-    description: 'Play 5 rounds in Lesbian mode',
+    title: 'Sesión Sáfica',
+    description: 'Juega 5 rondas en modo Lésbico',
     difficulty: 'normal',
     requirement: 5,
     xpReward: 150,
@@ -127,8 +127,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'romantic_5',
     type: 'category_specific',
-    title: 'Romantic Evening',
-    description: 'Answer 5 Romantic questions',
+    title: 'Noche Romántica',
+    description: 'Responde 5 preguntas Románticas',
     difficulty: 'normal',
     requirement: 5,
     xpReward: 150,
@@ -138,8 +138,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'party_hard',
     type: 'category_specific',
-    title: 'Party Hard',
-    description: 'Answer 7 Party questions',
+    title: 'Fiesta Total',
+    description: 'Responde 7 preguntas de Fiesta',
     difficulty: 'normal',
     requirement: 7,
     xpReward: 200,
@@ -149,8 +149,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'nsfw_brave',
     type: 'category_specific',
-    title: 'No Limits',
-    description: 'Answer 5 NSFW questions',
+    title: 'Sin Límites',
+    description: 'Responde 5 preguntas Picantes (+18)',
     difficulty: 'hard',
     requirement: 5,
     xpReward: 300,
@@ -162,8 +162,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'share_3',
     type: 'social',
-    title: 'Social Butterfly',
-    description: 'Share 3 moments today',
+    title: 'Mariposa Social',
+    description: 'Comparte 3 momentos hoy',
     difficulty: 'normal',
     requirement: 3,
     xpReward: 150,
@@ -173,7 +173,7 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
     id: 'share_5',
     type: 'social',
     title: 'Influencer',
-    description: 'Share 5 moments today',
+    description: 'Comparte 5 momentos hoy',
     difficulty: 'hard',
     requirement: 5,
     xpReward: 300,
@@ -184,8 +184,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'speed_15',
     type: 'speed',
-    title: 'Speed Demon',
-    description: 'Complete a dare in under 15 seconds',
+    title: 'Demonio Veloz',
+    description: 'Completa un reto en menos de 15 segundos',
     difficulty: 'hard',
     requirement: 1,
     xpReward: 300,
@@ -194,8 +194,8 @@ const CHALLENGE_TEMPLATES: Omit<DailyChallenge, 'progress' | 'completed'>[] = [
   {
     id: 'speed_10',
     type: 'speed',
-    title: 'Lightning Fast',
-    description: 'Complete a dare in under 10 seconds',
+    title: 'Rayo Veloz',
+    description: 'Completa un reto en menos de 10 segundos',
     difficulty: 'epic',
     requirement: 1,
     xpReward: 500,
@@ -406,9 +406,9 @@ export function getTotalXPReward(progress: DailyChallengeProgress): number {
 // Get difficulty color
 export function getDifficultyColor(difficulty: ChallengeDifficulty): string {
   switch (difficulty) {
-    case 'normal': return '#06FFA5';
-    case 'hard': return '#FFBE0B';
-    case 'epic': return '#FF006E';
+    case 'normal': return '#FFFFFF';
+    case 'hard': return '#FF4D5A';
+    case 'epic': return '#E50914';
   }
 }
 
@@ -416,7 +416,7 @@ export function getDifficultyColor(difficulty: ChallengeDifficulty): string {
 export function getDifficultyText(difficulty: ChallengeDifficulty): string {
   switch (difficulty) {
     case 'normal': return 'NORMAL';
-    case 'hard': return 'HARD';
-    case 'epic': return 'EPIC';
+    case 'hard': return 'DIFÍCIL';
+    case 'epic': return 'ÉPICO';
   }
 }

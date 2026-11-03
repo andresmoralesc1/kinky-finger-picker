@@ -7,6 +7,13 @@ interface Props {
   onBack: () => void;
 }
 
+const CATEGORY_NAMES: Record<string, string> = {
+  classic: 'Clásico',
+  romantic: 'Romántico',
+  party: 'Fiesta',
+  nsfw: 'Picante (+18)',
+};
+
 export default function StatsScreen({ stats, onBack }: Props) {
   const mostSelectedPlayer = stats.currentSession.reduce((prev, current) =>
     prev.timesSelected > current.timesSelected ? prev : current
@@ -16,41 +23,41 @@ export default function StatsScreen({ stats, onBack }: Props) {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Text style={styles.backButtonText}>← Volver</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Statistics</Text>
+        <Text style={styles.title}>Estadísticas</Text>
         <View style={{ width: 60 }} />
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Overview */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Session Overview</Text>
+          <Text style={styles.sectionTitle}>Resumen de la Sesión</Text>
           <View style={styles.statsGrid}>
             <View style={styles.statCard}>
               <Text style={styles.statValue}>{stats.totalRounds}</Text>
-              <Text style={styles.statLabel}>Total Rounds</Text>
+              <Text style={styles.statLabel}>Rondas Totales</Text>
             </View>
             <View style={styles.statCard}>
               <Text style={styles.statValue}>{stats.totalPlayers}</Text>
-              <Text style={styles.statLabel}>Players</Text>
+              <Text style={styles.statLabel}>Jugadores</Text>
             </View>
           </View>
         </View>
 
         {/* Level Distribution */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Intensity Levels Played</Text>
+          <Text style={styles.sectionTitle}>Niveles Jugados</Text>
           <View style={styles.barContainer}>
             <View style={styles.barRow}>
-              <Text style={styles.barLabel}>🌶️ Mild</Text>
+              <Text style={styles.barLabel}>🌶️ Suave</Text>
               <View style={styles.barBackground}>
                 <View
                   style={[
                     styles.barFill,
                     {
                       width: `${(stats.levelDistribution.mild / Math.max(stats.totalRounds, 1)) * 100}%`,
-                      backgroundColor: '#06FFA5',
+                      backgroundColor: '#FFFFFF',
                     },
                   ]}
                 />
@@ -59,14 +66,14 @@ export default function StatsScreen({ stats, onBack }: Props) {
             </View>
 
             <View style={styles.barRow}>
-              <Text style={styles.barLabel}>🌶️🌶️ Spicy</Text>
+              <Text style={styles.barLabel}>🌶️🌶️ Picante</Text>
               <View style={styles.barBackground}>
                 <View
                   style={[
                     styles.barFill,
                     {
                       width: `${(stats.levelDistribution.spicy / Math.max(stats.totalRounds, 1)) * 100}%`,
-                      backgroundColor: '#FB5607',
+                      backgroundColor: '#FF4D5A',
                     },
                   ]}
                 />
@@ -75,14 +82,14 @@ export default function StatsScreen({ stats, onBack }: Props) {
             </View>
 
             <View style={styles.barRow}>
-              <Text style={styles.barLabel}>🌶️🌶️🌶️ Extreme</Text>
+              <Text style={styles.barLabel}>🌶️🌶️🌶️ Extremo</Text>
               <View style={styles.barBackground}>
                 <View
                   style={[
                     styles.barFill,
                     {
                       width: `${(stats.levelDistribution.extreme / Math.max(stats.totalRounds, 1)) * 100}%`,
-                      backgroundColor: '#FF006E',
+                      backgroundColor: '#E50914',
                     },
                   ]}
                 />
@@ -94,13 +101,13 @@ export default function StatsScreen({ stats, onBack }: Props) {
 
         {/* Category Distribution */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Categories Played</Text>
+          <Text style={styles.sectionTitle}>Categorías Jugadas</Text>
           <View style={styles.categoryGrid}>
             {Object.entries(stats.categoryDistribution).map(([category, count]) => (
               <View key={category} style={styles.categoryCard}>
                 <Text style={styles.categoryValue}>{count}</Text>
                 <Text style={styles.categoryLabel}>
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                  {CATEGORY_NAMES[category] || (category.charAt(0).toUpperCase() + category.slice(1))}
                 </Text>
               </View>
             ))}
@@ -110,16 +117,16 @@ export default function StatsScreen({ stats, onBack }: Props) {
         {/* Player Stats */}
         {stats.currentSession.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Player Rankings</Text>
+            <Text style={styles.sectionTitle}>Ranking de Jugadores</Text>
             {mostSelectedPlayer && (
               <View style={styles.mvpCard}>
                 <Text style={styles.mvpEmoji}>👑</Text>
-                <Text style={styles.mvpTitle}>Most Selected</Text>
+                <Text style={styles.mvpTitle}>Más Elegido</Text>
                 <View
                   style={[styles.mvpColor, { backgroundColor: mostSelectedPlayer.color }]}
                 />
                 <Text style={styles.mvpCount}>
-                  {mostSelectedPlayer.timesSelected} times
+                  {mostSelectedPlayer.timesSelected} {mostSelectedPlayer.timesSelected === 1 ? 'vez' : 'veces'}
                 </Text>
               </View>
             )}
@@ -134,10 +141,10 @@ export default function StatsScreen({ stats, onBack }: Props) {
                   />
                   <View style={styles.playerStats}>
                     <Text style={styles.playerStat}>
-                      Selected: {player.timesSelected}
+                      Elegido: {player.timesSelected} {player.timesSelected === 1 ? 'vez' : 'veces'}
                     </Text>
                     <Text style={styles.playerStat}>
-                      Completed: {player.daresCompleted} | Skipped: {player.daresSkipped}
+                      Completados: {player.daresCompleted} | Saltados: {player.daresSkipped}
                     </Text>
                   </View>
                 </View>
@@ -201,7 +208,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#FF006E',
+    color: '#E50914',
     marginBottom: 5,
   },
   statLabel: {
@@ -254,7 +261,7 @@ const styles = StyleSheet.create({
   categoryValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FF006E',
+    color: '#E50914',
     marginBottom: 5,
   },
   categoryLabel: {
@@ -262,9 +269,9 @@ const styles = StyleSheet.create({
     color: '#BBB',
   },
   mvpCard: {
-    backgroundColor: 'rgba(255,0,110,0.1)',
+    backgroundColor: 'rgba(229, 9, 20, 0.1)',
     borderWidth: 2,
-    borderColor: '#FF006E',
+    borderColor: '#E50914',
     padding: 20,
     borderRadius: 15,
     alignItems: 'center',
@@ -302,7 +309,7 @@ const styles = StyleSheet.create({
   playerRank: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF006E',
+    color: '#E50914',
     width: 35,
   },
   playerColor: {

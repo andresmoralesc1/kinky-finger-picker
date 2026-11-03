@@ -20,12 +20,12 @@ export default function SettingsScreen({ settings, onUpdateSettings, onBack, onR
 
   const handleResetStats = () => {
     Alert.alert(
-      'Reset Statistics',
-      'Are you sure you want to reset all statistics? This will delete all your session data, but will keep your achievements and XP. This action cannot be undone.',
+      'Restablecer Estadísticas',
+      '¿Estás seguro de que deseas restablecer todas las estadísticas? Se borrarán los datos de sesión, pero se mantendrán tus logros y XP. Esta acción no se puede deshacer.',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Cancelar', style: 'cancel' },
         {
-          text: 'Reset',
+          text: 'Restablecer',
           style: 'destructive',
           onPress: onResetStats
         }
@@ -67,9 +67,9 @@ export default function SettingsScreen({ settings, onUpdateSettings, onBack, onR
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Text style={styles.backButtonText}>← Volver</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.title}>Ajustes</Text>
         <View style={{ width: 60 }} />
       </View>
 
@@ -79,31 +79,31 @@ export default function SettingsScreen({ settings, onUpdateSettings, onBack, onR
           <Text style={styles.sectionTitle}>Audio</Text>
 
           <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>Sound Effects</Text>
+            <Text style={styles.settingLabel}>Efectos de Sonido</Text>
             <Switch
               value={settings.soundEnabled}
               onValueChange={() => toggleSetting('soundEnabled')}
-              trackColor={{ false: '#333', true: '#FF006E' }}
+              trackColor={{ false: '#333', true: '#E50914' }}
               thumbColor="#fff"
             />
           </View>
 
           <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>Background Music</Text>
+            <Text style={styles.settingLabel}>Música de Fondo</Text>
             <Switch
               value={settings.musicEnabled}
               onValueChange={() => toggleSetting('musicEnabled')}
-              trackColor={{ false: '#333', true: '#FF006E' }}
+              trackColor={{ false: '#333', true: '#E50914' }}
               thumbColor="#fff"
             />
           </View>
 
           <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>Haptic Feedback</Text>
+            <Text style={styles.settingLabel}>Vibración Háptica</Text>
             <Switch
               value={settings.hapticEnabled}
               onValueChange={() => toggleSetting('hapticEnabled')}
-              trackColor={{ false: '#333', true: '#FF006E' }}
+              trackColor={{ false: '#333', true: '#E50914' }}
               thumbColor="#fff"
             />
           </View>
@@ -111,22 +111,22 @@ export default function SettingsScreen({ settings, onUpdateSettings, onBack, onR
 
         {/* Game Settings */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Gameplay</Text>
+          <Text style={styles.sectionTitle}>Jugabilidad</Text>
 
           <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>Avoid Repetition</Text>
+            <Text style={styles.settingLabel}>Evitar Repetición</Text>
             <Switch
               value={settings.avoidRepetition}
               onValueChange={() => toggleSetting('avoidRepetition')}
-              trackColor={{ false: '#333', true: '#FF006E' }}
+              trackColor={{ false: '#333', true: '#E50914' }}
               thumbColor="#fff"
             />
           </View>
 
           <View style={styles.settingRow}>
             <View>
-              <Text style={styles.settingLabel}>Skip Limit</Text>
-              <Text style={styles.settingSubtext}>Per player</Text>
+              <Text style={styles.settingLabel}>Límite de Saltos</Text>
+              <Text style={styles.settingSubtext}>Por jugador</Text>
             </View>
             <View style={styles.counter}>
               <TouchableOpacity
@@ -147,8 +147,8 @@ export default function SettingsScreen({ settings, onUpdateSettings, onBack, onR
 
           <View style={styles.settingRow}>
             <View>
-              <Text style={styles.settingLabel}>Timer Duration</Text>
-              <Text style={styles.settingSubtext}>Seconds</Text>
+              <Text style={styles.settingLabel}>Temporizador</Text>
+              <Text style={styles.settingSubtext}>Segundos</Text>
             </View>
             <View style={styles.counter}>
               <TouchableOpacity
@@ -170,14 +170,14 @@ export default function SettingsScreen({ settings, onUpdateSettings, onBack, onR
 
         {/* Question Categories */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Question Categories</Text>
-          <Text style={styles.sectionSubtext}>Select which categories to include</Text>
+          <Text style={styles.sectionTitle}>Categorías de Preguntas</Text>
+          <Text style={styles.sectionSubtext}>Selecciona qué categorías incluir en el juego</Text>
 
           {([
-            { id: 'classic' as QuestionCategory, name: 'Classic', desc: 'Traditional truths and dares' },
-            { id: 'romantic' as QuestionCategory, name: 'Romantic', desc: 'Sweet and intimate moments' },
-            { id: 'party' as QuestionCategory, name: 'Party', desc: 'Fun group activities' },
-            { id: 'nsfw' as QuestionCategory, name: 'NSFW', desc: 'Adults only (18+)' },
+            { id: 'classic' as QuestionCategory, name: 'Clásico', desc: 'Verdades y retos tradicionales' },
+            { id: 'romantic' as QuestionCategory, name: 'Romántico', desc: 'Momentos íntimos y sensuales' },
+            { id: 'party' as QuestionCategory, name: 'Fiesta', desc: 'Dinámicas grupales divertidas' },
+            { id: 'nsfw' as QuestionCategory, name: 'Picante (+18)', desc: 'Solo adultos y retos atrevidos' },
           ]).map(category => (
             <TouchableOpacity
               key={category.id}
@@ -214,13 +214,13 @@ export default function SettingsScreen({ settings, onUpdateSettings, onBack, onR
 
         {/* Other */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Other</Text>
+          <Text style={styles.sectionTitle}>Otros</Text>
 
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() => toggleSetting('showTutorial')}
           >
-            <Text style={styles.actionButtonText}>Show Tutorial Again</Text>
+            <Text style={styles.actionButtonText}>Ver Tutorial de Nuevo</Text>
           </TouchableOpacity>
 
           {onOpenCustomQuestions && (
@@ -231,8 +231,8 @@ export default function SettingsScreen({ settings, onUpdateSettings, onBack, onR
               <View style={styles.actionButtonContent}>
                 <Text style={styles.actionButtonEmoji}>✏️</Text>
                 <View>
-                  <Text style={styles.actionButtonText}>Manage Custom Questions</Text>
-                  <Text style={styles.actionButtonSubtext}>Add your own dares</Text>
+                  <Text style={styles.actionButtonText}>Preguntas Personalizadas</Text>
+                  <Text style={styles.actionButtonSubtext}>Agrega tus propios retos y preguntas</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -243,7 +243,7 @@ export default function SettingsScreen({ settings, onUpdateSettings, onBack, onR
             onPress={handleResetStats}
           >
             <Text style={[styles.actionButtonText, styles.dangerButtonText]}>
-              Reset Statistics
+              Restablecer Estadísticas
             </Text>
           </TouchableOpacity>
         </View>
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     width: 35,
     height: 35,
     borderRadius: 17.5,
-    backgroundColor: '#FF006E',
+    backgroundColor: '#E50914',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -350,8 +350,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   categoryButtonActive: {
-    borderColor: '#FF006E',
-    backgroundColor: 'rgba(255,0,110,0.1)',
+    borderColor: '#E50914',
+    backgroundColor: 'rgba(229, 9, 20, 0.15)',
   },
   categoryContent: {
     flex: 1,
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     color: '#BBB',
   },
   checkmark: {
-    color: '#FF006E',
+    color: '#E50914',
     fontSize: 20,
     fontWeight: 'bold',
   },
@@ -390,9 +390,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   customQuestionsButton: {
-    backgroundColor: 'rgba(255,190,11,0.1)',
-    borderWidth: 2,
-    borderColor: '#FFBE0B',
+    backgroundColor: 'rgba(229, 9, 20, 0.08)',
+    borderWidth: 1.5,
+    borderColor: '#E50914',
   },
   actionButtonContent: {
     flexDirection: 'row',
@@ -408,11 +408,11 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   dangerButton: {
-    backgroundColor: 'rgba(255,0,0,0.1)',
+    backgroundColor: 'rgba(229, 9, 20, 0.1)',
     borderWidth: 1,
-    borderColor: '#ff0000',
+    borderColor: '#E50914',
   },
   dangerButtonText: {
-    color: '#ff0000',
+    color: '#E50914',
   },
 });
