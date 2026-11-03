@@ -14,13 +14,13 @@ export default function PulsingCircle({ x, y, color }: Props) {
     const animation = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
-          toValue: 1.3,
-          duration: 800,
+          toValue: 1.35,
+          duration: 1400,
           useNativeDriver: true,
         }),
         Animated.timing(pulseAnim, {
           toValue: 1,
-          duration: 800,
+          duration: 1400,
           useNativeDriver: true,
         }),
       ])

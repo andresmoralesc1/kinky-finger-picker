@@ -40,9 +40,10 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
   const timeoutsRef = useRef<Set<NodeJS.Timeout>>(new Set());
 
   useEffect(() => {
-    let delay = 100;
+    // Slower, dramatic roulette pulses: starts at 200ms and decelerates towards 450ms+
+    let delay = 220;
     let iterations = 0;
-    const maxIterations = 16 + Math.floor(Math.random() * 8);
+    const maxIterations = 14 + Math.floor(Math.random() * 5);
 
     const safeTimeout = (cb: () => void, ms: number) => {
       const id = setTimeout(() => {
@@ -57,8 +58,9 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
       safeTimeout(() => {
         iterations++;
 
-        if (iterations > maxIterations * 0.7) {
-          delay += 45;
+        // Decelerate dramatically in the final rounds for maximum suspense
+        if (iterations > maxIterations * 0.6) {
+          delay += 60;
         }
 
         if (hasBothSides) {
@@ -81,17 +83,17 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
         }
 
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        soundManager.playSound('tap');
+        soundManager.playSound('tick');
 
         Animated.sequence([
           Animated.timing(scaleAnim, {
-            toValue: 1.25,
-            duration: 80,
+            toValue: 1.3,
+            duration: 130,
             useNativeDriver: true,
           }),
           Animated.timing(scaleAnim, {
             toValue: 1,
-            duration: 80,
+            duration: 130,
             useNativeDriver: true,
           }),
         ]).start();
@@ -104,19 +106,21 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             soundManager.playSound('winner');
 
+            // Winner celebration: glow stays lit and pulses proudly
             Animated.parallel([
               Animated.spring(scaleAnim, {
-                toValue: 1.45,
-                tension: 50,
-                friction: 3,
+                toValue: 1.5,
+                tension: 40,
+                friction: 4,
                 useNativeDriver: true,
               }),
               Animated.timing(glowAnim, {
                 toValue: 1,
-                duration: 350,
+                duration: 500,
                 useNativeDriver: true,
               }),
             ]).start(() => {
+              // Keep selected players glowing and illuminated for a noticeable, satisfying pause
               safeTimeout(() => {
                 if (isGroupEven) {
                   // Pair up all players into couples (2, 3 or 4 couples)
@@ -166,9 +170,9 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
 
                   onComplete(actor, target);
                 }
-              }, 600);
+              }, 1200);
             });
-          }, 250);
+          }, 350);
         }
       }, delay);
     };
@@ -217,9 +221,10 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
                   backgroundColor: player.color,
                   opacity: glowAnim.interpolate({
                     inputRange: [0, 1],
-                    outputRange: [0.45, 0.9],
+                    outputRange: [0.45, 0.95],
                   }),
                 },
+                isDone && styles.winnerGlowActive,
               ]}
             />
             <Animated.View
@@ -228,9 +233,11 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
                 {
                   left: player.x - 60,
                   top: player.y - 60,
-                  borderColor: player.color,
+                  borderColor: isDone ? '#FFFFFF' : player.color,
+                  backgroundColor: isDone ? player.color : 'transparent',
                   transform: [{ scale: scaleAnim }],
                 },
+                isDone && styles.winnerHighlightActive,
               ]}
             />
           </View>
@@ -279,5 +286,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 16,
     elevation: 16,
+  },
+  winnerGlowActive: {
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    shadowColor: '#FFFFFF',
+    shadowOpacity: 1,
+    shadowRadius: 32,
+    elevation: 25,
+  },
+  winnerHighlightActive: {
+    borderWidth: 8,
+    shadowColor: '#FFFFFF',
+    shadowOpacity: 1,
+    shadowRadius: 24,
+    elevation: 22,
   },
 });
