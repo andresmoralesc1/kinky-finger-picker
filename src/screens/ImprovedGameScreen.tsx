@@ -9,6 +9,9 @@ import {
   GestureResponderEvent,
   NativeSyntheticEvent,
   Platform,
+  Modal,
+  TextInput,
+  ScrollView,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -54,6 +57,9 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   const [showRoulette, setShowRoulette] = useState(false);
   const [ripples, setRipples] = useState<RippleData[]>([]);
   const [screenWidth, setScreenWidth] = useState(getWindowDimensions().width);
+  const [showNamesModal, setShowNamesModal] = useState(false);
+  const [customNames, setCustomNames] = useState<string[]>([]);
+  const [inputName, setInputName] = useState('');
   const usedColors = useRef<string[]>([]);
   const rippleIdCounter = useRef(0);
 
@@ -143,6 +149,8 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
       clearInterval(countdownInterval.current);
     }
     setCountdown(3);
+    soundManager.playSound('heartbeat');
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     countdownInterval.current = setInterval(() => {
       setCountdown((prev) => {
@@ -153,15 +161,25 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
           }
           setIsSelecting(true);
           setShowRoulette(true);
+          soundManager.playSound('roulette');
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           return null;
         }
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        soundManager.playSound('countdown');
+
+        const nextVal = prev - 1;
+        // Escalating haptic feedback and heartbeat as time runs down
+        if (nextVal === 2) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          soundManager.playSound('heartbeat');
+        } else if (nextVal === 1) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          soundManager.playSound('heartbeat');
+        }
 
         // Bounce animation on countdown
         Animated.sequence([
           Animated.timing(countdownAnim, {
-            toValue: 1.2,
+            toValue: 1.25,
             duration: 100,
             useNativeDriver: true,
           }),
@@ -172,7 +190,7 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
           }),
         ]).start();
 
-        return prev - 1;
+        return nextVal;
       });
     }, 1000);
   }, [countdownAnim]);
@@ -556,7 +574,35 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
   };
 
   const handleRouletteComplete = (winner: Player, target?: Player, groupContext?: GroupInteractionContext) => {
-    onPlayerSelected(winner, target, groupContext);
+    let finalWinner = { ...winner };
+    let finalTarget = target ? { ...target } : undefined;
+    let finalGroupContext = groupContext ? { ...groupContext } : undefined;
+
+    // If custom names are configured, assign them dynamically
+    if (customNames.length > 0) {
+      if (finalWinner && !finalWinner.name) {
+        finalWinner.name = customNames[0];
+      }
+      if (finalTarget && !finalTarget.name && customNames.length > 1) {
+        finalTarget.name = customNames[1];
+      }
+      if (finalGroupContext && finalGroupContext.pairs) {
+        let nameIdx = 0;
+        finalGroupContext.pairs = finalGroupContext.pairs.map((pair) => {
+          const p1Name = customNames[nameIdx % customNames.length];
+          nameIdx++;
+          const p2Name = customNames[nameIdx % customNames.length];
+          nameIdx++;
+          return {
+            ...pair,
+            player1: { ...pair.player1, name: pair.player1.name || p1Name },
+            player2: { ...pair.player2, name: pair.player2.name || p2Name },
+          };
+        });
+      }
+    }
+
+    onPlayerSelected(finalWinner, finalTarget, finalGroupContext);
     setIsSelecting(false);
     setPlayers([]);
     setShowRoulette(false);
@@ -606,19 +652,33 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
           <Text style={styles.backButtonText}>← Volver</Text>
         </AccessibleTouchable>
 
-        <AccessibleTouchable
-          style={styles.levelButton}
-          onPress={onChangeLevel}
-          accessibilityLabel={`Cambiar nivel de intensidad. Actual es ${level}`}
-          accessibilityHint="Toca para cambiar la intensidad"
-          accessibilityRole="button"
-        >
-          <GlowEffect color={getLevelColor()} intensity={15}>
-            <Text style={[styles.levelText, { color: getLevelColor() }]}>
-              {getLevelEmoji()} {level === 'mild' ? 'SUAVE' : level === 'spicy' ? 'PICANTE' : 'EXTREMO'}
+        <View style={styles.headerRightActions}>
+          <AccessibleTouchable
+            style={[styles.namesButton, customNames.length > 0 && styles.namesButtonActive]}
+            onPress={() => setShowNamesModal(true)}
+            accessibilityLabel="Configurar nombres de jugadores"
+            accessibilityHint="Ingresa los nombres de los jugadores para personalizar los retos"
+            accessibilityRole="button"
+          >
+            <Text style={styles.namesButtonText}>
+              👥 {customNames.length > 0 ? `${customNames.length} nombres` : 'Nombres'}
             </Text>
-          </GlowEffect>
-        </AccessibleTouchable>
+          </AccessibleTouchable>
+
+          <AccessibleTouchable
+            style={styles.levelButton}
+            onPress={onChangeLevel}
+            accessibilityLabel={`Cambiar nivel de intensidad. Actual es ${level}`}
+            accessibilityHint="Toca para cambiar la intensidad"
+            accessibilityRole="button"
+          >
+            <GlowEffect color={getLevelColor()} intensity={15}>
+              <Text style={[styles.levelText, { color: getLevelColor() }]}>
+                {getLevelEmoji()} {level === 'mild' ? 'SUAVE' : level === 'spicy' ? 'PICANTE' : 'EXTREMO'}
+              </Text>
+            </GlowEffect>
+          </AccessibleTouchable>
+        </View>
       </Animated.View>
 
       {/* Split screen divider for hetero mode */}
@@ -812,6 +872,98 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
           </View>
         </View>
       )}
+      {/* Player Names Setup Modal */}
+      <Modal
+        visible={showNamesModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowNamesModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>👥 Nombres de Jugadores</Text>
+            <Text style={styles.modalSubtitle}>
+              Ingresa los nombres de quienes juegan para que los retos salgan con nombres reales:
+            </Text>
+
+            <View style={styles.nameInputRow}>
+              <TextInput
+                style={styles.nameInput}
+                placeholder="Nombre (ej. Andrés, Sofía)"
+                placeholderTextColor="rgba(255,255,255,0.4)"
+                value={inputName}
+                onChangeText={setInputName}
+                onSubmitEditing={() => {
+                  const trimmed = inputName.trim();
+                  if (trimmed && !customNames.includes(trimmed)) {
+                    setCustomNames([...customNames, trimmed]);
+                    setInputName('');
+                    soundManager.playSound('tap');
+                  }
+                }}
+              />
+              <TouchableOpacity
+                style={styles.addNameButton}
+                onPress={() => {
+                  const trimmed = inputName.trim();
+                  if (trimmed && !customNames.includes(trimmed)) {
+                    setCustomNames([...customNames, trimmed]);
+                    setInputName('');
+                    soundManager.playSound('tap');
+                  }
+                }}
+              >
+                <Text style={styles.addNameButtonText}>+ Añadir</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.namesList} showsVerticalScrollIndicator={false}>
+              {customNames.length === 0 ? (
+                <Text style={styles.emptyNamesText}>
+                  Sin nombres personalizados aún (se usarán etiquetas por defecto como 'Ella', 'Él' o 'tu pareja').
+                </Text>
+              ) : (
+                <View style={styles.nameTagsContainer}>
+                  {customNames.map((name, idx) => (
+                    <View key={idx} style={styles.nameTag}>
+                      <Text style={styles.nameTagText}>{name}</Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setCustomNames(customNames.filter((_, i) => i !== idx));
+                          soundManager.playSound('tap');
+                        }}
+                        style={styles.removeNameBtn}
+                      >
+                        <Text style={styles.removeNameBtnText}>✕</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </ScrollView>
+
+            <View style={styles.modalActions}>
+              {customNames.length > 0 && (
+                <TouchableOpacity
+                  style={styles.clearNamesBtn}
+                  onPress={() => {
+                    setCustomNames([]);
+                    soundManager.playSound('tap');
+                  }}
+                >
+                  <Text style={styles.clearNamesBtnText}>Borrar Todos</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                style={styles.closeModalBtn}
+                onPress={() => setShowNamesModal(false)}
+              >
+                <Text style={styles.closeModalBtnText}>Listo ✓</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </Animated.View>
   );
 }
@@ -828,6 +980,28 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     zIndex: 10,
+  },
+  headerRightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  namesButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+  },
+  namesButtonActive: {
+    backgroundColor: 'rgba(229, 9, 20, 0.35)',
+    borderColor: '#E50914',
+  },
+  namesButtonText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '700',
   },
   backButton: {
     padding: 10,
@@ -1037,5 +1211,137 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
     letterSpacing: 0.6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 480,
+    backgroundColor: '#12121A',
+    borderRadius: 24,
+    padding: 24,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.2)',
+    shadowColor: '#E50914',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 12,
+  },
+  modalTitle: {
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: '900',
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 18,
+    lineHeight: 20,
+  },
+  nameInputRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  nameInput: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    color: '#fff',
+    fontSize: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  addNameButton: {
+    backgroundColor: '#E50914',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addNameButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  namesList: {
+    maxHeight: 180,
+    marginBottom: 18,
+  },
+  emptyNamesText: {
+    color: 'rgba(255,255,255,0.45)',
+    fontSize: 13,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    paddingVertical: 16,
+  },
+  nameTagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  nameTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(229, 9, 20, 0.25)',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 9, 20, 0.6)',
+    gap: 6,
+  },
+  nameTagText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  removeNameBtn: {
+    padding: 2,
+  },
+  removeNameBtnText: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+  },
+  clearNamesBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  clearNamesBtnText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  closeModalBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 14,
+    backgroundColor: '#E50914',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeModalBtnText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '800',
   },
 });

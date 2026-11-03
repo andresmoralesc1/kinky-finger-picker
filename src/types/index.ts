@@ -30,6 +30,7 @@ export interface Player {
   y: number;
   color: string;
   gender?: 'male' | 'female';
+  name?: string;
 }
 
 export interface PlayerPair {

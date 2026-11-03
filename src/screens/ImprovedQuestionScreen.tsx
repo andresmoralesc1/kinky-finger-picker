@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { Player, IntensityLevel, Question, QuestionCategory, Settings, GameMode, GroupInteractionContext } from '../types';
@@ -8,6 +8,7 @@ import ConfettiEffect from '../components/ConfettiEffect';
 import { soundManager } from '../utils/sounds';
 import AccessibleTouchable from '../components/AccessibleTouchable';
 import { SwipeGesture } from '../components/SwipeGesture';
+import ShareCard from '../components/ShareCard';
 
 interface Props {
   player: Player;
@@ -67,6 +68,33 @@ export default function ImprovedQuestionScreen({
   const [showConfetti, setShowConfetti] = useState(true);
   const [timeLeft, setTimeLeft] = useState(settings.timerDuration);
   const [isTimerActive, setIsTimerActive] = useState(false);
+  const [showPunishmentModal, setShowPunishmentModal] = useState(false);
+  const [currentPunishment, setCurrentPunishment] = useState('');
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  // Party punishments when someone refuses a dare / challenge
+  const PUNISHMENTS = [
+    '🥃 Tomarse 1 shot de licor sin hacer caras.',
+    '🍸 Beber 2 sorbos grandes del trago de la persona enfrente.',
+    '💃 Hacer un baile sensual de 10 segundos al centro de la ronda.',
+    '🤫 Dejar que la persona a tu derecha revise las últimas 3 fotos de tu galería.',
+    '🍗 Recibir una nalgadita juguetona con consentimiento del grupo.',
+    '🎭 Confesar en voz alta tu gusto culposo más vergonzoso.',
+    '🔥 Enviar un emoji de fueguito 🔥 a la última persona con la que hablaste en WhatsApp.',
+    '🍹 Servir y preparar la siguiente ronda de tragos para todos.',
+    '💋 Dejar que el grupo decida quién te da un beso en la mejilla o cuello.',
+    '🏋️‍♂️ Hacer 10 sentadillas o flexiones de forma seductora.',
+  ];
+
+  const handleOpenPunishment = () => {
+    const randomPunishment = PUNISHMENTS[Math.floor(Math.random() * PUNISHMENTS.length)];
+    setCurrentPunishment(randomPunishment);
+    setShowPunishmentModal(true);
+    soundManager.playSound('shot');
+    if (settings.hapticEnabled) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+  };
 
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -390,6 +418,29 @@ export default function ImprovedQuestionScreen({
           </AccessibleTouchable>
         </View>
 
+        {/* Secondary Actions: Punishment (Shot) & Share */}
+        <View style={styles.secondaryActionsRow}>
+          <AccessibleTouchable
+            style={styles.punishmentButton}
+            onPress={handleOpenPunishment}
+            accessibilityLabel="Castigo o Shot si alguien se acobarda"
+            accessibilityHint="Muestra un castigo divertido para quien no cumpla el reto"
+            accessibilityRole="button"
+          >
+            <Text style={styles.punishmentButtonText}>🥃 ¿Se acobardó? (Castigo)</Text>
+          </AccessibleTouchable>
+
+          <AccessibleTouchable
+            style={styles.shareStoryButton}
+            onPress={() => setShowShareModal(true)}
+            accessibilityLabel="Compartir reto en historias"
+            accessibilityHint="Genera una tarjeta elegante para compartir en Instagram o WhatsApp"
+            accessibilityRole="button"
+          >
+            <Text style={styles.shareStoryButtonText}>📸 Compartir</Text>
+          </AccessibleTouchable>
+        </View>
+
         {/* Action buttons */}
         <View style={styles.actionButtons}>
           <AccessibleTouchable
@@ -418,6 +469,62 @@ export default function ImprovedQuestionScreen({
           </AccessibleTouchable>
         </View>
       </Animated.View>
+
+      {/* Punishment / Shot Modal */}
+      <Modal
+        visible={showPunishmentModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowPunishmentModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.punishmentCard}>
+            <Text style={styles.punishmentTitle}>🥃 ¡CASTIGO / SHOT!</Text>
+            <Text style={styles.punishmentSubtitle}>
+              Por no cumplir el reto, toca pagar penitencia:
+            </Text>
+            <View style={styles.punishmentBox}>
+              <Text style={styles.punishmentText}>{currentPunishment}</Text>
+            </View>
+            <View style={styles.punishmentActions}>
+              <TouchableOpacity
+                style={styles.anotherPunishmentBtn}
+                onPress={() => {
+                  const randomPunishment = PUNISHMENTS[Math.floor(Math.random() * PUNISHMENTS.length)];
+                  setCurrentPunishment(randomPunishment);
+                  soundManager.playSound('shot');
+                }}
+              >
+                <Text style={styles.anotherPunishmentBtnText}>🎲 Otro Castigo</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.acceptPunishmentBtn}
+                onPress={() => {
+                  setShowPunishmentModal(false);
+                  soundManager.playSound('complete');
+                  onComplete(question.id);
+                }}
+              >
+                <Text style={styles.acceptPunishmentBtnText}>¡Cumplido! ✓</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Share Card Modal */}
+      {showShareModal && (
+        <ShareCard
+          title="Kinky Finger Picker"
+          subtitle={formattedQuestionText}
+          emoji={level === 'extreme' ? '🌶️🌶️🌶️' : level === 'spicy' ? '🌶️🌶️' : '🌶️'}
+          stats={{
+            level,
+          }}
+          onClose={() => setShowShareModal(false)}
+        />
+      )}
     </LinearGradient>
     </SwipeGesture>
   );
@@ -769,5 +876,126 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '900',
     letterSpacing: 0.5,
+  },
+  secondaryActionsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    width: '100%',
+    marginBottom: 12,
+  },
+  punishmentButton: {
+    flex: 1.2,
+    backgroundColor: 'rgba(255, 140, 0, 0.16)',
+    paddingVertical: 12,
+    borderRadius: 18,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 140, 0, 0.65)',
+  },
+  punishmentButtonText: {
+    color: '#FFA040',
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 0.3,
+  },
+  shareStoryButton: {
+    flex: 0.8,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingVertical: 12,
+    borderRadius: 18,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  shareStoryButtonText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  punishmentCard: {
+    width: '100%',
+    maxWidth: 460,
+    backgroundColor: '#160809',
+    borderRadius: 26,
+    padding: 26,
+    borderWidth: 2,
+    borderColor: '#E50914',
+    alignItems: 'center',
+    shadowColor: '#E50914',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.6,
+    shadowRadius: 18,
+    elevation: 14,
+  },
+  punishmentTitle: {
+    color: '#FFA040',
+    fontSize: 24,
+    fontWeight: '900',
+    marginBottom: 8,
+    textAlign: 'center',
+    letterSpacing: 0.8,
+  },
+  punishmentSubtitle: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 20,
+    fontWeight: '600',
+  },
+  punishmentBox: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 18,
+    padding: 20,
+    width: '100%',
+    marginBottom: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 140, 0, 0.4)',
+  },
+  punishmentText: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
+    lineHeight: 26,
+    fontWeight: '700',
+  },
+  punishmentActions: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  anotherPunishmentBtn: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingVertical: 14,
+    borderRadius: 18,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.25)',
+  },
+  anotherPunishmentBtnText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  acceptPunishmentBtn: {
+    flex: 1.2,
+    backgroundColor: '#E50914',
+    paddingVertical: 14,
+    borderRadius: 18,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.85)',
+  },
+  acceptPunishmentBtnText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '900',
   },
 });

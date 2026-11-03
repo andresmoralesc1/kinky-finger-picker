@@ -7,26 +7,28 @@ export function formatQuestionForPair(
 ): string {
   if (!target) return rawText;
 
-  const targetVocative =
-    target.gender === 'female'
-      ? 'a ella'
-      : target.gender === 'male'
-      ? 'a él'
-      : 'a tu pareja';
+  const targetVocative = target.name
+    ? target.name
+    : target.gender === 'female'
+    ? 'a ella'
+    : target.gender === 'male'
+    ? 'a él'
+    : 'a tu pareja';
 
-  const targetPronoun =
-    target.gender === 'female'
-      ? 'ella'
-      : target.gender === 'male'
-      ? 'él'
-      : 'tu pareja';
+  const targetPronoun = target.name
+    ? target.name
+    : target.gender === 'female'
+    ? 'ella'
+    : target.gender === 'male'
+    ? 'él'
+    : 'tu pareja';
 
   const formatted = rawText
-    .replace(/a\s+\{target\}/gi, targetVocative)
-    .replace(/de\s+\{target\}/gi, target.gender === 'female' ? 'de ella' : target.gender === 'male' ? 'de él' : 'de tu pareja')
-    .replace(/con\s+\{target\}/gi, target.gender === 'female' ? 'con ella' : target.gender === 'male' ? 'con él' : 'con tu pareja')
-    .replace(/hacia\s+\{target\}/gi, target.gender === 'female' ? 'hacia ella' : target.gender === 'male' ? 'hacia él' : 'hacia tu pareja')
-    .replace(/para\s+\{target\}/gi, target.gender === 'female' ? 'para ella' : target.gender === 'male' ? 'para él' : 'para tu pareja')
+    .replace(/a\s+\{target\}/gi, target.name ? `a ${target.name}` : targetVocative)
+    .replace(/de\s+\{target\}/gi, target.name ? `de ${target.name}` : target.gender === 'female' ? 'de ella' : target.gender === 'male' ? 'de él' : 'de tu pareja')
+    .replace(/con\s+\{target\}/gi, target.name ? `con ${target.name}` : target.gender === 'female' ? 'con ella' : target.gender === 'male' ? 'con él' : 'con tu pareja')
+    .replace(/hacia\s+\{target\}/gi, target.name ? `hacia ${target.name}` : target.gender === 'female' ? 'hacia ella' : target.gender === 'male' ? 'hacia él' : 'hacia tu pareja')
+    .replace(/para\s+\{target\}/gi, target.name ? `para ${target.name}` : target.gender === 'female' ? 'para ella' : target.gender === 'male' ? 'para él' : 'para tu pareja')
     .replace(/\{target\}/gi, targetVocative)
     .replace(/\{target_pronoun\}/gi, targetPronoun)
     .replace(/the person on your right/gi, targetVocative)
@@ -47,13 +49,30 @@ export function formatQuestionForGroup(
 
   groupContext.pairs.forEach((pair, idx) => {
     const pairNum = idx + 1;
-    const p1Label = pair.player1.gender === 'female' ? 'Ella (♀️)' : pair.player1.gender === 'male' ? 'Él (♂️)' : `Jugador 1`;
-    const p2Label = pair.player2.gender === 'female' ? 'Ella (♀️)' : pair.player2.gender === 'male' ? 'Él (♂️)' : `Jugador 2`;
+    const p1Label = pair.player1.name
+      ? pair.player1.name
+      : pair.player1.gender === 'female'
+      ? 'Ella (♀️)'
+      : pair.player1.gender === 'male'
+      ? 'Él (♂️)'
+      : `Jugador 1`;
+
+    const p2Label = pair.player2.name
+      ? pair.player2.name
+      : pair.player2.gender === 'female'
+      ? 'Ella (♀️)'
+      : pair.player2.gender === 'male'
+      ? 'Él (♂️)'
+      : `Jugador 2`;
+
+    const pairTitle = pair.player1.name && pair.player2.name
+      ? `${pair.player1.name} y ${pair.player2.name}`
+      : `Pareja ${pairNum}`;
 
     formatted = formatted
-      .replace(new RegExp(`\\{PAREJA_${pairNum}\\}`, 'gi'), `Pareja ${pairNum}`)
-      .replace(new RegExp(`\\{P${pairNum}_J1\\}`, 'gi'), `Pareja ${pairNum} (${p1Label})`)
-      .replace(new RegExp(`\\{P${pairNum}_J2\\}`, 'gi'), `Pareja ${pairNum} (${p2Label})`);
+      .replace(new RegExp(`\\{PAREJA_${pairNum}\\}`, 'gi'), pairTitle)
+      .replace(new RegExp(`\\{P${pairNum}_J1\\}`, 'gi'), p1Label)
+      .replace(new RegExp(`\\{P${pairNum}_J2\\}`, 'gi'), p2Label);
   });
 
   return formatted;
