@@ -1,4 +1,4 @@
-import { Question, IntensityLevel, QuestionCategory, Player } from '../types';
+import { Question, IntensityLevel, QuestionCategory, Player, GroupInteractionContext } from '../types';
 
 export function formatQuestionForPair(
   rawText: string,
@@ -37,6 +37,26 @@ export function formatQuestionForPair(
     .replace(/someone/gi, targetVocative);
 
   return formatted.replace(/\ba a\b/gi, 'a');
+}
+
+export function formatQuestionForGroup(
+  rawText: string,
+  groupContext: GroupInteractionContext
+): string {
+  let formatted = rawText;
+
+  groupContext.pairs.forEach((pair, idx) => {
+    const pairNum = idx + 1;
+    const p1Label = pair.player1.gender === 'female' ? 'Ella (♀️)' : pair.player1.gender === 'male' ? 'Él (♂️)' : `Jugador 1`;
+    const p2Label = pair.player2.gender === 'female' ? 'Ella (♀️)' : pair.player2.gender === 'male' ? 'Él (♂️)' : `Jugador 2`;
+
+    formatted = formatted
+      .replace(new RegExp(`\\{PAREJA_${pairNum}\\}`, 'gi'), `Pareja ${pairNum}`)
+      .replace(new RegExp(`\\{P${pairNum}_J1\\}`, 'gi'), `Pareja ${pairNum} (${p1Label})`)
+      .replace(new RegExp(`\\{P${pairNum}_J2\\}`, 'gi'), `Pareja ${pairNum} (${p2Label})`);
+  });
+
+  return formatted;
 }
 
 export const questions: Question[] = [
@@ -607,10 +627,309 @@ export const questions: Question[] = [
   },
 ];
 
-export const getQuestionsByLevel = (level: IntensityLevel, categories?: QuestionCategory[]): Question[] => {
-  let filtered = questions.filter(q => q.level === level);
+// DEDICATED CHALLENGES FOR 4, 6, 8 PLAYERS (COUPLES, QUARTETS & CROSS-COUPLES)
+export const groupQuestions: Question[] = [
+  // MILD GROUP / COUPLES CHALLENGES (Icebreakers, Complicity & Flirting)
+  {
+    id: 'group_mild_1',
+    text: 'Duelo de miradas: {PAREJA_1} y {PAREJA_2} deben mirarse fijamente a los ojos con sus respectivas parejas durante 30 segundos sin reírse. La primera pareja en reírse debe confesar qué fue lo primero que le atrajo de su compañero/a.',
+    level: 'mild',
+    type: 'dare',
+    category: 'classic',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_mild_2',
+    text: 'Cumplidos cruzados: Cada integrante de {PAREJA_1} debe susurrarle al oído un cumplido sincero y coqueto a un integrante de {PAREJA_2}.',
+    level: 'mild',
+    type: 'dare',
+    category: 'romantic',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_mild_3',
+    text: '¿Quién conoce mejor a su pareja?: {PAREJA_1} y {PAREJA_2} deben escribir en secreto el placer culposo del otro. Revelen al unísono; la pareja con menos aciertos baila 15 segundos al centro.',
+    level: 'mild',
+    type: 'question',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_mild_4',
+    text: 'Sincronía de baile lento: Todas las parejas se ponen de pie y bailan juntos un ritmo lento y sugerente durante 30 segundos mirándose fijamente.',
+    level: 'mild',
+    type: 'dare',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_mild_5',
+    text: 'Confesión cruzada en cuarteto: {PAREJA_1} formula una pregunta comprometedora a {PAREJA_2}. Si deciden no responder, ambos deben dar un abrazo cálido de 10 segundos al grupo.',
+    level: 'mild',
+    type: 'question',
+    category: 'classic',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_mild_6',
+    text: 'El abrazo grupal: Todos los participantes deben unirse en un abrazo grupal apretado durante 15 segundos y decir en voz alta una cualidad que admiran del cuarteto.',
+    level: 'mild',
+    type: 'dare',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_mild_7',
+    text: 'Caricia sincronizada: Los integrantes de {PAREJA_1} deben acariciar suavemente las manos de sus parejas durante 20 segundos mientras las demás parejas califican la ternura.',
+    level: 'mild',
+    type: 'dare',
+    category: 'romantic',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_mild_8',
+    text: 'Intercambio visual: Durante 20 segundos, intercambien de pareja con la mirada. Miren fijamente al integrante de la otra pareja con su mirada más seductora.',
+    level: 'mild',
+    type: 'dare',
+    category: 'romantic',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_mild_9',
+    text: 'Pregunta cruzada sincera: {P1_J1} le pregunta a alguien de {PAREJA_2}: "¿Qué detalle físico o de actitud te parece más atractivo en una cita?".',
+    level: 'mild',
+    type: 'question',
+    category: 'classic',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_mild_10',
+    text: 'Cadena de susurros: En círculo, cada jugador le susurra al oído al compañero de su derecha un deseo inocente y divertido para el resto de la velada.',
+    level: 'mild',
+    type: 'dare',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+
+  // SPICY GROUP / COUPLES CHALLENGES (Sensual Tension, Massages & Seduction)
+  {
+    id: 'group_spicy_1',
+    text: 'Masaje cruzado: Un integrante de {PAREJA_1} debe darle un masaje en el cuello y hombros a un integrante de {PAREJA_2} durante 30 segundos, supervisado por todos.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'romantic',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_spicy_2',
+    text: 'Beso sincronizado de parejas: {PAREJA_1} y {PAREJA_2} deben darse un beso apasionado de 15 segundos al mismo tiempo. Quien se detenga primero debe confesar un secreto sensual.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_spicy_3',
+    text: 'Intercambio de roces: Cada persona debe rozar suavemente los labios o la mejilla del integrante de la pareja contraria, sin tocar la boca, sintiendo la respiración por 10 segundos.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_spicy_4',
+    text: 'Confesión de fantasía en cuarteto: Cada pareja debe pactar en privado y confesar una fantasía atrevida o curiosidad que les gustaría probar en un ambiente de confianza.',
+    level: 'spicy',
+    type: 'question',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_spicy_5',
+    text: 'Susurro caliente cruzado: Un integrante de {PAREJA_1} debe susurrarle al oído a alguien de {PAREJA_2} la frase más sugerente o atrevida que sea capaz de pronunciar sin sonrojarse.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_spicy_6',
+    text: 'Exploración a ciegas: Un integrante de {PAREJA_1} con los ojos cerrados debe tocar solo las manos y cuello de los demás e intentar adivinar a quién pertenece cada toque.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_spicy_7',
+    text: 'Trago sensual compartido: {PAREJA_1} y {PAREJA_2} beben un sorbo de trago con los brazos entrelazados de forma cruzada mirando fijamente a sus compañeros.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_spicy_8',
+    text: 'Mordidita de complicidad: Cada pareja decide quién le da una mordidita suave en el lóbulo de la oreja o el cuello a su respectivo compañero durante 5 segundos.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'romantic',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_spicy_9',
+    text: 'Baile sugerente de parejas: {PAREJA_1} le baila de forma seductora y cercana a {PAREJA_2} durante 30 segundos con una canción elegida por el grupo.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_spicy_10',
+    text: 'Caricia encubierta: Durante toda la siguiente ronda, cada integrante debe mantener una mano sobre el muslo de su pareja o de la pareja asignada por el grupo.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+
+  // EXTREME GROUP / COUPLES CHALLENGES (No Limits, Deep Kisses & Daring Games)
+  {
+    id: 'group_extreme_1',
+    text: 'Intercambio de besos cruzados: Con el consentimiento unánime del grupo, cada integrante de {PAREJA_1} le da un beso intenso en los labios a un integrante de {PAREJA_2} por 10 segundos.',
+    level: 'extreme',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_extreme_2',
+    text: 'Subasta de prendas: Cada pareja debe acordar en 15 segundos cuál de sus dos integrantes se retira una prenda de ropa exterior (chaqueta, calzado, camisa o accesorio).',
+    level: 'extreme',
+    type: 'dare',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_extreme_3',
+    text: 'Cadena íntima de besos: Todos los participantes se sientan en círculo y se dan un beso suave en el cuello o la mejilla al de su derecha en ronda continua.',
+    level: 'extreme',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_extreme_4',
+    text: 'Masaje directo sobre la piel: Un integrante de cada pareja debe recibir un masaje de espalda directo sobre la piel durante 40 segundos por parte de su pareja o la pareja contraria.',
+    level: 'extreme',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_extreme_5',
+    text: 'Beso apasionado de 30 segundos: Ambas parejas deben entregarse al mismo tiempo a un beso profundo con lengua y manos libres durante 30 segundos ininterrumpidos.',
+    level: 'extreme',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_extreme_6',
+    text: 'El recorrido prohibido: Cada persona debe pasar sus manos lentamente por el torso o las piernas del integrante de la otra pareja por 20 segundos.',
+    level: 'extreme',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_extreme_7',
+    text: 'Posición favorita revelada: Cada pareja debe describir con absoluto detalle o demostrar por encima de la ropa la postura íntima que más disfrutan juntos.',
+    level: 'extreme',
+    type: 'question',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_extreme_8',
+    text: 'Intercambio de prenda superior: Cada pareja intercambia una prenda superior entre sí o con la pareja opuesta y debe usarla durante las próximas 3 rondas.',
+    level: 'extreme',
+    type: 'dare',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_extreme_9',
+    text: 'Recorrido de labios: Cada pareja debe recorrer con sus labios o un hielo el cuello y pecho de su compañero desde la mandíbula hasta el abdomen por 25 segundos.',
+    level: 'extreme',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+  {
+    id: 'group_extreme_10',
+    text: 'Pacto sin límites: Todo el grupo acuerda una acción atrevida consensuada para celebrar la ronda. Quien se niegue debe quitarse dos prendas de inmediato.',
+    level: 'extreme',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+  },
+];
+
+export const getQuestionsByLevel = (
+  level: IntensityLevel,
+  categories?: QuestionCategory[],
+  isGroup?: boolean
+): Question[] => {
+  const sourceList = isGroup ? [...groupQuestions, ...questions] : questions;
+  let filtered = sourceList.filter(q => q.level === level);
+
+  if (isGroup) {
+    // When in group mode, prioritize group-specific challenges
+    const onlyGroup = filtered.filter(q => q.groupOnly);
+    if (onlyGroup.length > 0) {
+      filtered = onlyGroup;
+    }
+  } else {
+    // When playing in normal 2-player mode, exclude groupOnly questions
+    filtered = filtered.filter(q => !q.groupOnly);
+  }
+
   if (categories && categories.length > 0) {
-    filtered = filtered.filter(q => categories.includes(q.category));
+    const byCategory = filtered.filter(q => categories.includes(q.category));
+    if (byCategory.length > 0) {
+      filtered = byCategory;
+    }
   }
   return filtered;
 };
@@ -618,9 +937,10 @@ export const getQuestionsByLevel = (level: IntensityLevel, categories?: Question
 export const getRandomQuestion = (
   level: IntensityLevel,
   categories?: QuestionCategory[],
-  usedQuestionIds?: string[]
+  usedQuestionIds?: string[],
+  isGroup?: boolean
 ): Question => {
-  let levelQuestions = getQuestionsByLevel(level, categories);
+  let levelQuestions = getQuestionsByLevel(level, categories, isGroup);
 
   // Filter out used questions if provided
   if (usedQuestionIds && usedQuestionIds.length > 0) {

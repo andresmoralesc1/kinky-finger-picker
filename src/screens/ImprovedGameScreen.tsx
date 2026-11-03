@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { GameMode, IntensityLevel, Player } from '../types';
+import { GameMode, IntensityLevel, Player, GroupInteractionContext } from '../types';
 import { getRandomColor } from '../utils/colors';
 import { soundManager } from '../utils/sounds';
 import RouletteAnimation from '../components/RouletteAnimation';
@@ -35,7 +35,7 @@ interface Touch {
 interface Props {
   mode: GameMode;
   level: IntensityLevel;
-  onPlayerSelected: (player: Player, targetPlayer?: Player) => void;
+  onPlayerSelected: (player: Player, targetPlayer?: Player, groupContext?: GroupInteractionContext) => void;
   onBack: () => void;
   onChangeLevel: () => void;
 }
@@ -555,8 +555,8 @@ export default function ImprovedGameScreen({ mode, level, onPlayerSelected, onBa
     handleClearTouches();
   };
 
-  const handleRouletteComplete = (winner: Player, target?: Player) => {
-    onPlayerSelected(winner, target);
+  const handleRouletteComplete = (winner: Player, target?: Player, groupContext?: GroupInteractionContext) => {
+    onPlayerSelected(winner, target, groupContext);
     setIsSelecting(false);
     setPlayers([]);
     setShowRoulette(false);

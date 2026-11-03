@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { Player, IntensityLevel, Question, QuestionCategory, Settings, GameMode } from '../types';
-import { getRandomQuestion, formatQuestionForPair } from '../data/questions';
+import { Player, IntensityLevel, Question, QuestionCategory, Settings, GameMode, GroupInteractionContext } from '../types';
+import { getRandomQuestion, formatQuestionForPair, formatQuestionForGroup } from '../data/questions';
 import ConfettiEffect from '../components/ConfettiEffect';
 import { soundManager } from '../utils/sounds';
 import AccessibleTouchable from '../components/AccessibleTouchable';
@@ -12,6 +12,7 @@ import { SwipeGesture } from '../components/SwipeGesture';
 interface Props {
   player: Player;
   targetPlayer?: Player | null;
+  groupContext?: GroupInteractionContext | null;
   mode?: GameMode;
   level: IntensityLevel;
   settings: Settings;
@@ -28,6 +29,7 @@ interface Props {
 export default function ImprovedQuestionScreen({
   player,
   targetPlayer,
+  groupContext,
   mode = 'hetero',
   level,
   settings,
@@ -40,8 +42,10 @@ export default function ImprovedQuestionScreen({
   canLevelUp,
   canLevelDown,
 }: Props) {
+  const isGroupRound = Boolean(groupContext && groupContext.pairs && groupContext.pairs.length > 0);
+
   const [question, setQuestion] = useState(() =>
-    getRandomQuestion(level, settings.categories, usedQuestionIds)
+    getRandomQuestion(level, settings.categories, usedQuestionIds, isGroupRound)
   );
 
   // Stable level change listener: only picks new question when levelUp or levelDown is clicked
@@ -49,14 +53,16 @@ export default function ImprovedQuestionScreen({
   useEffect(() => {
     if (currentLevelRef.current !== level) {
       currentLevelRef.current = level;
-      setQuestion(getRandomQuestion(level, settings.categories, usedQuestionIds));
+      setQuestion(getRandomQuestion(level, settings.categories, usedQuestionIds, isGroupRound));
     }
-  }, [level, settings.categories, usedQuestionIds]);
+  }, [level, settings.categories, usedQuestionIds, isGroupRound]);
 
-  const formattedQuestionText = useMemo(
-    () => formatQuestionForPair(question.text, player, targetPlayer),
-    [question.text, player, targetPlayer]
-  );
+  const formattedQuestionText = useMemo(() => {
+    if (groupContext && groupContext.pairs && groupContext.pairs.length > 0) {
+      return formatQuestionForGroup(question.text, groupContext);
+    }
+    return formatQuestionForPair(question.text, player, targetPlayer);
+  }, [question.text, player, targetPlayer, groupContext]);
 
   const [showConfetti, setShowConfetti] = useState(true);
   const [timeLeft, setTimeLeft] = useState(settings.timerDuration);
@@ -208,9 +214,53 @@ export default function ImprovedQuestionScreen({
             },
           ]}
         >
-        {/* Winner indicator / Interactive Pair indicator */}
+        {/* Winner indicator / Interactive Pair indicator / Group indicator */}
         <View style={styles.winnerSection}>
-          {targetPlayer ? (
+          {isGroupRound && groupContext ? (
+            <View style={styles.groupContainer}>
+              <View style={styles.groupBanner}>
+                <Text style={styles.groupBannerText}>
+                  {groupContext.totalPlayers === 4
+                    ? '🔥 DINÁMICA DE CUARTETO (2 PAREJAS)'
+                    : `🔥 DINÁMICA GRUPAL (${groupContext.totalPlayers} JUGADORES - ${groupContext.pairs.length} PAREJAS)`}
+                </Text>
+              </View>
+              <View style={styles.pairsRow}>
+                {groupContext.pairs.map((pair, pIdx) => (
+                  <React.Fragment key={pair.pairIndex}>
+                    <View style={styles.pairBox}>
+                      <Text style={styles.pairBoxTitle}>Pareja {pair.pairIndex}</Text>
+                      <View style={styles.pairDots}>
+                        {/* Player 1 */}
+                        <View style={[styles.groupDot, { backgroundColor: pair.player1.color }]}>
+                          <Text style={styles.groupDotNumber}>
+                            {pair.player1.id >= 1001 && pair.player1.id <= 1010
+                              ? (pair.player1.id === 1010 ? '0' : pair.player1.id - 1000)
+                              : (pair.player1.gender === 'female' ? '♀️' : pair.player1.gender === 'male' ? '♂️' : `${pair.pairIndex}A`)}
+                          </Text>
+                        </View>
+                        <Text style={styles.pairPlus}>+</Text>
+                        {/* Player 2 */}
+                        <View style={[styles.groupDot, { backgroundColor: pair.player2.color }]}>
+                          <Text style={styles.groupDotNumber}>
+                            {pair.player2.id >= 1001 && pair.player2.id <= 1010
+                              ? (pair.player2.id === 1010 ? '0' : pair.player2.id - 1000)
+                              : (pair.player2.gender === 'female' ? '♀️' : pair.player2.gender === 'male' ? '♂️' : `${pair.pairIndex}B`)}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                    {pIdx < groupContext.pairs.length - 1 && (
+                      <View style={styles.groupVsContainer}>
+                        <Text style={styles.groupVsText}>⚔️</Text>
+                        <Text style={styles.groupVsSub}>VS</Text>
+                      </View>
+                    )}
+                  </React.Fragment>
+                ))}
+              </View>
+            </View>
+          ) : targetPlayer ? (
             <View style={styles.pairHeaderContainer}>
               {/* Actor Player */}
               <View style={styles.pairPlayerCard}>
@@ -414,6 +464,99 @@ const styles = StyleSheet.create({
     height: 45,
     borderRadius: 22.5,
     backgroundColor: 'rgba(255,255,255,0.4)',
+  },
+  groupContainer: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    borderRadius: 24,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderWidth: 1.5,
+    borderColor: 'rgba(229, 9, 20, 0.4)',
+    width: '100%',
+    maxWidth: 520,
+  },
+  groupBanner: {
+    backgroundColor: 'rgba(229, 9, 20, 0.25)',
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E50914',
+  },
+  groupBannerText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  pairsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  pairBox: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  pairBoxTitle: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 6,
+    opacity: 0.9,
+  },
+  pairDots: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  groupDot: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  groupDotNumber: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '900',
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  pairPlus: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    opacity: 0.8,
+  },
+  groupVsContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 2,
+  },
+  groupVsText: {
+    fontSize: 18,
+  },
+  groupVsSub: {
+    color: '#E50914',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 1,
   },
   pairHeaderContainer: {
     flexDirection: 'row',

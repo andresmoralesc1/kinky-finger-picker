@@ -13,6 +13,8 @@ export interface Question {
   type: 'dare' | 'question';
   category: QuestionCategory;
   isCustom?: boolean;
+  minPlayers?: number;
+  groupOnly?: boolean;
 }
 
 export interface TouchPoint {
@@ -28,6 +30,18 @@ export interface Player {
   y: number;
   color: string;
   gender?: 'male' | 'female';
+}
+
+export interface PlayerPair {
+  pairIndex: number;
+  player1: Player;
+  player2: Player;
+}
+
+export interface GroupInteractionContext {
+  totalPlayers: number;
+  pairs: PlayerPair[];
+  interactionType: 'couples' | 'cross_couples' | 'group';
 }
 
 export interface PlayerStats {

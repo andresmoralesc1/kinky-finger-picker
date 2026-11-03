@@ -9,12 +9,13 @@ Este documento recopila las **78 preguntas y retos** actualmente integrados en e
 
 ## 📋 Resumen General
 
-| Nivel | Total | Preguntas | Retos | Enfoque |
+| Nivel / Modo | Total | Preguntas | Retos | Enfoque |
 | :--- | :---: | :---: | :---: | :--- |
 | **Suave (Mild)** 🌶️ | **30** | 15 | 15 | Rompehielos, coqueteo sutil, miradas, cumplidos y risas |
 | **Picante (Spicy)** 🌶️🌶️ | **28** | 14 | 14 | Besos, caricias, masajes, confesiones íntimas y seducción |
 | **Extremo (Extreme)** 🌶️🌶️🌶️ | **20** | 10 | 10 | Desafíos adultos directos (+18), striptease, besos intensos y secretos |
-| **TOTAL** | **78** | **39** | **39** | **Equilibrio perfecto 50% Preguntas / 50% Retos** |
+| **Grupales / Cuartetos (4, 6, 8)** 👥 | **30** | 6 | 24 | Dinámicas de parejas, intercambio cruzado, complicidad y desafíos 2vs2 |
+| **TOTAL GENERAL** | **108** | **45** | **63** | **Retos para 2 jugadores y grupos de 4, 6 u 8 personas** |
 
 ---
 
@@ -151,3 +152,51 @@ Solo para adultos (+18) en ambientes de confianza total. Sin censura ni tabúes.
 | 76 | Reto | Deja que {target} pase sus manos libremente por tu cuerpo (sobre la ropa) por 15 segundos. |
 | 77 | Reto | Bésale lentamente el abdomen o el cuello a {target} durante 15 segundos. |
 | 78 | Reto | Bésense intensamente con {target} durante 30 segundos sin detenerse. |
+
+---
+
+## 4. Retos Grupales, Cuartetos y Parejas Cruzadas (4, 6 y 8 Jugadores) 👥 (30 ítems)
+
+Activados automáticamente cuando hay **4, 6 u 8 dedos en pantalla**. El juego empareja a todos los participantes (Pareja 1 vs Pareja 2, Pareja 3, Pareja 4) y lanza retos de complicidad, desafíos sincronizados e intercambios cruzados.
+
+### Suave (Mild) 🌶️ (10)
+| # | Tipo | Texto |
+|---|:---:|---|
+| 79 | Reto | Duelo de miradas: {PAREJA_1} y {PAREJA_2} deben mirarse fijamente a los ojos con sus respectivas parejas durante 30 segundos sin reírse. La primera pareja en reírse debe confesar qué fue lo primero que le atrajo de su compañero/a. |
+| 80 | Reto | Cumplidos cruzados: Cada integrante de {PAREJA_1} debe susurrarle al oído un cumplido sincero y coqueto a un integrante de {PAREJA_2}. |
+| 81 | Pregunta | ¿Quién conoce mejor a su pareja?: {PAREJA_1} y {PAREJA_2} deben escribir en secreto el placer culposo del otro. Revelen al unísono; la pareja con menos aciertos baila 15 segundos al centro. |
+| 82 | Reto | Sincronía de baile lento: Todas las parejas se ponen de pie y bailan juntos un ritmo lento y sugerente durante 30 segundos mirándose fijamente. |
+| 83 | Pregunta | Confesión cruzada en cuarteto: {PAREJA_1} formula una pregunta comprometedora a {PAREJA_2}. Si deciden no responder, ambos deben dar un abrazo cálido de 10 segundos al grupo. |
+| 84 | Reto | El abrazo grupal: Todos los participantes deben unirse en un abrazo grupal apretado durante 15 segundos y decir en voz alta una cualidad que admiran del cuarteto. |
+| 85 | Reto | Caricia sincronizada: Los integrantes de {PAREJA_1} deben acariciar suavemente las manos de sus parejas durante 20 segundos mientras las demás parejas califican la ternura. |
+| 86 | Reto | Intercambio visual: Durante 20 segundos, intercambien de pareja con la mirada. Miren fijamente al integrante de la otra pareja con su mirada más seductora. |
+| 87 | Pregunta | Pregunta cruzada sincera: {P1_J1} le pregunta a alguien de {PAREJA_2}: "¿Qué detalle físico o de actitud te parece más atractivo en una cita?". |
+| 88 | Reto | Cadena de susurros: En círculo, cada jugador le susurra al oído al compañero de su derecha un deseo inocente y divertido para el resto de la velada. |
+
+### Picante (Spicy) 🌶️🌶️ (10)
+| # | Tipo | Texto |
+|---|:---:|---|
+| 89 | Reto | Masaje cruzado: Un integrante de {PAREJA_1} debe darle un masaje en el cuello y hombros a un integrante de {PAREJA_2} durante 30 segundos, supervisado por todos. |
+| 90 | Reto | Beso sincronizado de parejas: {PAREJA_1} y {PAREJA_2} deben darse un beso apasionado de 15 segundos al mismo tiempo. Quien se detenga primero debe confesar un secreto sensual. |
+| 91 | Reto | Intercambio de roces: Cada persona debe rozar suavemente los labios o la mejilla del integrante de la pareja contraria, sin tocar la boca, sintiendo la respiración por 10 segundos. |
+| 92 | Pregunta | Confesión de fantasía en cuarteto: Cada pareja debe pactar en privado y confesar una fantasía atrevida o curiosidad que les gustaría probar en un ambiente de confianza. |
+| 93 | Reto | Susurro caliente cruzado: Un integrante de {PAREJA_1} debe susurrarle al oído a alguien de {PAREJA_2} la frase más sugerente o atrevida que sea capaz de pronunciar sin sonrojarse. |
+| 94 | Reto | Exploración a ciegas: Un integrante de {PAREJA_1} con los ojos cerrados debe tocar solo las manos y cuello de los demás e intentar adivinar a quién pertenece cada toque. |
+| 95 | Reto | Trago sensual compartido: {PAREJA_1} y {PAREJA_2} beben un sorbo de trago con los brazos entrelazados de forma cruzada mirando fijamente a sus compañeros. |
+| 96 | Reto | Mordidita de complicidad: Cada pareja decide quién le da una mordidita suave en el lóbulo de la oreja o el cuello a su respectivo compañero durante 5 segundos. |
+| 97 | Reto | Baile sugerente de parejas: {PAREJA_1} le baila de forma seductora y cercana a {PAREJA_2} durante 30 segundos con una canción elegida por el grupo. |
+| 98 | Reto | Caricia encubierta: Durante toda la siguiente ronda, cada integrante debe mantener una mano sobre el muslo de su pareja o de la pareja asignada por el grupo. |
+
+### Extremo (Extreme) 🌶️🌶️🌶️ (10)
+| # | Tipo | Texto |
+|---|:---:|---|
+| 99 | Reto | Intercambio de besos cruzados: Con el consentimiento unánime del grupo, cada integrante de {PAREJA_1} le da un beso intenso en los labios a un integrante de {PAREJA_2} por 10 segundos. |
+| 100 | Reto | Subasta de prendas: Cada pareja debe acordar en 15 segundos cuál de sus dos integrantes se retira una prenda de ropa exterior (chaqueta, calzado, camisa o accesorio). |
+| 101 | Reto | Cadena íntima de besos: Todos los participantes se sientan en círculo y se dan un beso suave en el cuello o la mejilla al de su derecha en ronda continua. |
+| 102 | Reto | Masaje directo sobre la piel: Un integrante de cada pareja debe recibir un masaje de espalda directo sobre la piel durante 40 segundos por parte de su pareja o la pareja contraria. |
+| 103 | Reto | Beso apasionado de 30 segundos: Ambas parejas deben entregarse al mismo tiempo a un beso profundo con lengua y manos libres durante 30 segundos ininterrumpidos. |
+| 104 | Reto | El recorrido prohibido: Cada persona debe pasar sus manos lentamente por el torso o las piernas del integrante de la otra pareja por 20 segundos. |
+| 105 | Pregunta | Posición favorita revelada: Cada pareja debe describir con absoluto detalle o demostrar por encima de la ropa la postura íntima que más disfrutan juntos. |
+| 106 | Reto | Intercambio de prenda superior: Cada pareja intercambia una prenda superior entre sí o con la pareja opuesta y debe usarla durante las próximas 3 rondas. |
+| 107 | Reto | Recorrido de labios: Cada pareja debe recorrer con sus labios o un hielo el cuello y pecho de su compañero desde la mandíbula hasta el abdomen por 25 segundos. |
+| 108 | Reto | Pacto sin límites: Todo el grupo acuerda una acción atrevida consensuada para celebrar la ronda. Quien se niegue debe quitarse dos prendas de inmediato. |

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { GameMode, IntensityLevel, Player, Settings, GameStats, Question, PlayerStats, UserProgress, Achievement, DailyChallengeProgress, Screen } from './src/types';
+import { GameMode, IntensityLevel, Player, Settings, GameStats, Question, PlayerStats, UserProgress, Achievement, DailyChallengeProgress, Screen, GroupInteractionContext } from './src/types';
 // Note: Navigation uses a lightweight hand-rolled state machine (useState<Screen> + ScreenTransition)
 // rather than @react-navigation to optimize bundle size and startup speed for mobile and web.
 import ModeSelectionScreen from './src/screens/ModeSelectionScreen';
@@ -176,6 +176,7 @@ export default function App() {
   const [intensityLevel, setIntensityLevel] = useState<IntensityLevel>('mild');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [targetPlayer, setTargetPlayer] = useState<Player | null>(null);
+  const [groupContext, setGroupContext] = useState<GroupInteractionContext | null>(null);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [stats, setStats] = useState<GameStats>(defaultStats);
   const [customQuestions, setCustomQuestions] = useState<Question[]>([]);
@@ -328,41 +329,41 @@ export default function App() {
     navigateToScreen('game');
   };
 
-  const handlePlayerSelected = (player: Player, target?: Player) => {
+  const handlePlayerSelected = (player: Player, target?: Player, context?: GroupInteractionContext) => {
     setSelectedPlayer(player);
     setTargetPlayer(target || null);
+    setGroupContext(context || null);
 
     // Update stats - track this player
     const newStats = { ...stats };
     newStats.totalRounds += 1;
 
-    // Find or create player stats
-    let playerStat = newStats.currentSession.find(p => p.playerId === player.id);
-    if (!playerStat) {
-      playerStat = {
-        playerId: player.id,
-        color: player.color,
-        timesSelected: 0,
-        daresCompleted: 0,
-        daresSkipped: 0,
-      };
-      newStats.currentSession.push(playerStat);
-    }
-    playerStat.timesSelected += 1;
-
-    if (target) {
-      let targetStat = newStats.currentSession.find(p => p.playerId === target.id);
-      if (!targetStat) {
-        targetStat = {
-          playerId: target.id,
-          color: target.color,
+    // Helper to ensure player exists in session stats
+    const trackPlayer = (p: Player) => {
+      let pStat = newStats.currentSession.find(s => s.playerId === p.id);
+      if (!pStat) {
+        pStat = {
+          playerId: p.id,
+          color: p.color,
           timesSelected: 0,
           daresCompleted: 0,
           daresSkipped: 0,
         };
-        newStats.currentSession.push(targetStat);
+        newStats.currentSession.push(pStat);
       }
-      targetStat.timesSelected += 1;
+      pStat.timesSelected += 1;
+    };
+
+    if (context?.pairs && context.pairs.length > 0) {
+      context.pairs.forEach(pair => {
+        trackPlayer(pair.player1);
+        trackPlayer(pair.player2);
+      });
+    } else {
+      trackPlayer(player);
+      if (target) {
+        trackPlayer(target);
+      }
     }
 
     saveStats(newStats);
@@ -449,6 +450,7 @@ export default function App() {
 
     // Move to next round
     setSelectedPlayer(null);
+    setGroupContext(null);
     navigateToScreen('game');
   };
 
@@ -491,12 +493,14 @@ export default function App() {
 
     // Move to next round
     setSelectedPlayer(null);
+    setGroupContext(null);
     navigateToScreen('game');
   };
 
   const handleBackToMode = () => {
     navigateToScreen('mode');
     setSelectedPlayer(null);
+    setGroupContext(null);
     setUsedQuestionIds([]);
     setPlayerSkipCounts(new Map());
   };
@@ -663,6 +667,7 @@ export default function App() {
             <ImprovedQuestionScreen
               player={selectedPlayer}
               targetPlayer={targetPlayer}
+              groupContext={groupContext}
               mode={gameMode}
               level={intensityLevel}
               settings={settings}

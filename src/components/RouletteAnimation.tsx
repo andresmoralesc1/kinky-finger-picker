@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Animated, StyleSheet, Dimensions } from 'react-native';
-import { Player, GameMode } from '../types';
+import { Player, GameMode, GroupInteractionContext, PlayerPair } from '../types';
 import * as Haptics from 'expo-haptics';
 import { soundManager } from '../utils/sounds';
 
 interface Props {
   players: Player[];
   mode?: GameMode;
-  onComplete: (selectedPlayer: Player, targetPlayer: Player) => void;
+  onComplete: (selectedPlayer: Player, targetPlayer: Player, groupContext?: GroupInteractionContext) => void;
 }
 
 export default function RouletteAnimation({ players, mode = 'hetero', onComplete }: Props) {
   const screenWidth = Dimensions.get('window').width;
+  const isGroupEven = players.length >= 4 && players.length % 2 === 0;
 
   // Separate players into Left (e.g. Female / 1-5) and Right (e.g. Male / 6-0)
   const leftSidePlayers = players.filter(
@@ -117,22 +118,54 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
               }),
             ]).start(() => {
               safeTimeout(() => {
-                let actor: Player;
-                let target: Player;
+                if (isGroupEven) {
+                  // Pair up all players into couples (2, 3 or 4 couples)
+                  const pairs: PlayerPair[] = [];
+                  if (hasBothSides && leftSidePlayers.length === rightSidePlayers.length) {
+                    const shuffledL = [...leftSidePlayers].sort(() => 0.5 - Math.random());
+                    const shuffledR = [...rightSidePlayers].sort(() => 0.5 - Math.random());
+                    for (let i = 0; i < shuffledL.length; i++) {
+                      pairs.push({
+                        pairIndex: i + 1,
+                        player1: shuffledL[i],
+                        player2: shuffledR[i],
+                      });
+                    }
+                  } else {
+                    const shuffled = [...players].sort(() => 0.5 - Math.random());
+                    for (let i = 0; i < shuffled.length; i += 2) {
+                      pairs.push({
+                        pairIndex: (i / 2) + 1,
+                        player1: shuffled[i],
+                        player2: shuffled[i + 1],
+                      });
+                    }
+                  }
 
-                if (hasBothSides) {
-                  const left = leftSidePlayers[leftIdxRef.current];
-                  const right = rightSidePlayers[rightIdxRef.current];
-                  // 50% chance Left is actor, 50% chance Right is actor
-                  const leftActs = Math.random() < 0.5;
-                  actor = leftActs ? left : right;
-                  target = leftActs ? right : left;
+                  const groupContext: GroupInteractionContext = {
+                    totalPlayers: players.length,
+                    pairs,
+                    interactionType: 'couples',
+                  };
+
+                  onComplete(pairs[0].player1, pairs[0].player2, groupContext);
                 } else {
-                  actor = players[aIdxRef.current];
-                  target = players[bIdxRef.current] || players[(aIdxRef.current + 1) % players.length];
-                }
+                  let actor: Player;
+                  let target: Player;
 
-                onComplete(actor, target);
+                  if (hasBothSides) {
+                    const left = leftSidePlayers[leftIdxRef.current];
+                    const right = rightSidePlayers[rightIdxRef.current];
+                    const leftActs = Math.random() < 0.5;
+                    actor = leftActs ? left : right;
+                    target = leftActs ? right : left;
+                  } else {
+                    actor = players[aIdxRef.current];
+                    target = players[bIdxRef.current] || players[(aIdxRef.current + 1) % players.length];
+                  }
+
+                  onComplete(actor, target);
+                }
               }, 600);
             });
           }, 250);
@@ -149,6 +182,10 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
   }, []);
 
   const isPlayerHighlighted = (player: Player) => {
+    if (isGroupEven && isDone) {
+      // In group even mode, highlight everyone upon completion as couples
+      return true;
+    }
     if (hasBothSides) {
       const leftPlayer = leftSidePlayers[highlightedLeftIdx];
       const rightPlayer = rightSidePlayers[highlightedRightIdx];
