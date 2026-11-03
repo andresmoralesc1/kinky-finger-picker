@@ -131,6 +131,48 @@ export const questions: Question[] = [
     type: 'dare',
     category: 'classic'
   },
+  {
+    id: 'mild_classic_11',
+    text: '¿Qué cualidad o valor hace que alguien pase de gustarte físicamente a atraerte profundamente el alma?',
+    level: 'mild',
+    type: 'question',
+    category: 'classic'
+  },
+  {
+    id: 'mild_classic_12',
+    text: 'Pon tu mano sobre el pecho de {target} durante 15 segundos y sientan los latidos de su corazón en silencio mirándose a los ojos.',
+    level: 'mild',
+    type: 'dare',
+    category: 'classic'
+  },
+  {
+    id: 'mild_classic_13',
+    text: 'Si tuviéramos una conversación a las 3 de la mañana sin pantallas ni distracciones, ¿de qué te gustaría hablar con {target}?',
+    level: 'mild',
+    type: 'question',
+    category: 'classic'
+  },
+  {
+    id: 'mild_classic_14',
+    text: 'Toma las dos manos de {target}, míralo/a a los ojos y dile qué sensación o energía te despierta su presencia en este instante.',
+    level: 'mild',
+    type: 'dare',
+    category: 'classic'
+  },
+  {
+    id: 'mild_classic_15',
+    text: '¿Cuál ha sido el cumplido más significativo que te han hecho en tu vida y por qué se quedó grabado en ti?',
+    level: 'mild',
+    type: 'question',
+    category: 'classic'
+  },
+  {
+    id: 'mild_classic_16',
+    text: 'Cuéntale a {target} un recuerdo o sueño de tu vida que casi nadie conozca y que te haga sonreír.',
+    level: 'mild',
+    type: 'dare',
+    category: 'classic'
+  },
 
   // MILD LEVEL - ROMANTIC
   {
@@ -199,6 +241,76 @@ export const questions: Question[] = [
   {
     id: 'mild_romantic_10',
     text: 'Dedícale a {target} una frase poética o un piropo improvisado con mucha elegancia.',
+    level: 'mild',
+    type: 'dare',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_11',
+    text: '¿Qué significa para ti \'hacer clic\' con alguien? ¿Sientes que la química se construye o surge de inmediato?',
+    level: 'mild',
+    type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_12',
+    text: 'Acaricia suavemente el dorso de la mano de {target} trazando círculos lentos mientras le dices qué te transmite su mirada.',
+    level: 'mild',
+    type: 'dare',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_13',
+    text: '¿Cuál es tu lenguaje del amor predominante: palabras de afirmación, tiempo de calidad, caricias físicas, detalles o actos de servicio?',
+    level: 'mild',
+    type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_14',
+    text: 'Apoya tu frente suavemente contra la de {target} por 10 segundos con los ojos cerrados respirando al mismo ritmo.',
+    level: 'mild',
+    type: 'dare',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_15',
+    text: '¿Qué pequeño detalle diario hace que te sientas verdaderamente querido/a y valorado/a por alguien?',
+    level: 'mild',
+    type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_16',
+    text: 'Acércate a {target} y susúrrale al oído qué fue lo más encantador que notaste de su risa o actitud hoy.',
+    level: 'mild',
+    type: 'dare',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_17',
+    text: '¿Recuerdas alguna vez en la que una simple mirada te aceleró el pulso? Descríbele esa sensación a {target}.',
+    level: 'mild',
+    type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_18',
+    text: 'Elige una canción imaginaria y baila pegadito/a con {target} durante 20 segundos abrazándole por la cintura o los hombros.',
+    level: 'mild',
+    type: 'dare',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_19',
+    text: '¿Qué es lo más valiente o auténtico que has hecho o te gustaría hacer por amor?',
+    level: 'mild',
+    type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'mild_romantic_20',
+    text: 'Miren fijamente a los ojos de {target} durante 20 segundos sin hablar, dejando que solo la mirada exprese lo que sienten en el momento.',
     level: 'mild',
     type: 'dare',
     category: 'romantic'
@@ -403,6 +515,62 @@ export const questions: Question[] = [
     text: 'Confiesa con sinceridad qué pensamiento atrevido se te cruzó por la mente al ver a {target} hoy.',
     level: 'spicy',
     type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'spicy_romantic_9',
+    text: '¿Qué tipo de caricia o beso es el que más rápido te eriza la piel y te hace suspirar?',
+    level: 'spicy',
+    type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'spicy_romantic_10',
+    text: 'Pasa la yema de tus dedos rozando el cuello de {target} desde la nuca hasta la clavícula muy lentamente.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'romantic'
+  },
+  {
+    id: 'spicy_romantic_11',
+    text: '¿Qué detalle, actitud o perfume en alguien te resulta inmediatamente magnético e irresistible?',
+    level: 'spicy',
+    type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'spicy_romantic_12',
+    text: 'Susúrrale al oído a {target} una confesión íntima de lo que te gustaría decirle a solas al despedirse hoy.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'romantic'
+  },
+  {
+    id: 'spicy_romantic_13',
+    text: '¿Prefieres los besos lentos y tiernos que van subiendo de intensidad o los besos apasionados e inesperados?',
+    level: 'spicy',
+    type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'spicy_romantic_14',
+    text: 'Tómale el mentón a {target} con delicadeza, acércate a un centímetro de sus labios por 5 segundos y dale un beso dulce en la comisura.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'romantic'
+  },
+  {
+    id: 'spicy_romantic_15',
+    text: '¿Cuál es tu fantasía romántica más soñada para una velada o escapada de fin de semana con alguien especial?',
+    level: 'spicy',
+    type: 'question',
+    category: 'romantic'
+  },
+  {
+    id: 'spicy_romantic_16',
+    text: 'Entrelaza tus dedos con los de {target} a la altura del pecho y dile una verdad honesta que te inspire su cercanía.',
+    level: 'spicy',
+    type: 'dare',
     category: 'romantic'
   },
 
