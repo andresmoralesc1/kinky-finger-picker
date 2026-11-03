@@ -46,6 +46,22 @@ export default function ModeSelectionScreen({
 
   return (
     <View style={styles.container}>
+      {/* Full-screen Background: Tacón Rojo */}
+      <Image
+        source={require('../../assets/red-heel.jpg')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      />
+      {/* Dark Vignette & Gradient Overlay for perfect contrast */}
+      <LinearGradient
+        colors={[
+          'rgba(5, 0, 1, 0.72)',
+          'rgba(14, 0, 3, 0.84)',
+          'rgba(5, 0, 1, 0.94)',
+        ] as const}
+        style={styles.backgroundOverlay}
+      />
+
       <ScrollView
         style={styles.scrollWrapper}
         contentContainerStyle={styles.scrollContent}
@@ -119,26 +135,6 @@ export default function ModeSelectionScreen({
                 tagline="Pon tus dedos en la pantalla y rompe el hielo"
               />
             </View>
-          </View>
-
-          {/* Hero Banner: Tacón Rojo */}
-          <View style={styles.heroBannerCard}>
-            <Image
-              source={require('../../assets/red-heel.jpg')}
-              style={styles.heroBannerImage}
-              resizeMode="cover"
-            />
-            <LinearGradient
-              colors={['transparent', 'rgba(10, 0, 2, 0.4)', 'rgba(10, 0, 2, 0.95)'] as const}
-              style={styles.heroBannerGradient}
-            >
-              <View style={styles.heroBannerPill}>
-                <Text style={styles.heroBannerPillText}>👠 NOCHES SALVAJES</Text>
-              </View>
-              <Text style={styles.heroBannerCaption}>
-                Atrévete a romper el hielo con desafíos picantes
-              </Text>
-            </LinearGradient>
           </View>
 
           {/* Compact Quick Play Button */}
@@ -329,59 +325,15 @@ const styles = StyleSheet.create({
     color: '#ccc',
     marginTop: 2,
   },
-  heroBannerCard: {
-    width: '100%',
-    height: 155,
-    borderRadius: 20,
-    overflow: 'hidden',
-    marginBottom: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(229, 9, 20, 0.45)',
-    backgroundColor: '#0A0002',
-    position: 'relative',
-    shadowColor: '#E50914',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    elevation: 6,
-  },
-  heroBannerImage: {
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
   },
-  heroBannerGradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    top: 0,
-    justifyContent: 'flex-end',
-    padding: 14,
-  },
-  heroBannerPill: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(229, 9, 20, 0.35)',
-    borderWidth: 1,
-    borderColor: 'rgba(229, 9, 20, 0.7)',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    marginBottom: 4,
-  },
-  heroBannerPillText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
-  heroBannerCaption: {
-    color: '#EEEEEE',
-    fontSize: 13,
-    fontWeight: '600',
-    textShadowColor: 'rgba(0, 0, 0, 0.9)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
+  backgroundOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
   },
   quickPlayTouchable: {
     width: '100%',
