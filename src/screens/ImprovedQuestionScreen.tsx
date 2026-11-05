@@ -19,7 +19,7 @@ interface Props {
   settings: Settings;
   usedQuestionIds: string[];
   skipCount: number;
-  onComplete: (questionId: string) => void;
+  onComplete: (questionId: string, category?: string) => void;
   onSkip: (questionId: string) => void;
   onChangeLevelUp: () => void;
   onChangeLevelDown: () => void;
@@ -46,7 +46,7 @@ export default function ImprovedQuestionScreen({
   const isGroupRound = Boolean(groupContext && groupContext.pairs && groupContext.pairs.length > 0);
 
   const [question, setQuestion] = useState(() =>
-    getRandomQuestion(level, settings.categories, usedQuestionIds, isGroupRound)
+    getRandomQuestion(level, settings.categories, usedQuestionIds, isGroupRound, groupContext?.interactionType)
   );
 
   // Stable level change listener: only picks new question when levelUp or levelDown is clicked
@@ -54,9 +54,9 @@ export default function ImprovedQuestionScreen({
   useEffect(() => {
     if (currentLevelRef.current !== level) {
       currentLevelRef.current = level;
-      setQuestion(getRandomQuestion(level, settings.categories, usedQuestionIds, isGroupRound));
+      setQuestion(getRandomQuestion(level, settings.categories, usedQuestionIds, isGroupRound, groupContext?.interactionType));
     }
-  }, [level, settings.categories, usedQuestionIds, isGroupRound]);
+  }, [level, settings.categories, usedQuestionIds, isGroupRound, groupContext?.interactionType]);
 
   const formattedQuestionText = useMemo(() => {
     if (groupContext && groupContext.pairs && groupContext.pairs.length > 0) {
@@ -175,7 +175,7 @@ export default function ImprovedQuestionScreen({
 
   const handleComplete = () => {
     soundManager.playSound('complete');
-    onComplete(question.id);
+    onComplete(question.id, question.category);
   };
 
   const handleSkip = () => {
@@ -213,7 +213,7 @@ export default function ImprovedQuestionScreen({
 
   const canSkip = skipCount < settings.skipLimit;
 
-  const handleSwipeComplete = () => onComplete(question.id);
+  const handleSwipeComplete = () => onComplete(question.id, question.category);
   const handleSwipeSkip = () => {
     if (canSkip) handleSkip();
   };
@@ -248,45 +248,153 @@ export default function ImprovedQuestionScreen({
             <View style={styles.groupContainer}>
               <View style={styles.groupBanner}>
                 <Text style={styles.groupBannerText}>
-                  {groupContext.totalPlayers === 4
-                    ? '🔥 DINÁMICA DE CUARTETO (2 PAREJAS)'
-                    : `🔥 DINÁMICA GRUPAL (${groupContext.totalPlayers} JUGADORES - ${groupContext.pairs.length} PAREJAS)`}
+                  {groupContext.title || (groupContext.totalPlayers === 4
+                    ? '🔥 DUELO DE PAREJAS (2vs2)'
+                    : `🔥 DINÁMICA GRUPAL (${groupContext.totalPlayers} JUGADORES)`)}
                 </Text>
               </View>
-              <View style={styles.pairsRow}>
-                {groupContext.pairs.map((pair, pIdx) => (
-                  <React.Fragment key={pair.pairIndex}>
-                    <View style={styles.pairBox}>
-                      <Text style={styles.pairBoxTitle}>Pareja {pair.pairIndex}</Text>
-                      <View style={styles.pairDots}>
-                        {/* Player 1 */}
-                        <View style={[styles.groupDot, { backgroundColor: pair.player1.color }]}>
-                          <Text style={styles.groupDotNumber}>
-                            {pair.player1.id >= 1001 && pair.player1.id <= 1010
-                              ? (pair.player1.id === 1010 ? '0' : pair.player1.id - 1000)
-                              : (pair.player1.gender === 'female' ? '♀️' : pair.player1.gender === 'male' ? '♂️' : `${pair.pairIndex}A`)}
+
+              {groupContext.targetDescription ? (
+                <Text style={styles.groupSubDescription}>{groupContext.targetDescription}</Text>
+              ) : null}
+
+              {/* Mode: ALL VS ONE (3 pa 1) */}
+              {groupContext.interactionType === 'all_vs_one' ? (
+                <View style={styles.allVsOneRow}>
+                  {/* Solo player in spotlight */}
+                  <View style={styles.soloHighlightCard}>
+                    <Text style={styles.soloHighlightLabel}>👑 EN EL BLANCO</Text>
+                    <View style={[styles.groupDotLarge, { backgroundColor: (groupContext.soloPlayer || player).color }]}>
+                      <Text style={styles.groupDotNumberLarge}>
+                        {(groupContext.soloPlayer || player).id >= 1001 && (groupContext.soloPlayer || player).id <= 1010
+                          ? ((groupContext.soloPlayer || player).id === 1010 ? '0' : (groupContext.soloPlayer || player).id - 1000)
+                          : ((groupContext.soloPlayer || player).gender === 'female' ? '♀️' : (groupContext.soloPlayer || player).gender === 'male' ? '♂️' : '1')}
+                      </Text>
+                    </View>
+                    <Text style={styles.soloName}>
+                      {(groupContext.soloPlayer || player).name || ((groupContext.soloPlayer || player).gender === 'female' ? 'Ella' : (groupContext.soloPlayer || player).gender === 'male' ? 'Él' : 'Elegido')}
+                    </Text>
+                  </View>
+
+                  <View style={styles.groupVsContainer}>
+                    <Text style={styles.groupVsText}>⚡</Text>
+                    <Text style={styles.groupVsSub}>VS</Text>
+                  </View>
+
+                  {/* The rest of the group */}
+                  <View style={styles.groupTeamCard}>
+                    <Text style={styles.groupTeamLabel}>
+                      👥 EL GRUPO ({groupContext.groupMembers?.length || groupContext.totalPlayers - 1})
+                    </Text>
+                    <View style={styles.groupTeamDots}>
+                      {(groupContext.groupMembers || [targetPlayer]).filter(Boolean).map((member, mIdx) => (
+                        <View key={member!.id || mIdx} style={[styles.groupDotSmall, { backgroundColor: member!.color }]}>
+                          <Text style={styles.groupDotNumberSmall}>
+                            {member!.id >= 1001 && member!.id <= 1010
+                              ? (member!.id === 1010 ? '0' : member!.id - 1000)
+                              : (member!.gender === 'female' ? '♀️' : member!.gender === 'male' ? '♂️' : `${mIdx + 1}`)}
                           </Text>
                         </View>
-                        <Text style={styles.pairPlus}>+</Text>
-                        {/* Player 2 */}
-                        <View style={[styles.groupDot, { backgroundColor: pair.player2.color }]}>
-                          <Text style={styles.groupDotNumber}>
-                            {pair.player2.id >= 1001 && pair.player2.id <= 1010
-                              ? (pair.player2.id === 1010 ? '0' : pair.player2.id - 1000)
-                              : (pair.player2.gender === 'female' ? '♀️' : pair.player2.gender === 'male' ? '♂️' : `${pair.pairIndex}B`)}
-                          </Text>
-                        </View>
+                      ))}
+                    </View>
+                    <Text style={styles.groupTeamRole}>Jueces del Reto</Text>
+                  </View>
+                </View>
+              ) : groupContext.interactionType === 'single_pair' && groupContext.pairs.length > 0 ? (
+                /* Mode: SINGLE PAIR PROTAGONIST */
+                <View style={styles.singlePairCenterRow}>
+                  <View style={styles.singlePairCard}>
+                    <View style={styles.pairDots}>
+                      <View style={[styles.groupDotLarge, { backgroundColor: groupContext.pairs[0].player1.color }]}>
+                        <Text style={styles.groupDotNumberLarge}>
+                          {groupContext.pairs[0].player1.id >= 1001 && groupContext.pairs[0].player1.id <= 1010
+                            ? (groupContext.pairs[0].player1.id === 1010 ? '0' : groupContext.pairs[0].player1.id - 1000)
+                            : (groupContext.pairs[0].player1.gender === 'female' ? '♀️' : groupContext.pairs[0].player1.gender === 'male' ? '♂️' : '1A')}
+                        </Text>
+                      </View>
+                      <Text style={styles.singlePairHeart}>❤️</Text>
+                      <View style={[styles.groupDotLarge, { backgroundColor: groupContext.pairs[0].player2.color }]}>
+                        <Text style={styles.groupDotNumberLarge}>
+                          {groupContext.pairs[0].player2.id >= 1001 && groupContext.pairs[0].player2.id <= 1010
+                            ? (groupContext.pairs[0].player2.id === 1010 ? '0' : groupContext.pairs[0].player2.id - 1000)
+                            : (groupContext.pairs[0].player2.gender === 'female' ? '♀️' : groupContext.pairs[0].player2.gender === 'male' ? '♂️' : '1B')}
+                        </Text>
                       </View>
                     </View>
-                    {pIdx < groupContext.pairs.length - 1 && (
-                      <View style={styles.groupVsContainer}>
-                        <Text style={styles.groupVsText}>⚔️</Text>
-                        <Text style={styles.groupVsSub}>VS</Text>
+                    <Text style={styles.singlePairCardTitle}>
+                      {groupContext.pairs[0].player1.name && groupContext.pairs[0].player2.name
+                        ? `${groupContext.pairs[0].player1.name} y ${groupContext.pairs[0].player2.name}`
+                        : 'Pareja Protagonista'}
+                    </Text>
+                  </View>
+                </View>
+              ) : groupContext.interactionType === 'cross_couples' && groupContext.pairs.length >= 2 ? (
+                /* Mode: CROSS COUPLES */
+                <View style={styles.crossCouplesRow}>
+                  <View style={styles.pairBox}>
+                    <Text style={styles.pairBoxTitle}>De Pareja 1</Text>
+                    <View style={[styles.groupDot, { backgroundColor: groupContext.pairs[0].player1.color }]}>
+                      <Text style={styles.groupDotNumber}>
+                        {groupContext.pairs[0].player1.id >= 1001 && groupContext.pairs[0].player1.id <= 1010
+                          ? (groupContext.pairs[0].player1.id === 1010 ? '0' : groupContext.pairs[0].player1.id - 1000)
+                          : (groupContext.pairs[0].player1.gender === 'female' ? '♀️' : groupContext.pairs[0].player1.gender === 'male' ? '♂️' : '1')}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.groupVsContainer}>
+                    <Text style={styles.groupVsText}>🔀</Text>
+                    <Text style={styles.groupVsSub}>CRUCE</Text>
+                  </View>
+
+                  <View style={styles.pairBox}>
+                    <Text style={styles.pairBoxTitle}>De Pareja 2</Text>
+                    <View style={[styles.groupDot, { backgroundColor: groupContext.pairs[1].player2.color }]}>
+                      <Text style={styles.groupDotNumber}>
+                        {groupContext.pairs[1].player2.id >= 1001 && groupContext.pairs[1].player2.id <= 1010
+                          ? (groupContext.pairs[1].player2.id === 1010 ? '0' : groupContext.pairs[1].player2.id - 1000)
+                          : (groupContext.pairs[1].player2.gender === 'female' ? '♀️' : groupContext.pairs[1].player2.gender === 'male' ? '♂️' : '2')}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              ) : (
+                /* Mode: COUPLES (Standard Duelo) */
+                <View style={styles.pairsRow}>
+                  {groupContext.pairs.map((pair, pIdx) => (
+                    <React.Fragment key={pair.pairIndex}>
+                      <View style={styles.pairBox}>
+                        <Text style={styles.pairBoxTitle}>Pareja {pair.pairIndex}</Text>
+                        <View style={styles.pairDots}>
+                          {/* Player 1 */}
+                          <View style={[styles.groupDot, { backgroundColor: pair.player1.color }]}>
+                            <Text style={styles.groupDotNumber}>
+                              {pair.player1.id >= 1001 && pair.player1.id <= 1010
+                                ? (pair.player1.id === 1010 ? '0' : pair.player1.id - 1000)
+                                : (pair.player1.gender === 'female' ? '♀️' : pair.player1.gender === 'male' ? '♂️' : `${pair.pairIndex}A`)}
+                            </Text>
+                          </View>
+                          <Text style={styles.pairPlus}>+</Text>
+                          {/* Player 2 */}
+                          <View style={[styles.groupDot, { backgroundColor: pair.player2.color }]}>
+                            <Text style={styles.groupDotNumber}>
+                              {pair.player2.id >= 1001 && pair.player2.id <= 1010
+                                ? (pair.player2.id === 1010 ? '0' : pair.player2.id - 1000)
+                                : (pair.player2.gender === 'female' ? '♀️' : pair.player2.gender === 'male' ? '♂️' : `${pair.pairIndex}B`)}
+                            </Text>
+                          </View>
+                        </View>
                       </View>
-                    )}
-                  </React.Fragment>
-                ))}
-              </View>
+                      {pIdx < groupContext.pairs.length - 1 && (
+                        <View style={styles.groupVsContainer}>
+                          <Text style={styles.groupVsText}>⚔️</Text>
+                          <Text style={styles.groupVsSub}>VS</Text>
+                        </View>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </View>
+              )}
             </View>
           ) : targetPlayer ? (
             <View style={styles.pairHeaderContainer}>
@@ -503,7 +611,7 @@ export default function ImprovedQuestionScreen({
                 onPress={() => {
                   setShowPunishmentModal(false);
                   soundManager.playSound('complete');
-                  onComplete(question.id);
+                  onComplete(question.id, question.category);
                 }}
               >
                 <Text style={styles.acceptPunishmentBtnText}>¡Cumplido! ✓</Text>
@@ -597,6 +705,144 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '900',
     letterSpacing: 0.5,
+  },
+  groupSubDescription: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 8,
+  },
+  allVsOneRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  soloHighlightCard: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(229, 9, 20, 0.15)',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: '#E50914',
+  },
+  soloHighlightLabel: {
+    color: '#FFA040',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  soloName: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+    marginTop: 4,
+  },
+  groupDotLarge: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 5,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  groupDotNumberLarge: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '900',
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  groupTeamCard: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  groupTeamLabel: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+    opacity: 0.9,
+  },
+  groupTeamDots: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexWrap: 'wrap',
+    maxWidth: 160,
+    justifyContent: 'center',
+  },
+  groupDotSmall: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  groupDotNumberSmall: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '900',
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  groupTeamRole: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 10,
+    fontWeight: '600',
+    marginTop: 4,
+  },
+  singlePairCenterRow: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  singlePairCard: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#E50914',
+  },
+  singlePairHeart: {
+    fontSize: 20,
+    marginHorizontal: 8,
+  },
+  singlePairCardTitle: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '800',
+    marginTop: 6,
+  },
+  crossCouplesRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 16,
   },
   pairsRow: {
     flexDirection: 'row',

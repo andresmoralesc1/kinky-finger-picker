@@ -15,6 +15,7 @@ export interface Question {
   isCustom?: boolean;
   minPlayers?: number;
   groupOnly?: boolean;
+  groupMode?: 'couples' | 'cross_couples' | 'group' | 'all_vs_one' | 'single_pair' | 'trio_vs_one';
 }
 
 export interface TouchPoint {
@@ -42,7 +43,11 @@ export interface PlayerPair {
 export interface GroupInteractionContext {
   totalPlayers: number;
   pairs: PlayerPair[];
-  interactionType: 'couples' | 'cross_couples' | 'group';
+  interactionType: 'couples' | 'cross_couples' | 'group' | 'all_vs_one' | 'single_pair' | 'trio_vs_one';
+  title?: string;
+  targetDescription?: string;
+  soloPlayer?: Player;
+  groupMembers?: Player[];
 }
 
 export interface PlayerStats {

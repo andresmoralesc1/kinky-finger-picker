@@ -123,7 +123,7 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
               // Keep selected players glowing and illuminated for a noticeable, satisfying pause
               safeTimeout(() => {
                 if (isGroupEven) {
-                  // Pair up all players into couples (2, 3 or 4 couples)
+                  // Pair up all players into base couples
                   const pairs: PlayerPair[] = [];
                   if (hasBothSides && leftSidePlayers.length === rightSidePlayers.length) {
                     const shuffledL = [...leftSidePlayers].sort(() => 0.5 - Math.random());
@@ -146,13 +146,63 @@ export default function RouletteAnimation({ players, mode = 'hetero', onComplete
                     }
                   }
 
+                  // Pick group dynamic mode
+                  // Supported modes: 'couples' (Duelo), 'all_vs_one' (3 pa 1 / Todos contra 1), 'single_pair' (1 pareja al centro), 'cross_couples' (Intercambio)
+                  const modes: Array<'couples' | 'all_vs_one' | 'single_pair' | 'cross_couples'> = [
+                    'all_vs_one',
+                    'couples',
+                    'single_pair',
+                    'cross_couples',
+                  ];
+                  const chosenMode = modes[Math.floor(Math.random() * modes.length)];
+
+                  // Random solo player for all_vs_one
+                  const randomSoloIndex = Math.floor(Math.random() * players.length);
+                  const soloPlayer = players[randomSoloIndex];
+                  const groupMembers = players.filter((_, idx) => idx !== randomSoloIndex);
+
+                  let title = '';
+                  let targetDescription = '';
+
+                  switch (chosenMode) {
+                    case 'all_vs_one':
+                      title = `🎯 TODOS CONTRA UNO (${players.length - 1} PARA 1)`;
+                      targetDescription = `¡1 jugador en el blanco frente a los otros ${players.length - 1}!`;
+                      break;
+                    case 'single_pair':
+                      title = '👑 PAREJA ELEGIDA DEL GRUPO';
+                      targetDescription = 'Esta pareja fue seleccionada al centro. ¡Los demás son jueces!';
+                      break;
+                    case 'cross_couples':
+                      title = '🔀 INTERCAMBIO CRUZADO';
+                      targetDescription = '¡Tensión entre parejas! Conexión cruzada entre participantes.';
+                      break;
+                    case 'couples':
+                    default:
+                      title = players.length === 4
+                        ? '🔥 DUELO DE PAREJAS (2vs2)'
+                        : `🔥 DINÁMICA DE ${pairs.length} PAREJAS`;
+                      targetDescription = 'Todas las parejas participan al unísono o compiten entre sí.';
+                      break;
+                  }
+
                   const groupContext: GroupInteractionContext = {
                     totalPlayers: players.length,
                     pairs,
-                    interactionType: 'couples',
+                    interactionType: chosenMode,
+                    title,
+                    targetDescription,
+                    soloPlayer,
+                    groupMembers,
                   };
 
-                  onComplete(pairs[0].player1, pairs[0].player2, groupContext);
+                  if (chosenMode === 'all_vs_one') {
+                    onComplete(soloPlayer, groupMembers[0], groupContext);
+                  } else if (chosenMode === 'cross_couples' && pairs.length >= 2) {
+                    onComplete(pairs[0].player1, pairs[1].player2, groupContext);
+                  } else {
+                    onComplete(pairs[0].player1, pairs[0].player2, groupContext);
+                  }
                 } else {
                   let actor: Player;
                   let target: Player;

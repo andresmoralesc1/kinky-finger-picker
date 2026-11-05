@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, Dimensions, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { Achievement } from '../types';
@@ -78,99 +78,116 @@ export default function AchievementUnlockedModal({ achievement, onClose }: Props
   };
 
   return (
-    <View style={styles.overlay}>
-      <Animated.View
-        style={[
-          styles.backdrop,
-          {
-            opacity: fadeAnim,
-          },
-        ]}
-      />
-
-      {/* Confetti */}
-      <ConfettiEffect colors={[rarityColor, '#E50914', '#fff']} particleCount={80} />
-
-      {/* Achievement Card */}
-      <Animated.View
-        style={[
-          styles.card,
-          {
-            transform: [{ scale: scaleAnim }],
-            opacity: fadeAnim,
-          },
-        ]}
-      >
-        {/* Glow effect */}
-        <Animated.View
-          style={[
-            styles.glowEffect,
-            {
-              backgroundColor: getRarityGlow(achievement.rarity),
-              opacity: glowOpacity,
-            },
-          ]}
+    <Modal
+      visible={true}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={onClose}
+      statusBarTranslucent={true}
+    >
+      <View style={styles.overlay}>
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.backdrop}
+          onPress={onClose}
+          accessibilityLabel="Cerrar modal"
+          accessibilityRole="button"
         />
 
-        <LinearGradient
-          colors={['#1a1a1a', '#0a0a0a']}
-          style={styles.cardContent}
+        {/* Confetti */}
+        <ConfettiEffect colors={[rarityColor, '#E50914', '#fff']} particleCount={80} />
+
+        {/* Achievement Card */}
+        <Animated.View
+          style={[
+            styles.card,
+            {
+              transform: [{ scale: scaleAnim }],
+              opacity: fadeAnim,
+            },
+          ]}
         >
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.unlockLabel}>🎉 ¡LOGRO DESBLOQUEADO!</Text>
-          </View>
+          {/* Glow effect */}
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.glowEffect,
+              {
+                backgroundColor: getRarityGlow(achievement.rarity),
+                opacity: glowOpacity,
+              },
+            ]}
+          />
 
-          {/* Icon */}
-          <View style={[styles.iconContainer, { borderColor: rarityColor }]}>
-            <Animated.View
-              style={[
-                styles.iconGlow,
-                {
-                  borderColor: rarityColor,
-                  opacity: glowOpacity,
-                },
-              ]}
-            />
-            <Text style={styles.icon}>{achievement.icon}</Text>
-          </View>
+          <LinearGradient
+            colors={['#1a1a1a', '#0a0a0a']}
+            style={styles.cardContent}
+          >
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={styles.unlockLabel}>🎉 ¡LOGRO DESBLOQUEADO!</Text>
+            </View>
 
-          {/* Title & Description */}
-          <Text style={[styles.title, { color: rarityColor }]}>
-            {achievement.title}
-          </Text>
-          <Text style={styles.description}>{achievement.description}</Text>
+            {/* Icon */}
+            <View style={[styles.iconContainer, { borderColor: rarityColor }]}>
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  styles.iconGlow,
+                  {
+                    borderColor: rarityColor,
+                    opacity: glowOpacity,
+                  },
+                ]}
+              />
+              <Text style={styles.icon}>{achievement.icon}</Text>
+            </View>
 
-          {/* Rarity Badge */}
-          <View style={[styles.rarityBadge, { backgroundColor: rarityColor }]}>
-            <Text style={styles.rarityText}>
-              {RARITY_LABELS[achievement.rarity] || achievement.rarity.toUpperCase()}
+            {/* Title & Description */}
+            <Text style={[styles.title, { color: rarityColor }]}>
+              {achievement.title}
             </Text>
-          </View>
+            <Text style={styles.description}>{achievement.description}</Text>
 
-          {/* XP Reward */}
-          <View style={styles.xpContainer}>
-            <Text style={styles.xpLabel}>XP Ganada</Text>
-            <Text style={styles.xpValue}>+{achievement.xpReward}</Text>
-          </View>
+            {/* Rarity Badge */}
+            <View style={[styles.rarityBadge, { backgroundColor: rarityColor }]}>
+              <Text style={styles.rarityText}>
+                {RARITY_LABELS[achievement.rarity] || achievement.rarity.toUpperCase()}
+              </Text>
+            </View>
 
-          {/* Close Button */}
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>Continuar</Text>
-          </TouchableOpacity>
-        </LinearGradient>
-      </Animated.View>
-    </View>
+            {/* XP Reward */}
+            <View style={styles.xpContainer}>
+              <Text style={styles.xpLabel}>XP Ganada</Text>
+              <Text style={styles.xpValue}>+{achievement.xpReward}</Text>
+            </View>
+
+            {/* Close Button */}
+            <TouchableOpacity
+              style={styles.closeButton}
+              activeOpacity={0.7}
+              onPress={() => {
+                try {
+                  onClose();
+                } catch (err) {
+                  console.error('Error closing achievement modal:', err);
+                }
+              }}
+              accessibilityLabel="Continuar"
+              accessibilityRole="button"
+            >
+              <Text style={styles.closeButtonText}>Continuar</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+        </Animated.View>
+      </View>
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
   overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10000,

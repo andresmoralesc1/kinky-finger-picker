@@ -47,6 +47,7 @@ export function formatQuestionForGroup(
 ): string {
   let formatted = rawText;
 
+  // Format individual pairs
   groupContext.pairs.forEach((pair, idx) => {
     const pairNum = idx + 1;
     const p1Label = pair.player1.name
@@ -55,7 +56,7 @@ export function formatQuestionForGroup(
       ? 'Ella (♀️)'
       : pair.player1.gender === 'male'
       ? 'Él (♂️)'
-      : `Jugador 1`;
+      : (pair.player1.id >= 1001 && pair.player1.id <= 1010 ? `Jugador ${pair.player1.id === 1010 ? '0' : pair.player1.id - 1000}` : `Jugador ${pairNum}A`);
 
     const p2Label = pair.player2.name
       ? pair.player2.name
@@ -63,7 +64,7 @@ export function formatQuestionForGroup(
       ? 'Ella (♀️)'
       : pair.player2.gender === 'male'
       ? 'Él (♂️)'
-      : `Jugador 2`;
+      : (pair.player2.id >= 1001 && pair.player2.id <= 1010 ? `Jugador ${pair.player2.id === 1010 ? '0' : pair.player2.id - 1000}` : `Jugador ${pairNum}B`);
 
     const pairTitle = pair.player1.name && pair.player2.name
       ? `${pair.player1.name} y ${pair.player2.name}`
@@ -75,7 +76,50 @@ export function formatQuestionForGroup(
       .replace(new RegExp(`\\{P${pairNum}_J2\\}`, 'gi'), p2Label);
   });
 
-  return formatted;
+  // Format solo player for all_vs_one / trio_vs_one
+  if (groupContext.soloPlayer) {
+    const sp = groupContext.soloPlayer;
+    const soloLabel = sp.name
+      ? sp.name
+      : sp.gender === 'female'
+      ? 'Ella (♀️)'
+      : sp.gender === 'male'
+      ? 'Él (♂️)'
+      : (sp.id >= 1001 && sp.id <= 1010 ? `Jugador ${sp.id === 1010 ? '0' : sp.id - 1000}` : 'Jugador Elegido');
+
+    formatted = formatted
+      .replace(/\{PROTAGONISTA\}/gi, soloLabel)
+      .replace(/\{SOLO_PLAYER\}/gi, soloLabel);
+  }
+
+  // Format group members / rest of group
+  const groupCount = groupContext.groupMembers?.length || (groupContext.totalPlayers - 1);
+  const groupLabel = groupCount > 1 ? `los otros ${groupCount} participantes` : 'el resto del grupo';
+  formatted = formatted
+    .replace(/\{GRUPO\}/gi, groupLabel)
+    .replace(/\{RESTO\}/gi, groupLabel);
+
+  // Format single pair protagonist
+  if (groupContext.pairs.length > 0) {
+    const p1 = groupContext.pairs[0];
+    const pairTitle = p1.player1.name && p1.player2.name
+      ? `${p1.player1.name} y ${p1.player2.name}`
+      : `la Pareja 1`;
+    formatted = formatted.replace(/\{PAREJA_ELEGIDA\}/gi, pairTitle);
+  }
+
+  // Format cross couples
+  if (groupContext.pairs.length >= 2) {
+    const jc1 = groupContext.pairs[0].player1;
+    const jc2 = groupContext.pairs[1].player2;
+    const jc1Label = jc1.name || (jc1.gender === 'female' ? 'Ella (♀️)' : jc1.gender === 'male' ? 'Él (♂️)' : 'Jugador 1');
+    const jc2Label = jc2.name || (jc2.gender === 'female' ? 'Ella (♀️)' : jc2.gender === 'male' ? 'Él (♂️)' : 'Jugador 2');
+    formatted = formatted
+      .replace(/\{JUGADOR_CRUZADO_1\}/gi, jc1Label)
+      .replace(/\{JUGADOR_CRUZADO_2\}/gi, jc2Label);
+  }
+
+  return formatted.replace(/\ba a\b/gi, 'a');
 }
 
 export const questions: Question[] = [
@@ -1091,21 +1135,227 @@ export const groupQuestions: Question[] = [
     minPlayers: 4,
     groupOnly: true,
   },
+  // SPECIALIZED MULTI-MODE GROUP CHALLENGES (ALL VS 1, SINGLE PAIR & CROSS COUPLES)
+  // MILD - All vs 1
+  {
+    id: 'group_mild_all_vs_one_1',
+    text: '🎯 3 para 1 (Tribunal de preguntas): {PROTAGONISTA} está en el punto de mira. Cada uno de {GRUPO} le hace una pregunta sincera sobre sus gustos o amores, y debe responderlas todas sin dudar.',
+    level: 'mild',
+    type: 'question',
+    category: 'classic',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'all_vs_one',
+  },
+  {
+    id: 'group_mild_all_vs_one_2',
+    text: '🎯 3 para 1 (Lluvia de cumplidos): {GRUPO} se turnan para decirle a {PROTAGONISTA} el piropo o cumplido más dulce y sincero sobre su sonrisa o su energía.',
+    level: 'mild',
+    type: 'dare',
+    category: 'romantic',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'all_vs_one',
+  },
+  // MILD - Single Pair
+  {
+    id: 'group_mild_single_pair_1',
+    text: '👑 Pareja Elegida (Duelo de miradas): {PAREJA_ELEGIDA} son los protagonistas exclusivos. Deben mirarse fijamente a los ojos a 5 cm de distancia por 20 segundos mientras los demás hacen muecas para hacerlos reír.',
+    level: 'mild',
+    type: 'dare',
+    category: 'classic',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'single_pair',
+  },
+  {
+    id: 'group_mild_single_pair_2',
+    text: '👑 Pareja Elegida (Complicidad): {PAREJA_ELEGIDA} deben confesar ante el grupo qué apodo cariñoso o gesto especial comparten en privado.',
+    level: 'mild',
+    type: 'question',
+    category: 'romantic',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'single_pair',
+  },
+  // MILD - Cross Couples
+  {
+    id: 'group_mild_cross_1',
+    text: '🔀 Intercambio Cruzado: {JUGADOR_CRUZADO_1} y {JUGADOR_CRUZADO_2} cruzan miradas y se dicen mutuamente qué detalle o prenda del otro les llamó más la atención hoy.',
+    level: 'mild',
+    type: 'dare',
+    category: 'romantic',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'cross_couples',
+  },
+  {
+    id: 'group_mild_cross_2',
+    text: '🔀 Intercambio Cruzado (Saludo coqueto): {JUGADOR_CRUZADO_1} y {JUGADOR_CRUZADO_2} deben inventar en 15 segundos un saludo secreto con manos y abrazo.',
+    level: 'mild',
+    type: 'dare',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'cross_couples',
+  },
+
+  // SPICY - All vs 1
+  {
+    id: 'group_spicy_all_vs_one_1',
+    text: '🎯 3 para 1 (Interrogatorio ardiente): {GRUPO} eligen en consenso una pregunta íntima y comprometedora para {PROTAGONISTA}. Si no responde en 15 segundos, paga castigo/shot.',
+    level: 'spicy',
+    type: 'question',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'all_vs_one',
+  },
+  {
+    id: 'group_spicy_all_vs_one_2',
+    text: '🎯 3 para 1 (Masaje en equipo): {GRUPO} le darán un masaje relajante y tentador a {PROTAGONISTA} durante 30 segundos (hombros, cuello o manos) con los ojos cerrados.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'all_vs_one',
+  },
+  // SPICY - Single Pair
+  {
+    id: 'group_spicy_single_pair_1',
+    text: '👑 Pareja Elegida (Show de beso): {PAREJA_ELEGIDA} deben darse un beso apasionado de 15 segundos al centro del grupo, mientras el resto califica la química del 1 al 10.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'romantic',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'single_pair',
+  },
+  {
+    id: 'group_spicy_single_pair_2',
+    text: '👑 Pareja Elegida (Susurro secreto): Un integrante de {PAREJA_ELEGIDA} le susurra una fantasía secreta al otro. El resto del grupo debe adivinar de qué nivel de picardía se trataba.',
+    level: 'spicy',
+    type: 'question',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'single_pair',
+  },
+  // SPICY - Cross Couples
+  {
+    id: 'group_spicy_cross_1',
+    text: '🔀 Intercambio Cruzado: {JUGADOR_CRUZADO_1} debe susurrarle al oído a {JUGADOR_CRUZADO_2} la frase más seductora que se le ocurra sin que sus compañeros se pongan celosos.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'cross_couples',
+  },
+  {
+    id: 'group_spicy_cross_2',
+    text: '🔀 Intercambio Cruzado (Baile de tensión): {JUGADOR_CRUZADO_1} y {JUGADOR_CRUZADO_2} deben bailar 20 segundos pegados mirándose a los ojos bajo la supervisión de sus parejas.',
+    level: 'spicy',
+    type: 'dare',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'cross_couples',
+  },
+
+  // EXTREME - All vs 1
+  {
+    id: 'group_extreme_all_vs_one_1',
+    text: '🎯 3 para 1 (Ronda de caricias a ciegas): {PROTAGONISTA} cierra los ojos por 30 segundos y {GRUPO} le dan caricias suaves en el rostro, cuello o brazos. Debe adivinar quién le dio cada toque.',
+    level: 'extreme',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'all_vs_one',
+  },
+  {
+    id: 'group_extreme_all_vs_one_2',
+    text: '🎯 3 para 1 (Juicio grupal): {GRUPO} se reúnen en privado y le imponen un reto atrevido y consensuado a {PROTAGONISTA}. ¡Si se niega, paga doble shot o penitencia!',
+    level: 'extreme',
+    type: 'dare',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'all_vs_one',
+  },
+  // EXTREME - Single Pair
+  {
+    id: 'group_extreme_single_pair_1',
+    text: '👑 Pareja Elegida (Beso sin censura): {PAREJA_ELEGIDA} deben demostrarle al grupo su beso más apasionado durante 30 segundos ininterrumpidos con manos libres.',
+    level: 'extreme',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'single_pair',
+  },
+  {
+    id: 'group_extreme_single_pair_2',
+    text: '👑 Pareja Elegida (Retiro de prenda): {PAREJA_ELEGIDA} deben quitarse mutuamente una prenda de ropa exterior con los dientes o con una sola mano frente al grupo.',
+    level: 'extreme',
+    type: 'dare',
+    category: 'party',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'single_pair',
+  },
+  // EXTREME - Cross Couples
+  {
+    id: 'group_extreme_cross_1',
+    text: '🔀 Intercambio Cruzado: Con consentimiento de todos, {JUGADOR_CRUZADO_1} y {JUGADOR_CRUZADO_2} se dan un beso atrevido de 10 segundos ante las miradas de sus parejas.',
+    level: 'extreme',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'cross_couples',
+  },
+  {
+    id: 'group_extreme_cross_2',
+    text: '🔀 Intercambio Cruzado (Recorrido prohibido): {JUGADOR_CRUZADO_1} pasa sus manos por el torso o cintura de {JUGADOR_CRUZADO_2} durante 20 segundos sintiendo la respiración del otro.',
+    level: 'extreme',
+    type: 'dare',
+    category: 'nsfw',
+    minPlayers: 4,
+    groupOnly: true,
+    groupMode: 'cross_couples',
+  },
 ];
 
 export const getQuestionsByLevel = (
   level: IntensityLevel,
   categories?: QuestionCategory[],
-  isGroup?: boolean
+  isGroup?: boolean,
+  groupMode?: 'couples' | 'cross_couples' | 'group' | 'all_vs_one' | 'single_pair' | 'trio_vs_one'
 ): Question[] => {
   const sourceList = isGroup ? [...groupQuestions, ...questions] : questions;
   let filtered = sourceList.filter(q => q.level === level);
 
   if (isGroup) {
-    // When in group mode, prioritize group-specific challenges
-    const onlyGroup = filtered.filter(q => q.groupOnly);
-    if (onlyGroup.length > 0) {
-      filtered = onlyGroup;
+    if (groupMode) {
+      // Prioritize questions matching this exact group mode
+      const modeSpecific = filtered.filter(q => q.groupMode === groupMode);
+      if (modeSpecific.length > 0) {
+        filtered = modeSpecific;
+      } else {
+        const onlyGroup = filtered.filter(q => q.groupOnly);
+        if (onlyGroup.length > 0) {
+          filtered = onlyGroup;
+        }
+      }
+    } else {
+      // When in group mode, prioritize group-specific challenges
+      const onlyGroup = filtered.filter(q => q.groupOnly);
+      if (onlyGroup.length > 0) {
+        filtered = onlyGroup;
+      }
     }
   } else {
     // When playing in normal 2-player mode, exclude groupOnly questions
@@ -1125,9 +1375,10 @@ export const getRandomQuestion = (
   level: IntensityLevel,
   categories?: QuestionCategory[],
   usedQuestionIds?: string[],
-  isGroup?: boolean
+  isGroup?: boolean,
+  groupMode?: 'couples' | 'cross_couples' | 'group' | 'all_vs_one' | 'single_pair' | 'trio_vs_one'
 ): Question => {
-  let levelQuestions = getQuestionsByLevel(level, categories, isGroup);
+  let levelQuestions = getQuestionsByLevel(level, categories, isGroup, groupMode);
 
   // Filter out used questions if provided
   if (usedQuestionIds && usedQuestionIds.length > 0) {

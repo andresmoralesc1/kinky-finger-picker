@@ -393,65 +393,69 @@ export default function App() {
       return;
     }
 
-    // Mark question as used
-    setUsedQuestionIds([...usedQuestionIds, questionId]);
+    try {
+      // Mark question as used
+      setUsedQuestionIds([...usedQuestionIds, questionId]);
 
-    // Update stats
-    const newStats = { ...stats };
-    newStats.levelDistribution[intensityLevel] += 1;
+      // Update stats
+      const newStats = { ...stats };
+      newStats.levelDistribution[intensityLevel] += 1;
 
-    const playerStat = newStats.currentSession.find(p => p.playerId === selectedPlayer.id);
-    if (playerStat) {
-      playerStat.daresCompleted += 1;
-    }
+      const playerStat = newStats.currentSession.find(p => p.playerId === selectedPlayer.id);
+      if (playerStat) {
+        playerStat.daresCompleted += 1;
+      }
 
-    saveStats(newStats);
+      saveStats(newStats);
 
-    // Update user progress for achievements
-    const newConsecutive = userProgress.stats.consecutiveCompletions + 1;
-    const updatedLevels = new Set(userProgress.stats.levelsPlayed);
-    updatedLevels.add(intensityLevel);
+      // Update user progress for achievements
+      const newConsecutive = userProgress.stats.consecutiveCompletions + 1;
+      const updatedLevels = new Set(userProgress.stats.levelsPlayed);
+      updatedLevels.add(intensityLevel);
 
-    const updatedCategories = new Set(userProgress.stats.categoriesPlayed);
-    if (category) {
-      updatedCategories.add(category as any);
-    }
+      const updatedCategories = new Set(userProgress.stats.categoriesPlayed);
+      if (category) {
+        updatedCategories.add(category as any);
+      }
 
-    updateUserProgress({
-      totalRounds: userProgress.stats.totalRounds + 1,
-      totalDaresCompleted: userProgress.stats.totalDaresCompleted + 1,
-      consecutiveCompletions: newConsecutive,
-      maxConsecutiveCompletions: Math.max(newConsecutive, userProgress.stats.maxConsecutiveCompletions),
-      levelsPlayed: updatedLevels,
-      categoriesPlayed: updatedCategories,
-    });
-
-    // Update daily challenges - dare completed
-    if (dailyChallenges) {
-      const updatedLevelStats = {
-        ...dailyChallenges.dailyStats.levelStats,
-        [intensityLevel]: dailyChallenges.dailyStats.levelStats[intensityLevel] + 1,
-      };
-
-      const updatedCategoryStats = category
-        ? {
-            ...dailyChallenges.dailyStats.categoryStats,
-            [category]: dailyChallenges.dailyStats.categoryStats[category as keyof typeof dailyChallenges.dailyStats.categoryStats] + 1,
-          }
-        : dailyChallenges.dailyStats.categoryStats;
-
-      updateDailyChallenges({
-        daresCompleted: dailyChallenges.dailyStats.daresCompleted + 1,
-        consecutiveCompletions: dailyChallenges.dailyStats.consecutiveCompletions + 1,
-        levelStats: updatedLevelStats,
-        categoryStats: updatedCategoryStats,
+      updateUserProgress({
+        totalRounds: userProgress.stats.totalRounds + 1,
+        totalDaresCompleted: userProgress.stats.totalDaresCompleted + 1,
+        consecutiveCompletions: newConsecutive,
+        maxConsecutiveCompletions: Math.max(newConsecutive, userProgress.stats.maxConsecutiveCompletions),
+        levelsPlayed: updatedLevels,
+        categoriesPlayed: updatedCategories,
       });
-    }
 
-    // Move to next round
-    setSelectedPlayer(null);
-    setGroupContext(null);
-    navigateToScreen('game');
+      // Update daily challenges - dare completed
+      if (dailyChallenges) {
+        const updatedLevelStats = {
+          ...dailyChallenges.dailyStats.levelStats,
+          [intensityLevel]: dailyChallenges.dailyStats.levelStats[intensityLevel] + 1,
+        };
+
+        const updatedCategoryStats = category
+          ? {
+              ...dailyChallenges.dailyStats.categoryStats,
+              [category]: dailyChallenges.dailyStats.categoryStats[category as keyof typeof dailyChallenges.dailyStats.categoryStats] + 1,
+            }
+          : dailyChallenges.dailyStats.categoryStats;
+
+        updateDailyChallenges({
+          daresCompleted: dailyChallenges.dailyStats.daresCompleted + 1,
+          consecutiveCompletions: dailyChallenges.dailyStats.consecutiveCompletions + 1,
+          levelStats: updatedLevelStats,
+          categoryStats: updatedCategoryStats,
+        });
+      }
+    } catch (err) {
+      console.error('Error updating progress on question completion:', err);
+    } finally {
+      // Move to next round
+      setSelectedPlayer(null);
+      setGroupContext(null);
+      navigateToScreen('game');
+    }
   };
 
   const handleQuestionSkip = (questionId: string) => {
@@ -767,6 +771,7 @@ export default function App() {
       {/* Achievement Unlocked Modal */}
       {newlyUnlockedAchievements.length > 0 && (
         <AchievementUnlockedModal
+          key={newlyUnlockedAchievements[0].id}
           achievement={newlyUnlockedAchievements[0]}
           onClose={handleCloseAchievementModal}
         />
